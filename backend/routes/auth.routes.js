@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { register } from "../controllers/auth.controllers.js";
+import { login, logout, me, register } from "../controllers/auth.controllers.js";
+import { isLoggedIn } from "../middleware/isLoggedIn.js";
 
 const router = Router();
 router.post("/register",register);
 
-router.post("/login", (req, res) => {
-  res.send("login");
-});
-
+router.post("/login", login);
+router.get("/logout",isLoggedIn, logout);
+router.get("/me", isLoggedIn, me);
 export default router;
