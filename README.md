@@ -12,3 +12,7 @@
 4) npx prisma db push
 ```
 
+
+
+
+JUDGE0_API_URL=http://localhost:2358/
