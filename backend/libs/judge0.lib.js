@@ -1,13 +1,16 @@
+
+import axios from "axios"
+
 export const getLanguageById = (language) => {
   const languageMap = {
-    JAVASCRIPT: 63,
+    "JAVASCRIPT": 63,
     "C++": 53,
-    JAVA: 62,
-    PYTHON: 71,
-    C: 50,
+    "JAVA": 62,
+    "PYTHON": 71,
+    "C": 50,
   };
 
-  return languageMap[language.toUppercase()] || null;
+  return languageMap[language.toUpperCase()] || null;
 };
 
 const sleep = (delay) => {
@@ -45,7 +48,7 @@ export const pollBatchResults = async (tokens) => {
     );
 
     if (isAllDone) return results;
-
+ 
     await sleep(1000);
   }
 };

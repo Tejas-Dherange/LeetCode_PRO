@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.post("/create-problem", isLoggedIn, createProblem);
 router.delete("/delete-problem", isLoggedIn, deleteProblem);
-router.update("/update-problem", isLoggedIn, updateProblem);
+router.post("/update-problem", isLoggedIn, updateProblem);
 router.get("/get-problem-byId/:id", isLoggedIn, getProblemById);
 router.get("/getAllProblems", isLoggedIn, getAllProblems);
 router.get(

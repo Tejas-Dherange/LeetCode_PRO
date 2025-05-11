@@ -200,7 +200,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://tejas:tejas@2182@localhost:5432/mydb?schema=public"
+        "value": "postgresql://judge0:T64fwSCBdSPSqJ8HtSNbW6y2ufNLjpSB@localhost:5432/judge0?schema=public"
       }
     }
   },
