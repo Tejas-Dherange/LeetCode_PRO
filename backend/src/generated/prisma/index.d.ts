@@ -3794,6 +3794,7 @@ export namespace Prisma {
     stderr: string | null
     compile_output: string | null
     status: string | null
+    memory: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3809,6 +3810,7 @@ export namespace Prisma {
     stderr: string | null
     compile_output: string | null
     status: string | null
+    memory: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3825,6 +3827,7 @@ export namespace Prisma {
     stderr: number
     compile_output: number
     status: number
+    memory: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3842,6 +3845,7 @@ export namespace Prisma {
     stderr?: true
     compile_output?: true
     status?: true
+    memory?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3857,6 +3861,7 @@ export namespace Prisma {
     stderr?: true
     compile_output?: true
     status?: true
+    memory?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3873,6 +3878,7 @@ export namespace Prisma {
     stderr?: true
     compile_output?: true
     status?: true
+    memory?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -3962,6 +3968,7 @@ export namespace Prisma {
     stderr: string | null
     compile_output: string | null
     status: string
+    memory: string | null
     createdAt: Date
     updatedAt: Date
     _count: SubmissionCountAggregateOutputType | null
@@ -3995,6 +4002,7 @@ export namespace Prisma {
     stderr?: boolean
     compile_output?: boolean
     status?: boolean
+    memory?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4015,6 +4023,7 @@ export namespace Prisma {
     stderr?: boolean
     compile_output?: boolean
     status?: boolean
+    memory?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4033,6 +4042,7 @@ export namespace Prisma {
     stderr?: boolean
     compile_output?: boolean
     status?: boolean
+    memory?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4051,11 +4061,12 @@ export namespace Prisma {
     stderr?: boolean
     compile_output?: boolean
     status?: boolean
+    memory?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "problemId" | "sourceCode" | "language" | "stdin" | "stdout" | "time" | "stderr" | "compile_output" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["submission"]>
+  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "problemId" | "sourceCode" | "language" | "stdin" | "stdout" | "time" | "stderr" | "compile_output" | "status" | "memory" | "createdAt" | "updatedAt", ExtArgs["result"]["submission"]>
   export type SubmissionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     problem?: boolean | ProblemDefaultArgs<ExtArgs>
@@ -4090,6 +4101,7 @@ export namespace Prisma {
       stderr: string | null
       compile_output: string | null
       status: string
+      memory: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["submission"]>
@@ -4529,6 +4541,7 @@ export namespace Prisma {
     readonly stderr: FieldRef<"Submission", 'String'>
     readonly compile_output: FieldRef<"Submission", 'String'>
     readonly status: FieldRef<"Submission", 'String'>
+    readonly memory: FieldRef<"Submission", 'String'>
     readonly createdAt: FieldRef<"Submission", 'DateTime'>
     readonly updatedAt: FieldRef<"Submission", 'DateTime'>
   }
@@ -7292,6 +7305,7 @@ export namespace Prisma {
     stderr: 'stderr',
     compile_output: 'compile_output',
     status: 'status',
+    memory: 'memory',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -7684,6 +7698,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compile_output?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
+    memory?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -7703,6 +7718,7 @@ export namespace Prisma {
     stderr?: SortOrderInput | SortOrder
     compile_output?: SortOrderInput | SortOrder
     status?: SortOrder
+    memory?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -7725,6 +7741,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compile_output?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
+    memory?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -7744,6 +7761,7 @@ export namespace Prisma {
     stderr?: SortOrderInput | SortOrder
     compile_output?: SortOrderInput | SortOrder
     status?: SortOrder
+    memory?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SubmissionCountOrderByAggregateInput
@@ -7766,6 +7784,7 @@ export namespace Prisma {
     stderr?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     compile_output?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     status?: StringWithAggregatesFilter<"Submission"> | string
+    memory?: StringNullableWithAggregatesFilter<"Submission"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
   }
@@ -8158,6 +8177,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionInput
@@ -8177,6 +8197,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     testCases?: TeastCaseResultUncheckedCreateNestedManyWithoutSubmissionInput
@@ -8192,6 +8213,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionNestedInput
@@ -8211,6 +8233,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testCases?: TeastCaseResultUncheckedUpdateManyWithoutSubmissionNestedInput
@@ -8228,6 +8251,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8242,6 +8266,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8258,6 +8283,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8753,6 +8779,7 @@ export namespace Prisma {
     stderr?: SortOrder
     compile_output?: SortOrder
     status?: SortOrder
+    memory?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -8768,6 +8795,7 @@ export namespace Prisma {
     stderr?: SortOrder
     compile_output?: SortOrder
     status?: SortOrder
+    memory?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -8783,6 +8811,7 @@ export namespace Prisma {
     stderr?: SortOrder
     compile_output?: SortOrder
     status?: SortOrder
+    memory?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9558,6 +9587,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     problem: ProblemCreateNestedOneWithoutSubmissionInput
@@ -9575,6 +9605,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     testCases?: TeastCaseResultUncheckedCreateNestedManyWithoutSubmissionInput
@@ -9682,6 +9713,7 @@ export namespace Prisma {
     stderr?: StringNullableFilter<"Submission"> | string | null
     compile_output?: StringNullableFilter<"Submission"> | string | null
     status?: StringFilter<"Submission"> | string
+    memory?: StringNullableFilter<"Submission"> | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
     updatedAt?: DateTimeFilter<"Submission"> | Date | string
   }
@@ -9754,6 +9786,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionInput
@@ -9771,6 +9804,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     testCases?: TeastCaseResultUncheckedCreateNestedManyWithoutSubmissionInput
@@ -10124,6 +10158,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionInput
@@ -10142,6 +10177,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -10172,6 +10208,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionNestedInput
@@ -10190,6 +10227,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10382,6 +10420,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -10458,6 +10497,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     problem?: ProblemUpdateOneRequiredWithoutSubmissionNestedInput
@@ -10475,6 +10515,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testCases?: TeastCaseResultUncheckedUpdateManyWithoutSubmissionNestedInput
@@ -10491,6 +10532,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10527,6 +10569,7 @@ export namespace Prisma {
     stderr?: string | null
     compile_output?: string | null
     status: string
+    memory?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -10548,6 +10591,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionNestedInput
@@ -10565,6 +10609,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testCases?: TeastCaseResultUncheckedUpdateManyWithoutSubmissionNestedInput
@@ -10581,6 +10626,7 @@ export namespace Prisma {
     stderr?: NullableStringFieldUpdateOperationsInput | string | null
     compile_output?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    memory?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
