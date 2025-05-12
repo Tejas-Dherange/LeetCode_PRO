@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors"
 import authRouter from "../routes/auth.routes.js";
 import problemsRouter from "../routes/problems.routes.js";
+import codeExecutionRouter from "../routes/execute-code.routes.js"
 dotenv.config();
 
 const port = process.env.PORT || 4000;
@@ -30,6 +31,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", authRouter);
 app.use("/api/v1/problems", problemsRouter);
+app.use("/api/v1/execute-code", codeExecutionRouter);
 
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);

@@ -1,5 +1,4 @@
-
-import axios from "axios"
+import axios from "axios";
 
 export const getLanguageById = (language) => {
   const languageMap = {
@@ -10,17 +9,20 @@ export const getLanguageById = (language) => {
     "C": 50,
   };
 
-  return languageMap[language.toUpperCase()] || null;
+  console.log(languageMap[language.toUpperCase()]);
+
+  return languageMap[language.toUpperCase()] ;
 };
 
-const sleep = (delay) => {
-  return new Promise((resolve) => setTimeout(resolve, delay));
-};
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
+
 export const submitBatch = async (submissions) => {
+  // console.log("Batch -----", submissions);
+
   const { data } = await axios.post(
     `${process.env.JUDGE0_BATCH_SUBMISSION_ENDPOINT}/submissions/batch?base64_encoded=false`,
     {
-      submissions,
+      submissions: submissions,
     },
   );
 
@@ -32,7 +34,7 @@ export const submitBatch = async (submissions) => {
 export const pollBatchResults = async (tokens) => {
   while (true) {
     const { data } = await axios.get(
-      `${process.env.JUDGE0_BATCH_SUBMISSION_ENDPOINT}/submission/batch`,
+      `${process.env.JUDGE0_BATCH_SUBMISSION_ENDPOINT}/submissions/batch/`,
       {
         params: {
           tokens: tokens.join(","),
@@ -41,14 +43,16 @@ export const pollBatchResults = async (tokens) => {
       },
     );
 
-    const results = await data.submissions;
+    const results = data.submissions;
 
     const isAllDone = results.every(
-      (res) => res.status_id !== 1 && res.status_id !== 2,
+      (res) => res.status.id !== 1 && res.status.id !== 2,
     );
 
-    if (isAllDone) return results;
- 
+    if (isAllDone) {
+      return results;
+    }
+
     await sleep(1000);
   }
 };
