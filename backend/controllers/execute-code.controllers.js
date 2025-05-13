@@ -3,17 +3,16 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
+import db from "../libs/db.js";
 
 const executeCode = async (req, res) => {
   const { source_code, language_id, stdin, expected_outputs, problemId } =
     req.body;
 
-  const id = req.user.id;
+  const userId = req.user.id;
 
-  if (!id) {
-    return res.status(400).json({
-      message: "some error occured",
-    });
+  if (!userId) {
+    return res.status(400).json({ message: "Unauthorized" });
   }
 
   try {
@@ -80,7 +79,7 @@ const executeCode = async (req, res) => {
 
     const submission = await db.submission.create({
       data: {
-        userId: id,
+        userId,
         problemId,
         sourceCode: source_code,
         language: getLanguageNameById(language_id),
@@ -121,15 +120,42 @@ const executeCode = async (req, res) => {
       });
     }
 
+    const testCaseResults = detailedResults.map((result) => ({
+      submissionId: submission.id,
+      testcase: result.testcase,
+      passed: result.passed,
+      stdout: result.stdout,
+      expected: result.expected,
+      stderr: result.stderr,
+      compileOutput: result.compileOutput,
+      status: result.status,
+      memory: result.memory,
+      time: result.time,
+    }));
+
+    await db.teastCaseResult.createMany({
+      data: testCaseResults,
+    });
+
+    const submissionWithTestcase = await db.submission.findUnique({
+      where: {
+        id: submission.id,
+      },
+      include: {
+        testCases: true,
+      },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Code executed succesfully",
-      results,
+      submission: submissionWithTestcase,
     });
   } catch (error) {
-    console.error(error);
-    res.status(400).json({
-      error: "Error in executing code",
+    console.log(error);
+    return res.status(400).json({
+      success: false,
+      message: "error in executing code",
     });
   }
 };

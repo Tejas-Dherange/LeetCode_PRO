@@ -330,7 +330,18 @@ const getAllProblemsSolvedByUser = async (req, res) => {
 
     const problemSolvedByUser = await db.problem.findMany({
       where: {
-        userId: id,
+        solvedBy: {
+          some: {
+            userId: id,
+          },
+        },
+      },
+      include: {
+        solvedBy: {
+          where: {
+            userId: id,
+          },
+        },
       },
     });
 
