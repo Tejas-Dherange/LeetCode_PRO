@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import Layout from "./layout/Layout";
 import ProfilePage from "./page/ProfilePage";
 import AddProblemPage from "./page/AddProblemPage";
+import AdminRoute from "./components/AdminRoute";
 // import Dashboard from "./page/dashboard";
 
 const App = () => {
@@ -40,10 +41,6 @@ const App = () => {
             path="/profile"
             element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
           />
-          <Route
-            path="/add-problem"
-            element={authUser ? <AddProblemPage /> : <Navigate to={"/login"} />}
-          />
         </Route>
         <Route
           path="/login"
@@ -53,6 +50,13 @@ const App = () => {
           path="/signup"
           element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />}
         />
+
+        <Route element={<AdminRoute />}>
+          <Route
+            path="/add-problem"
+            element={authUser ? <AddProblemPage /> : <Navigate to={"/"} />}
+          />
+        </Route>
       </Routes>
     </div>
   );
