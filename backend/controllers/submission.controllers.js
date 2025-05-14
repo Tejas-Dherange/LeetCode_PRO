@@ -30,6 +30,7 @@ import db from "../libs/db.js";
 //   }
 // };
 
+
 const getAllSubmissions = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -122,6 +123,7 @@ const countSubmissions = async (req, res) => {
     });
   }
 };
+
 export {
 //   getSubmissionById,
   getAllSubmissions,

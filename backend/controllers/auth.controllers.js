@@ -6,6 +6,8 @@ import { UserRole } from "../src/generated/prisma/index.js";
 const register = async (req, res) => {
   try {
     const { name, email, password, image } = req.body;
+    console.log("name ", name);
+
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -34,7 +36,11 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "User not created" });
     }
 
-    return res.status(200).json({ message: "User created successfully" });
+    return res.status(200).json({
+      success: true,
+      message: "User created successfully",
+      user,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
@@ -71,18 +77,17 @@ const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 7 * 1000,
     });
 
     return res
       .status(200)
-      .json({ message: "User logged in successfully", token });
+      .json({ message: "User logged in successfully", token, user });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong" });
   }
 };
-
 
 const logout = async (req, res) => {
   try {

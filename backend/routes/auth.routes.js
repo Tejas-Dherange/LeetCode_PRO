@@ -7,5 +7,5 @@ router.post("/register",register);
 
 router.post("/login", login);
 router.get("/logout",isLoggedIn, logout);
-router.get("/me", isLoggedIn, me);
+router.get("/me",isLoggedIn, me);
 export default router;
