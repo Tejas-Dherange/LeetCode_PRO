@@ -45,10 +45,10 @@ const executeCode = async (req, res) => {
     console.log("Results ****************");
     console.log(results);
 
-    const allPassed = true;
+    let allPassed = true;
 
     const detailedResults = results.map((result, i) => {
-      const stdout = result.stdout.trim();
+      const stdout = result.stdout !== null ? result.stdout.trim() : result.stdout;
       const expected_output = expected_outputs[i].trim();
       const passed = stdout == expected_output;
 

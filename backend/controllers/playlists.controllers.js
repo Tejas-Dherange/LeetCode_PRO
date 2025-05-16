@@ -3,7 +3,7 @@ import db from "../libs/db.js";
 const createPlaylist = async (req, res) => {
   try {
     const { name, description } = req.body;
-    if (!title) {
+    if (!name) {
       return res.status(404).json({ error: "title is required" });
     }
 
@@ -71,7 +71,7 @@ const getAllPlayLists = async (req, res) => {
         userId: req.user.id,
       },
       include: {
-        problems: {
+        problem: {
           include: {
             problem: true,
           },
@@ -99,7 +99,8 @@ const getAllPlayLists = async (req, res) => {
 
 const getPlayListById = async (req, res) => {
   try {
-    const playListId = req.params;
+    const {playListId} = req.params;
+    
     if (!playListId) {
       return res.status(400).json({ message: "some error occured" });
     }
@@ -110,7 +111,7 @@ const getPlayListById = async (req, res) => {
         userId: req.user.id,
       },
       include: {
-        problems: {
+        problem: {
           include: {
             problem: true,
           },
@@ -140,6 +141,8 @@ const addProblemInPlayList = async (req, res) => {
     const { playListId } = req.params;
     const { problemIds } = req.body;
 
+    console.log(problemIds);
+    
     if (!playListId && !problemIds) {
       return res.status(400).json({ error: "some error occured" });
     }
@@ -147,7 +150,7 @@ const addProblemInPlayList = async (req, res) => {
     if (!Array.isArray(problemIds) && problemIds.length === 0) {
       return res.status(400).json({ error: "Invalid or missing problemIds" });
     }
-    const problemsInPlayList = await db.problemInPlayList.create({
+    const problemsInPlayList = await db.problemInPlayList.createMany({
       data: problemIds.map((problemId) => ({
         playListId,
         problemId,

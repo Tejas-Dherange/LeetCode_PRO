@@ -149,7 +149,15 @@ const getAllProblems = async (req, res) => {
     return res.status(400).json({ message: "Unauthorized" });
   }
   try {
-    const allProblems = await db.problem.findMany();
+    const allProblems = await db.problem.findMany({
+      include: {
+        solvedBy: {
+          where: {
+            userId: req.user.id,
+          },
+        },
+      },
+    });
 
     if (!allProblems) {
       return res.status(404).json({ message: "problems not found" });

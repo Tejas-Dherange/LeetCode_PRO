@@ -13,7 +13,7 @@ const router = expres.Router();
 
 router.get("/", isLoggedIn, getAllPlayLists);
 router.get("/get-playlist-by-id/:playListId", isLoggedIn, getPlayListById);
-router.get("/:playListId/add-problem", isLoggedIn, addProblemInPlayList);
+router.post("/:playListId/add-problem", isLoggedIn, addProblemInPlayList);
 router.delete(
   "/:playListId/remove-problem",
   isLoggedIn,
