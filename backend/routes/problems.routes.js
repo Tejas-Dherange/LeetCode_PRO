@@ -16,7 +16,7 @@ router.delete("/delete-problem/:id", isLoggedIn, deleteProblem); //done
 router.post("/update-problem/:id", isLoggedIn, updateProblem); //done
 router.get("/get-problem-byId/:id", isLoggedIn, getProblemById); //done
 router.get("/getAllProblems", isLoggedIn, getAllProblems); //done
-router.get(
+router.get( 
   "/getAllProblemsSolvedByUser",
   isLoggedIn,
   getAllProblemsSolvedByUser,

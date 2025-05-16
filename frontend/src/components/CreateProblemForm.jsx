@@ -1,4 +1,3 @@
-import React from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,14 +25,14 @@ const problemSchema = z.object({
   constraints: z.string().min(1, "atleast one constraint is required"),
   hints: z.string().optional(),
   editorial: z.string().optional(),
-  testcase: z
+  testcases: z
     .array(
       z.object({
         input: z.string().min(1, "atleast one input is required"),
         output: z.string().min(1, "atleast one output is required"),
       }),
     )
-    .min(1, "atleast one testcase is required"),
+    .min(1, "atleast one testcases is required"),
   examples: z.object({
     JAVASCRIPT: z.object({
       input: z.string().min(1, "Input is required"),
@@ -51,12 +50,12 @@ const problemSchema = z.object({
       explanation: z.string().optional(),
     }),
   }),
-  codeSnippet: z.object({
+  codeSnippets: z.object({
     JAVASCRIPT: z.string().min(1, "JavaScript code snippet is required"),
     PYTHON: z.string().min(1, "Python code snippet is required"),
     JAVA: z.string().min(1, "Java solution is required"),
   }),
-  referenceSolution: z.object({
+  referenceSolutions: z.object({
     JAVASCRIPT: z.string().min(1, "JavaScript solution is required"),
     PYTHON: z.string().min(1, "Python solution is required"),
     JAVA: z.string().min(1, "Java solution is required"),
@@ -522,19 +521,19 @@ const CreateProblemForm = () => {
   } = useForm({
     resolver: zodResolver(problemSchema),
     defaultValues: {
-      testcase: [{ input: "", output: "" }],
+      testcases: [{ input: "", output: "" }],
       tags: [""],
       examples: {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
         PYTHON: { input: "", output: "", explanation: "" },
         JAVA: { input: "", output: "", explanation: "" },
       },
-      codeSnippet: {
+      codeSnippets: {
         JAVASCRIPT: "function solution() {\n  // Write your code here\n}",
         PYTHON: "def solution():\n    # Write your code here\n    pass",
         JAVA: "public class Solution {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}",
       },
-      referenceSolution: {
+      referenceSolutions: {
         JAVASCRIPT: "// Add your reference solution here",
         PYTHON: "# Add your reference solution here",
         JAVA: "// Add your reference solution here",
@@ -543,12 +542,12 @@ const CreateProblemForm = () => {
   });
 
   const {
-    fields: testCaseFields,
-    append: appendTestCase,
-    remove: removeTestCase,
-    replace: replaceTestCases,
+    fields: testcasesFields,
+    append: appendtestcases,
+    remove: removetestcases,
+    replace: replacetestcases,
   } = useFieldArray({
-    name: "testCases",
+    name: "testcases",
     control,
   });
   const {
@@ -565,12 +564,16 @@ const CreateProblemForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      setIsLoading = true;
-      console.log(data);
+      setIsLoading(true);
+
+      const res = await axiosInstance.post("/problems/create-problem", data);
+      console.log("hello data", data);
+      toast.success(res.message || "Problem created successfully");
+      navigation("/");
     } catch (error) {
-      console.error("error in creating problem", error);
+      console.error("error while creating problem", error);
     } finally {
-      setIsLoading = false;
+      setIsLoading(false);
     }
   };
 
@@ -578,7 +581,7 @@ const CreateProblemForm = () => {
     const sampleData = sampleType === "DP" ? sampledpData : sampleStringProblem;
 
     replaceTags(sampleData.tags.map((tag) => tag));
-    replaceTestCases(sampleData.testcases.map((tc) => tc));
+    replacetestcases(sampleData.testcases.map((tc) => tc));
 
     // Reset the form with sample data
     reset(sampleData);
@@ -747,13 +750,13 @@ const CreateProblemForm = () => {
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
-                  onClick={() => appendTestCase({ input: "", output: "" })}
+                  onClick={() => appendtestcases({ input: "", output: "" })}
                 >
                   <Plus className="w-4 h-4 mr-1" /> Add Test Case
                 </button>
               </div>
               <div className="space-y-6">
-                {testCaseFields.map((field, index) => (
+                {testcasesFields.map((field, index) => (
                   <div key={field.id} className="card bg-base-100 shadow-md">
                     <div className="card-body p-4 md:p-6">
                       <div className="flex justify-between items-center mb-4">
@@ -763,8 +766,8 @@ const CreateProblemForm = () => {
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm text-error"
-                          onClick={() => removeTestCase(index)}
-                          disabled={testCaseFields.length === 1}
+                          onClick={() => removetestcases(index)}
+                          disabled={testcasesFields.length === 1}
                         >
                           <Trash2 className="w-4 h-4 mr-1" /> Remove
                         </button>

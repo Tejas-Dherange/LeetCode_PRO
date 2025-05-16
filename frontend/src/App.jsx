@@ -10,10 +10,12 @@ import Layout from "./layout/Layout";
 import ProfilePage from "./page/ProfilePage";
 import AddProblemPage from "./page/AddProblemPage";
 import AdminRoute from "./components/AdminRoute";
-// import Dashboard from "./page/dashboard";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
+
+  // console.log("AdminRoute - authUser:", authUser);
+  // console.log("AdminRoute - isCheckingAuth:", isCheckingAuth);
 
   useEffect(() => {
     checkAuth();
@@ -36,12 +38,11 @@ const App = () => {
             index
             element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
           />
-
-          <Route
-            path="/profile"
-            element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
-          />
         </Route>
+        <Route
+          path="profile"
+          element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+        />
         <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to={"/"} />}
@@ -52,10 +53,7 @@ const App = () => {
         />
 
         <Route element={<AdminRoute />}>
-          <Route
-            path="/add-problem"
-            element={authUser ? <AddProblemPage /> : <Navigate to={"/"} />}
-          />
+          <Route path="/add-problem" element={<AddProblemPage />} />
         </Route>
       </Routes>
     </div>

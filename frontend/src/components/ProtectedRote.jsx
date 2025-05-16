@@ -1,10 +1,11 @@
-import { Navigate, Outlet } from "react-router-dom";
+// components/ProtectedRoute.tsx
+import { Navigate } from "react-router-dom";
 import useAuthStore from "../store/useAuthStore";
 import { Loader } from "lucide-react";
-const AdminRoute = () => {
+
+const ProtectedRoute = ({ children }) => {
   const { authUser, isCheckingAuth } = useAuthStore();
 
-  // console.log("AdminRoute authUser:", authUser, "isCheckingAuth:", isCheckingAuth);
   if (isCheckingAuth) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -14,13 +15,10 @@ const AdminRoute = () => {
   }
 
   if (!authUser) {
-    return <Navigate to={"/login"} />;
+    return <Navigate to="/login" />;
   }
 
-  if (authUser.role !== "ADMIN") {
-    return <Navigate to="/" />;
-  }
-  return <Outlet />;
+  return <>{children}</>;
 };
 
-export default AdminRoute;
+export default ProtectedRoute;
