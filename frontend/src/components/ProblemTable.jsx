@@ -2,17 +2,36 @@ import React, { useState, useMemo } from "react";
 import useAuthStore from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 
-import { Bookmark, PencilIcon, Trash, TrashIcon, Plus } from "lucide-react";
+import {
+  Bookmark,
+  PencilIcon,
+  Trash,
+  TrashIcon,
+  Plus,
+  Loader2,
+} from "lucide-react";
+import { useProblemStore } from "../store/useProblemStore";
+import { usePlaylistStore } from "../store/usePlaylistStore";
+import AddToPlaylistModal from "./AddToPlaylistModal";
 const ProblemTable = ({ problems }) => {
-  console.log("Prooblems in table", problems);
+  // console.log("Prooblems in table", problems);
 
   const { authUser } = useAuthStore();
+  const { deleteProblem } = useProblemStore();
 
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("ALL");
   const [selectedTag, setSelectedTag] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
 
+  const [showPopup, setShowPopup] = useState(false);
+  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] =
+    useState(false);
+  const [selectedProblemId, setSelectedProblemId] = useState(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const { isLoading, createPlayList, addProblemToPlayList } =
+    usePlaylistStore();
   const difficulties = ["EASY", "MEDIUM", "HARD"];
 
   const allTags = useMemo(() => {
@@ -47,19 +66,81 @@ const ProblemTable = ({ problems }) => {
     );
   }, [filteredProblems, currentPage]);
 
-  const handleDelete = (id) => {};
+  const handleDelete = (id) => {
+    deleteProblem(id);
+  };
+  const handleAddToPlaylist = (id) => {
+    setSelectedProblemId(id);
+    setIsAddToPlaylistModalOpen(true);
+  };
 
-  const handleAddToPlaylist = (id) => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Name:", name);
+    console.log("Description:", description);
+    const playListData = {
+      name,
+      description,
+    };
+    if (name.length > 0) {
+      await createPlayList(playListData);
+      setShowPopup(false);
+    }
+  };
   return (
     <div className="w-full max-w-6xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
-        <button className="btn btn-primary gap-2" onClick={() => {}}>
+        <button
+          className="btn btn-primary gap-2"
+          onClick={() => {
+            setShowPopup(true);
+          }}
+        >
           <Plus className="w-4 h-4" />
           Create Playlist
         </button>
       </div>
 
+      {showPopup && (
+        <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center z-50">
+          <div className=" p-6 rounded-lg w-80 bg-base-200 ">
+            <h2 className="text-xl mb-4 font-semibold">Enter Details</h2>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full mb-3 p-2 border rounded"
+                required
+              />
+              <textarea
+                placeholder="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full mb-3 p-2 border rounded"
+                required
+              ></textarea>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowPopup(false)}
+                  className="px-4 py-2 cursor-pointer bg-gray-900 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded"
+                >
+                  {isLoading ? <Loader2 /> : <h3>Submit</h3>}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <input
           type="text"
@@ -215,6 +296,11 @@ const ProblemTable = ({ problems }) => {
           Next
         </button>
       </div>
+      <AddToPlaylistModal
+        isOpen={isAddToPlaylistModalOpen}
+        onClose={() => setIsAddToPlaylistModalOpen(false)}
+        problemId={selectedProblemId}
+      />
     </div>
   );
 };

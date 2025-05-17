@@ -1,3 +1,4 @@
+import PlaylistProfile from "../components/PlaylistProfile";
 import useAuthStore from "../store/useAuthStore";
 
 const ProfilePage = () => {
@@ -11,6 +12,9 @@ const ProfilePage = () => {
 
       <h1>{authUser.name}</h1>
       <h1>{authUser.email}</h1>
+      <div>
+        <PlaylistProfile/>
+      </div>
     </div>
   );
 };

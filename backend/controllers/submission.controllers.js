@@ -30,7 +30,6 @@ import db from "../libs/db.js";
 //   }
 // };
 
-
 const getAllSubmissions = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -66,6 +65,7 @@ const getAllSubmissions = async (req, res) => {
 const getAllSubmissionsForProblem = async (req, res) => {
   try {
     const { problemId } = req.params;
+    const { userId } = req.user.id;
     if (!problemId) {
       return res.status(400).json({ message: "some error occured" });
     }
@@ -125,7 +125,7 @@ const countSubmissions = async (req, res) => {
 };
 
 export {
-//   getSubmissionById,
+  //   getSubmissionById,
   getAllSubmissions,
   countSubmissions,
   getAllSubmissionsForProblem,

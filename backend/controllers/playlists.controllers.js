@@ -147,7 +147,7 @@ const addProblemInPlayList = async (req, res) => {
       return res.status(400).json({ error: "some error occured" });
     }
 
-    if (!Array.isArray(problemIds) && problemIds.length === 0) {
+    if (!Array.isArray(problemIds) || problemIds.length === 0) {
       return res.status(400).json({ error: "Invalid or missing problemIds" });
     }
     const problemsInPlayList = await db.problemInPlayList.createMany({
@@ -155,6 +155,8 @@ const addProblemInPlayList = async (req, res) => {
         playListId,
         problemId,
       })),
+      
+       skipDuplicates: true,
     });
 
     return res.status(201).json({

@@ -22,11 +22,13 @@ import myCustomTheme from "../themes/customTheme";
 import { useExecutionStore } from "../store/useExecutionStore";
 import { getLaguageId } from "../libs/utils";
 import Submission from "../components/Submission";
+import SubmissionsList from "../components/SubmissionList";
+import { useSubmissionStore } from "../store/useSubmissionStore";
 
 const ProblemPage = () => {
-  const submissionCount = 10;
   const { id } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
+    const { submission:submissions, isLoading: isSubmissionsLoading, getSubmissionForProblem , getSubmissionCountForProblem , submissionCount } = useSubmissionStore();
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("JAVA");
@@ -40,6 +42,7 @@ const ProblemPage = () => {
 
   useEffect(() => {
     getProblemById(id);
+    getSubmissionCountForProblem(id)
   }, [id]);
 
   //   console.log("Problem", problem);
@@ -55,6 +58,15 @@ const ProblemPage = () => {
       );
     }
   }, [problem, selectedLanguage]);
+
+  useEffect(() => {
+    if (activeTab === "submissions" && id) {
+      getSubmissionForProblem(id);
+    }
+    
+  }, [activeTab, id])
+  
+  // console.log("Submission",submissions);
 
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
@@ -124,11 +136,10 @@ const ProblemPage = () => {
         );
       case "submissions":
         return (
-          //   <SubmissionsList
-          //     submissions={submissions}
-          //     isLoading={isSubmissionsLoading}
-          //   />
-          <h1>No submission yet</h1>
+            <SubmissionsList
+              submissions={submissions}
+              isLoading={isSubmissionsLoading}
+            />
         );
       case "discussion":
         return (
@@ -159,7 +170,7 @@ const ProblemPage = () => {
 
   const { executeCode, submission, isExecuting } = useExecutionStore();
 
-  console.log("Submission",submission);
+  
   
   const handleRunCode = (e) => {
     e.preventDefault();
@@ -176,7 +187,7 @@ const ProblemPage = () => {
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-base-300 to-base-200">
-      <nav className="navbar bg-base-100 shadow-lg px-4">
+      <nav className="navbar bg-base-100 shadow-lg px-10 ">
         <div className="flex-1 gap-2">
           <Link to={"/"} className="flex items-center gap-2 text-primary">
             <Home className="w-6 h-6" />

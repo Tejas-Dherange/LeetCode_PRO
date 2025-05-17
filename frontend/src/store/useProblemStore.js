@@ -61,6 +61,21 @@ export const useProblemStore = create((set) => ({
 //       toast.error("error in fetching problem");
 //     }
 //   },
+
+     deleteProblem:async(id)=>{
+      try {
+        const res=await axiosInstance.delete(`/problems/delete-problem/${id}`)
+
+        console.log(res);
+
+        toast.success(res.data.message || "problem deleted succesfully")
+        
+      } catch (error) {
+        console.error("error occured in deleting  problem", error);
+      toast.error("error in deleting problem");
+      }
+     }
+
 }));
 
 
