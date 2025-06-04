@@ -1,4 +1,4 @@
-import expres from "express";
+import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import {
   addProblemInPlayList,
@@ -9,7 +9,7 @@ import {
   removeProblemInPlayList,
 } from "../controllers/playlists.controllers.js";
 
-const router = expres.Router();
+const router = express.Router();
 
 router.get("/", isLoggedIn, getAllPlayLists);
 router.get("/get-playlist-by-id/:playListId", isLoggedIn, getPlayListById);

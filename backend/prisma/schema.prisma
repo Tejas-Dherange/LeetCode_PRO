@@ -64,6 +64,7 @@ model Problem {
   Submission         Submission[]
   solvedBy           ProblemSolved[]
   problemInPlayLists ProblemInPlayList[]
+  ContestProblem     ContestProblem[]
 }
 
 model Submission {
@@ -150,4 +151,43 @@ model ProblemInPlayList {
   problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([playListId, problemId])
+}
+
+model Contest {
+  id          String           @id @default(uuid())
+  name        String
+  description String?
+  startTime   DateTime
+  endTime     DateTime
+  problems    ContestProblem[]
+  createdAt   DateTime         @default(now())
+  createdBy   String
+}
+
+model ContestProblem {
+  id        String  @id @default(uuid())
+  contest   Contest @relation(fields: [contestId], references: [id])
+  contestId String
+  problem   Problem @relation(fields: [problemId], references: [id])
+  problemId String
+}
+
+model ContestSubmission {
+  id        String @id @default(uuid())
+  userId    String
+  contestId String
+  problemId String
+
+  sourceCode     Json
+  language       String
+  stdin          String?
+  stdout         String?
+  time           String?
+  stderr         String?
+  compile_output String?
+  status         String
+  memory         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

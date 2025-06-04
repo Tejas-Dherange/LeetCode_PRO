@@ -204,6 +204,40 @@ exports.Prisma.ProblemInPlayListScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  createdAt: 'createdAt',
+  createdBy: 'createdBy'
+};
+
+exports.Prisma.ContestProblemScalarFieldEnum = {
+  id: 'id',
+  contestId: 'contestId',
+  problemId: 'problemId'
+};
+
+exports.Prisma.ContestSubmissionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contestId: 'contestId',
+  problemId: 'problemId',
+  sourceCode: 'sourceCode',
+  language: 'language',
+  stdin: 'stdin',
+  stdout: 'stdout',
+  time: 'time',
+  stderr: 'stderr',
+  compile_output: 'compile_output',
+  status: 'status',
+  memory: 'memory',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -246,7 +280,10 @@ exports.Prisma.ModelName = {
   TeastCaseResult: 'TeastCaseResult',
   ProblemSolved: 'ProblemSolved',
   Playlist: 'Playlist',
-  ProblemInPlayList: 'ProblemInPlayList'
+  ProblemInPlayList: 'ProblemInPlayList',
+  Contest: 'Contest',
+  ContestProblem: 'ContestProblem',
+  ContestSubmission: 'ContestSubmission'
 };
 
 /**
