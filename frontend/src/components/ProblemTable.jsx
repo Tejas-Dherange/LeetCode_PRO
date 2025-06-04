@@ -13,9 +13,9 @@ import {
 import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
 import AddToPlaylistModal from "./AddToPlaylistModal";
-const ProblemTable = ({ problems }) => {
-  // console.log("Prooblems in table", problems);
-
+const ProblemTable = ({ problems: initialProblems }) => {
+  const [problems, setProblems] = useState(initialProblems);
+  console.log("Prooblems in table", problems);
   const { authUser } = useAuthStore();
   const { deleteProblem } = useProblemStore();
 
@@ -68,6 +68,7 @@ const ProblemTable = ({ problems }) => {
 
   const handleDelete = (id) => {
     deleteProblem(id);
+    setProblems((prev) => prev.filter((p) => p.id !== id));
   };
   const handleAddToPlaylist = (id) => {
     setSelectedProblemId(id);
@@ -216,7 +217,11 @@ const ProblemTable = ({ problems }) => {
                         {(problem.tags || []).map((tag, idx) => (
                           <span
                             key={idx}
-                            className="badge badge-outline badge-warning text-xs font-bold"
+                            className={
+                              tag === "demo"
+                                ? "badge px-5 font-bold text-xl py-2 bg-red-500 text-white animate-pulse "
+                                : "badge badge-outline badge-warning text-xs font-bold"
+                            }
                           >
                             {tag}
                           </span>
