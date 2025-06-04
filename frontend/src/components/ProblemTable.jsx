@@ -219,7 +219,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                             key={idx}
                             className={
                               tag === "demo"
-                                ? "badge px-5 font-bold text-xl py-2 bg-red-500 text-white animate-pulse "
+                                ? "badge px-5 py-3 text-lg  text-white bg-indigo-500 uppercase animate-pulse transition-all duration-300 ease-in-out"
                                 : "badge badge-outline badge-warning text-xs font-bold"
                             }
                           >
