@@ -3,7 +3,7 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
-import db from "../libs/db.js";
+import db from "../libs/db.js"; 
 
 const executeCode = async (req, res) => {
   const { source_code, language_id, stdin, expected_outputs, problemId } =
@@ -56,6 +56,11 @@ const executeCode = async (req, res) => {
         allPassed = false;
       }
 
+      // console.log(`Teastcase #${i+1}`);
+      //   console.log(`Input ${stdin[i]}`);
+      //   console.log(`Expected output ${expected_output}`);
+      //   console.log(`Actual output ${stdout}`);
+      //   console.log("Matched",passed);
       return {
         testcase: i + 1,
         passed,
@@ -67,11 +72,7 @@ const executeCode = async (req, res) => {
         memory: result.memory ? `${result.memory} KB` : undefined,
         time: result.time ? `${result.time} s` : undefined,
       };
-      //   console.log(`Teastcase #${i+1}`);
-      //   console.log(`Input ${stdin[i]}`);
-      //   console.log(`Expected output ${expected_output}`);
-      //   console.log(`Actual output ${stdout}`);
-      //   console.log("Matched",passed);
+        
     });
 
     //save it into db

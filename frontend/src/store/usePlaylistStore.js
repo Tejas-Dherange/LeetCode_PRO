@@ -67,7 +67,7 @@ export const usePlaylistStore = create((set, get) => ({
       
       const res = await axiosInstance.post(
         `/playlist/${playListId}/add-problem`,
-        problemIds,
+        {problemIds},
       );
       console.log("response",res);
 

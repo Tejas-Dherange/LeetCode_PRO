@@ -17,7 +17,7 @@ export const getLanguageById = (language) => {
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
 export const submitBatch = async (submissions) => {
-  // console.log("Batch -----", submissions);
+  console.log("Batch -----", submissions);
 
   const { data } = await axios.post(
     `${process.env.JUDGE0_BATCH_SUBMISSION_ENDPOINT}/submissions/batch?base64_encoded=false`,
@@ -38,12 +38,14 @@ export const pollBatchResults = async (tokens) => {
       {
         params: {
           tokens: tokens.join(","),
-          base64_encode: false,
+          base64_encoded: false,
         },
       },
     );
 
     const results = data.submissions;
+    console.log("Submission  ",data);
+    
 
     const isAllDone = results.every(
       (res) => res.status.id !== 1 && res.status.id !== 2,

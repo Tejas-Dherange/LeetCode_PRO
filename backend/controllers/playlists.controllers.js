@@ -141,7 +141,7 @@ const addProblemInPlayList = async (req, res) => {
     const { playListId } = req.params;
     const { problemIds } = req.body;
 
-    console.log(problemIds);
+    console.log("problemids :--", problemIds);
     
     if (!playListId && !problemIds) {
       return res.status(400).json({ error: "some error occured" });

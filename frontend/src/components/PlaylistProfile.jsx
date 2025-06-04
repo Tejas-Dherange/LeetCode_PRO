@@ -10,11 +10,20 @@ import {
   List,
   Tag,
   ExternalLink,
+  
+  Loader2,
 } from "lucide-react";
+
 const PlaylistProfile = () => {
-  const { playlists, getAllPlayLists, deletePlayList } = usePlaylistStore();
+  const { playlists, getAllPlayLists, deletePlayList, createPlayList,isLoading } =
+    usePlaylistStore();
+  // console.log("Playlists : 0", playlists);
 
   const [expandedPlaylist, setExpandedPlaylist] = useState(null);
+
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
     getAllPlayLists();
@@ -31,6 +40,19 @@ const PlaylistProfile = () => {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Name:", name);
+    console.log("Description:", description);
+    const playListData = {
+      name,
+      description,
+    };
+    if (name.length > 0) {
+      await createPlayList(playListData);
+      setShowPopup(false);
+    }
+  };
   const getDifficultyBadge = (difficulty) => {
     switch (difficulty) {
       case "EASY":
@@ -57,9 +79,52 @@ const PlaylistProfile = () => {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-primary">My Playlists</h2>
-          <button className="btn btn-primary btn-sm">Create Playlist</button>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={() => setShowPopup(true)}
+          >
+            Create Playlist
+          </button>
+        {showPopup && (
+          <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center z-50">
+            <div className=" p-6 rounded-lg w-80 bg-base-200 ">
+              <h2 className="text-xl mb-4 font-semibold">Enter Details</h2>
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full mb-3 p-2 border rounded"
+                  required
+                />
+                <textarea
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full mb-3 p-2 border rounded"
+                  required
+                ></textarea>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPopup(false)}
+                    className="px-4 py-2 cursor-pointer bg-gray-900 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded"
+                  >
+                    {isLoading ? <Loader2 /> : <h3>Submit</h3>}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
         </div>
-
         {playlists.length === 0 ? (
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body items-center text-center">
@@ -125,7 +190,7 @@ const PlaylistProfile = () => {
                         Problems in this playlist
                       </h4>
 
-                      {playlist.problems?.length === 0 ? (
+                      {playlist.problem?.length === 0 ? (
                         <div className="alert">
                           <span>No problems added to this playlist yet.</span>
                         </div>
@@ -141,7 +206,7 @@ const PlaylistProfile = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {playlist.problems?.map((item) => (
+                              {playlist.problem?.map((item) => (
                                 <tr key={item.id} className="hover">
                                   <td className="font-medium">
                                     {item.problem.title}
