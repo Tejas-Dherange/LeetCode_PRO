@@ -35,7 +35,7 @@ export const usePlaylistStore = create((set, get) => ({
       const res = await axiosInstance.get("/playlist");
 
       set({ playlists: res.data.allPlaylists });
-      toast.success(res.data.message);
+      // toast.success(res.data.message);
     } catch (error) {
       console.error("error occured in fetching playlists", error);
       toast.error("error in fetching playlists");
@@ -109,7 +109,7 @@ export const usePlaylistStore = create((set, get) => ({
     try {
       set({ isLoading: true });
 
-      await axiosInstance.delete(`/playlist/delete-playlist/${playListId}`);
+      const res=await axiosInstance.delete(`/playlist/delete-playlist/${playListId}`);
       set((state) => ({
         playlists: state.playlists.filter((p) => p.id !== playListId),
       }));

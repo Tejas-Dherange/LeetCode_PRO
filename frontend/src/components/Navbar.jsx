@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import React from "react";
 import { User, Code, LogOut } from "lucide-react";
 import  useAuthStore  from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
@@ -11,7 +10,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full py-5">
-      <div className="flex w-full justify-between mx-auto max-w-4xl bg-black/15 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-gray-200/10 p-4 rounded-2xl">
+      <div className="flex w-full justify-between items-center mx-auto max-w-4xl bg-black/15 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-gray-200/10 p-4 rounded-2xl">
         {/* Logo Section */}
         <Link to="/" className="flex items-center gap-3 cursor-pointer">
           <img
@@ -23,6 +22,9 @@ const Navbar = () => {
           </span>
         </Link>
 
+          <div className="text-xl badge font-bold p-4 cursor-pointer animate-pulse bg-red-600 text-white">
+            contest
+          </div>
         {/* User Profile and Dropdown */}
         <div className="flex items-center gap-8">
           <div className="dropdown dropdown-end">

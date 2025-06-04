@@ -260,11 +260,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://tejas:tejas2182@localhost:5432/mydb?schema=public"
+        "value": null
       }
     }
   },

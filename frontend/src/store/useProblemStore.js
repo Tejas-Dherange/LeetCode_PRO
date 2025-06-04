@@ -44,7 +44,7 @@ export const useProblemStore = create((set) => ({
       );
       console.log(res);
       set({ solvedProblems: res.data.problemSolvedByUser });
-      toast.success(res.data.message);
+      // toast.success(res.data.message);
     } catch (error) {
       console.error("error occured in fetching  problem", error);
       toast.error("error in fetching problem");

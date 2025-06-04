@@ -11,6 +11,7 @@ import ProfilePage from "./page/ProfilePage";
 import AddProblemPage from "./page/AddProblemPage";
 import AdminRoute from "./components/AdminRoute";
 import ProblemPage from "./page/ProblemPage";
+import Dashboard from "./page/Dashboard";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -34,10 +35,10 @@ const App = () => {
     <div className="flex flex-col items-center justify-start">
       <Toaster />
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/dashboard" element={<Layout />}>
           <Route
             index
-            element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
+            element={authUser ? < Dashboard /> : <Navigate to={"/login"} />}
           />
         </Route>
         <Route
@@ -46,11 +47,11 @@ const App = () => {
         />
         <Route
           path="/login"
-          element={!authUser ? <LoginPage /> : <Navigate to={"/"} />}
+          element={!authUser ? <LoginPage /> : <Navigate to={"/dashboard"} />}
         />
         <Route
           path="/signup"
-          element={!authUser ? <SignUpPage /> : <Navigate to={"/"} />}
+          element={!authUser ? <SignUpPage /> : <Navigate to={"/dashboard"} />}
         />
 
         <Route element={<AdminRoute />}>
@@ -58,6 +59,7 @@ const App = () => {
         </Route>
 
         <Route path="/problem/:id" element={authUser ?<ProblemPage  /> :<Navigate to={"/login"} />} />
+        <Route path="/" element={authUser ?< HomePage /> :<Navigate to={"/login"} />} />
       </Routes>
     </div>
   );
