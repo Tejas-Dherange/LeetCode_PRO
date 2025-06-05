@@ -12,6 +12,7 @@ import AddProblemPage from "./page/AddProblemPage";
 import AdminRoute from "./components/AdminRoute";
 import ProblemPage from "./page/ProblemPage";
 import Dashboard from "./page/Dashboard";
+import ContestPage from "./page/ContestPage";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -60,6 +61,7 @@ const App = () => {
 
         <Route path="/problem/:id" element={authUser ?<ProblemPage  /> :<Navigate to={"/login"} />} />
         <Route path="/" element={authUser ?< HomePage /> :<Navigate to={"/login"} />} />
+        <Route path="/contest" element={authUser ?< ContestPage /> :<Navigate to={"/login"} />} />
       </Routes>
     </div>
   );

@@ -238,6 +238,14 @@ exports.Prisma.ContestSubmissionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContestRegistrationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contestId: 'contestId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -283,7 +291,8 @@ exports.Prisma.ModelName = {
   ProblemInPlayList: 'ProblemInPlayList',
   Contest: 'Contest',
   ContestProblem: 'ContestProblem',
-  ContestSubmission: 'ContestSubmission'
+  ContestSubmission: 'ContestSubmission',
+  ContestRegistration: 'ContestRegistration'
 };
 
 /**

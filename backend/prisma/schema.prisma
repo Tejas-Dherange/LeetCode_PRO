@@ -26,18 +26,19 @@ enum Difficulty {
 }
 
 model User {
-  id            String          @id @default(uuid())
-  name          String?
-  email         String          @unique
-  image         String?
-  password      String
-  role          UserRole        @default(USER)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  Problem       Problem[]
-  Submission    Submission[]
-  solvedProblem ProblemSolved[]
-  playlists     Playlist[]
+  id                  String                @id @default(uuid())
+  name                String?
+  email               String                @unique
+  image               String?
+  password            String
+  role                UserRole              @default(USER)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  Problem             Problem[]
+  Submission          Submission[]
+  solvedProblem       ProblemSolved[]
+  playlists           Playlist[]
+  ContestRegistration ContestRegistration[]
 }
 
 model Problem {
@@ -154,21 +155,22 @@ model ProblemInPlayList {
 }
 
 model Contest {
-  id          String           @id @default(uuid())
-  name        String
-  description String?
-  startTime   DateTime
-  endTime     DateTime
-  problems    ContestProblem[]
-  createdAt   DateTime         @default(now())
-  createdBy   String
+  id                  String                @id @default(uuid())
+  name                String
+  description         String?
+  startTime           DateTime
+  endTime             DateTime
+  problems            ContestProblem[]
+  createdAt           DateTime              @default(now())
+  createdBy           String
+  ContestRegistration ContestRegistration[]
 }
 
 model ContestProblem {
   id        String  @id @default(uuid())
-  contest   Contest @relation(fields: [contestId], references: [id])
+  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
   contestId String
-  problem   Problem @relation(fields: [problemId], references: [id])
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
 }
 
@@ -190,4 +192,17 @@ model ContestSubmission {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ContestRegistration {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  contestId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, contestId])
 }

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { User, Code, LogOut } from "lucide-react";
-import  useAuthStore  from "../store/useAuthStore";
+import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 
 const Navbar = () => {
@@ -21,10 +21,11 @@ const Navbar = () => {
             Leetlab
           </span>
         </Link>
-
+        <Link to="/contest" className="hidden md:flex items-center gap-2">
           <div className="text-xl badge font-bold p-4 cursor-pointer animate-pulse bg-red-600 text-white">
             contest
           </div>
+        </Link>
         {/* User Profile and Dropdown */}
         <div className="flex items-center gap-8">
           <div className="dropdown dropdown-end">
