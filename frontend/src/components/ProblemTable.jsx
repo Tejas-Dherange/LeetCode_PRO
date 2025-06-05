@@ -15,7 +15,7 @@ import { usePlaylistStore } from "../store/usePlaylistStore";
 import AddToPlaylistModal from "./AddToPlaylistModal";
 const ProblemTable = ({ problems: initialProblems }) => {
   const [problems, setProblems] = useState(initialProblems);
-  console.log("Prooblems in table", problems);
+  console.log("Problems in table", problems);
   const { authUser } = useAuthStore();
   const { deleteProblem } = useProblemStore();
 

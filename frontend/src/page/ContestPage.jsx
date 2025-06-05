@@ -1,124 +1,123 @@
-import React from 'react';
-import 'daisyui';
+import "daisyui";
+import { useContestStore } from "../store/useContestStore";
+import ContestsTable from "../components/ContestsTable";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
-function ContestCard({ name, date, status, extra, statusColor, animation }) {
+// Helper to get contest status
+function getStatus(startTime, endTime) {
+  const now = new Date();
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+  if (now >= start && now <= end) return "live";
+  if (now < start) return "upcoming";
+  return "past";
+}
+
+// ContestCard component
+function ContestCard({
+  name,
+  description,
+  startTime,
+  endTime,
+  banner,
+  status,
+  onAttempt,
+}) {
+  const statusMap = {
+    live: "badge-success",
+    upcoming: "badge-warning",
+    past: "badge-neutral",
+  };
   return (
-    <div
-      className={`card w-full bg-base-100 shadow-xl transition-transform duration-300 hover:scale-[1.03] ${animation}`}
-    >
+    <div className="card bg-base-100 shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-105 w-full max-w-md mx-auto">
+      <figure className="h-40 overflow-hidden rounded-t-xl">
+        <img src='/weekly1.avif' alt={name} className="object-cover w-full h-full" />
+      </figure>
       <div className="card-body">
-        <div className="flex items-center justify-between">
-          <h3 className="card-title text-lg sm:text-xl">{name}</h3>
-          <span className={`badge badge-lg ${statusColor}`}>{status}</span>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="card-title text-lg font-bold">{name}</h2>
+          <span className={`badge badge-lg ${statusMap[status]}`}>
+            {status.toUpperCase()}
+          </span>
         </div>
-        <p className="text-sm text-gray-500">{date}</p>
-        {extra && <p className="mt-2 text-green-600 font-semibold">{extra}</p>}
+        <p className="text-base-content/70 mb-2 line-clamp-2">{description}</p>
+        <p className="text-sm text-gray-500 mb-2">
+          {new Date(startTime).toLocaleString()} -{" "}
+          {new Date(endTime).toLocaleString()}
+        </p>
+        <Link to={`/contest/${name}`}>
+        <button
+          className="btn btn-primary btn-sm w-full mt-2"
+          disabled={status === "past"}
+          >
+          Register
+        </button>
+          </Link>
       </div>
     </div>
   );
 }
 
-function ContestPage() {
-  const today = [
-    {
-      name: 'LeetCode Weekly #350',
-      date: 'Today, 7:00 PM - 9:00 PM',
-      status: 'Live',
-      extra: 'Live Now',
-      statusColor: 'badge-success',
-    },
-  ];
-  const upcoming = [
-    {
-      name: 'LeetCode Biweekly #100',
-      date: 'Tomorrow, 8:00 PM - 10:00 PM',
-      status: 'Upcoming',
-      statusColor: 'badge-warning',
-    },
-    {
-      name: 'Codeforces Round #900',
-      date: 'June 10, 6:00 PM - 8:00 PM',
-      status: 'Upcoming',
-      statusColor: 'badge-warning',
-    },
-  ];
-  const previous = [
-    {
-      name: 'LeetCode Weekly #349',
-      date: 'June 1, 7:00 PM - 9:00 PM',
-      status: 'Past',
-      statusColor: 'badge-neutral',
-    },
-    {
-      name: 'Codeforces Round #899',
-      date: 'May 28, 6:00 PM - 8:00 PM',
-      status: 'Past',
-      statusColor: 'badge-neutral',
-    },
-  ];
 
-  const all = [...today, ...upcoming, ...previous];
+
+function ContestPage() {
+  const { getAllContests, isContestsLoading, contests } = useContestStore();
+
+  useEffect(() => {
+    getAllContests();
+  }, [getAllContests]);
+
+  // Group contests by status
+  const live = contests.filter(
+    (c) => getStatus(c.startTime, c.endTime) === "live",
+  );
+  const upcoming = contests.filter(
+    (c) => getStatus(c.startTime, c.endTime) === "upcoming",
+  );
+  const past = contests.filter(
+    (c) => getStatus(c.startTime, c.endTime) === "past",
+  );
+
+  
 
   return (
-    <div className="min-h-screen px-4 sm:px-8 py-10 bg-base-200">
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-4xl font-bold mb-10 text-center animate-fade-in">🔥 Programming Contests</h1>
+    <div className="min-h-screen w-full px-4 sm:px-8 py-10 bg-base-200">
+      <h1 className="text-4xl font-bold text-center mb-2">
+        Welcome to the Contest Page
+      </h1>
+      <p className="text-lg text-center mb-8">
+        Here you can find all the upcoming contests and their details.
+      </p>
 
-        <Section title="Today's Contests" data={today} />
-        <Section title="Upcoming Contests" data={upcoming} />
-        <Section title="Previous Contests" data={previous} />
+      {/* Live Contests */}
+      <Section title="Live Contests" data={live} />
+      {/* Upcoming Contests */}
+      <Section title="Upcoming Contests" data={upcoming} />
+      {/* Past Contests */}
+      <Section title="Past Contests" data={past} />
 
-        <section className="mt-12 animate-fade-in">
-          <h2 className="text-2xl font-semibold mb-4 text-center">📋 All Contests Table</h2>
-          <div className="overflow-x-auto bg-base-100 rounded-xl shadow-xl">
-            <table className="table w-full text-base">
-              <thead>
-                <tr className="bg-base-300">
-                  <th>Name</th>
-                  <th>Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {all.map((c, i) => (
-                  <tr key={i}>
-                    <td>{c.name}</td>
-                    <td>{c.date}</td>
-                    <td>
-                      <span className={`badge ${c.statusColor}`}>{c.status}</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      {/* //contest table */}
+      <div className="mt-10 ">
+        <h1 className="text-3xl font-bold mb-6">Contests</h1>
+        <ContestsTable />
       </div>
-
-      {/* Fade animation CSS */}
-      <style>
-        {`
-          @keyframes fade-in {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fade-in {
-            animation: fade-in 0.6s ease-out both;
-          }
-        `}
-      </style>
     </div>
   );
 }
 
 function Section({ title, data }) {
   return (
-    <section className="mb-10 animate-fade-in">
+    <section className="mb-10">
       <h2 className="text-2xl font-semibold mb-4">{title}</h2>
       {data.length ? (
-        <div className="space-y-4">
-          {data.map((c, i) => (
-            <ContestCard key={i} {...c} animation="animate-fade-in" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {data.slice(0, 3).map((c) => (
+            <ContestCard
+              key={c.id}
+              {...c}
+              status={getStatus(c.startTime, c.endTime)}
+            />
           ))}
         </div>
       ) : (

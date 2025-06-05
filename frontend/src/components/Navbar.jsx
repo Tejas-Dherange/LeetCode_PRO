@@ -21,7 +21,7 @@ const Navbar = () => {
             Leetlab
           </span>
         </Link>
-        <Link to="/contest" className="hidden md:flex items-center gap-2">
+        <Link to="/dashboard/contest" className="hidden md:flex items-center gap-2">
           <div className="text-xl badge font-bold p-4 cursor-pointer animate-pulse bg-red-600 text-white">
             contest
           </div>
