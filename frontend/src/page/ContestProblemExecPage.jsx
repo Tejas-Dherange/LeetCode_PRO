@@ -4,13 +4,10 @@ import Editor from "@monaco-editor/react";
 import {
   Play,
   FileText,
-  MessageSquare,
-  Lightbulb,
   Bookmark,
   Share2,
   Clock,
   ChevronRight,
-  BookOpen,
   Terminal,
   Code2,
   Users,
@@ -26,7 +23,7 @@ import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
 
-const ProblemPage = () => {
+const ContestProblemExecPage = () => {
   const { id } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
   const {
@@ -147,28 +144,6 @@ const ProblemPage = () => {
             isLoading={isSubmissionsLoading}
           />
         );
-      case "discussion":
-        return (
-          <div className="p-4 text-center text-base-content/70">
-            No discussions yet
-          </div>
-        );
-      case "hints":
-        return (
-          <div className="p-4">
-            {problem?.hints ? (
-              <div className="bg-base-200 p-6 rounded-xl">
-                <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                  {problem.hints}
-                </span>
-              </div>
-            ) : (
-              <div className="text-center text-base-content/70">
-                No hints available
-              </div>
-            )}
-          </div>
-        );
       default:
         return null;
     }
@@ -282,24 +257,6 @@ const ProblemPage = () => {
                   <Code2 className="w-4 h-4" />
                   Submissions
                 </button>
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "discussion" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("discussion")}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Discussion
-                </button>
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "hints" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("hints")}
-                >
-                  <Lightbulb className="w-4 h-4" />
-                  Hints
-                </button>
               </div>
 
               <div className="p-6">{renderTabContent()}</div>
@@ -401,4 +358,5 @@ const ProblemPage = () => {
   );
 };
 
-export default ProblemPage;
+export default ContestProblemExecPage;
+

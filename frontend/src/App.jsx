@@ -15,6 +15,7 @@ import Dashboard from "./page/Dashboard";
 import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
+import ContestProblemExecPage from "./page/ContestProblemExecPage";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -80,6 +81,12 @@ const App = () => {
         <Route
           path="/problem/:id"
           element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/dashboard/contest-execution/:id"
+          element={
+            authUser ? <ContestProblemExecPage /> : <Navigate to={"/login"} />
+          }
         />
         <Route
           path="/dashboard/contest/create-contest"

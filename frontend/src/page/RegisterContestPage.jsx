@@ -1,3 +1,4 @@
+// ...existing imports...
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useContestStore } from "../store/useContestStore";
@@ -5,7 +6,7 @@ import { Loader } from "lucide-react";
 import ContestProblem from "../components/ContestProblem";
 
 function RegisterContestPage() {
-const { id } = useParams();
+  const { id } = useParams();
 
   const {
     contest,
@@ -20,19 +21,23 @@ const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const [startsIn, setStartsIn] = useState("");
 
+  // Helper: contest live check
+  const isContestLive =
+    contest?.startTime && new Date(contest.startTime) <= new Date();
+
   // Safe version of isRegisteredForContest wrapped with useCallback
-const checkRegistration = useCallback(async () => {
-  if (!id) return;
-  try {
-    const registered = await isRegisteredForContest(id);
-    setIsRegistered((prev) => {
-      if (prev !== registered) return registered;
-      return prev; // Avoid unnecessary re-renders
-    });
-  } catch (err) {
-    console.error("Error checking registration status:", err);
-  }
-}, [id, isRegisteredForContest]);
+  const checkRegistration = useCallback(async () => {
+    if (!id) return;
+    try {
+      const registered = await isRegisteredForContest(id);
+      setIsRegistered((prev) => {
+        if (prev !== registered) return registered;
+        return prev; // Avoid unnecessary re-renders
+      });
+    } catch (err) {
+      console.error("Error checking registration status:", err);
+    }
+  }, [id, isRegisteredForContest]);
 
   useEffect(() => {
     if (id) {
@@ -103,7 +108,7 @@ const checkRegistration = useCallback(async () => {
   };
 
   // console.log(isRegistered, "isRegistered");
-  
+
   return (
     <div className="min-h-screen bg-base-200 flex flex-col items-center py-6 px-2">
       <div className="w-full max-w-6xl bg-base-100 rounded-xl shadow-2xl overflow-hidden flex flex-col ">
@@ -139,28 +144,36 @@ const checkRegistration = useCallback(async () => {
                 onClick={
                   isRegistered ? handleUnregister : handleRegisterContest
                 }
-                disabled={isLoading}
+                disabled={
+                  isLoading ||
+                  (isRegistered && isContestLive) // Disable if contest is live and user is registered
+                }
               >
                 {isLoading
                   ? isRegistered
                     ? "Unregistering..."
                     : "Registering..."
                   : isRegistered
-                  ? "Unregister"
+                  ? isContestLive
+                    ? "Contest Live"
+                    : "Unregister"
                   : "Register"}
               </button>
+              {isRegistered && isContestLive && (
+                <div className="text-error mt-2">
+                  You cannot unregister after the contest has started.
+                </div>
+              )}
             </div>
           )}
         </div>
-
-       
 
         {/* // Contest problems section */}
         <div className="flex-1 p-6 md:p-12 min-w-0 bg-base-200">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Contest Problems
           </h2>
-          {isRegistered ? (
+          {isRegistered && isContestLive ? (
             <ContestProblem contestId={id} />
           ) : (
             <div className="text-center text-base-content/70">
