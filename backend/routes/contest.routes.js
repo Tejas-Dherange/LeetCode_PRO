@@ -10,7 +10,9 @@ import {
   getAllContest,
   getAllProblemsInContest,
   getContestById,
+  isRegisteredForContest,
   registerForContest,
+  unRegisterContest,
 } from "../controllers/contest.controllers.js";
 
 const router = express.Router();
@@ -22,12 +24,19 @@ router.delete("/delete-contest/:id", isLoggedIn, deleteContest);
 router.post("/contest/:cid/leaderboard", isLoggedIn, contestLeaderBoard); //remaining to check
 router.post("/add-problem-to-contest/:cid", isLoggedIn, addProblemToContest); //remaining to check
 
-router.post("/contest-submission/:cid/:pid", isLoggedIn, contestProblemSubmission); //remaining to check
+router.post(
+  "/contest-submission/:cid/:pid",
+  isLoggedIn,
+  contestProblemSubmission,
+); //remaining to check
 router.get(
   "/get-all-problems-in-contest/:cid",
   isLoggedIn,
   getAllProblemsInContest,
 );
-router.post('/register', isLoggedIn, registerForContest);
+router.post("/register", isLoggedIn, registerForContest);
+router.get("/is-registered/:contestId", isLoggedIn, isRegisteredForContest);
+
+router.delete("/unregister/:contestId", isLoggedIn, unRegisterContest);
 
 export default router;

@@ -2,7 +2,8 @@ import "daisyui";
 import { useContestStore } from "../store/useContestStore";
 import ContestsTable from "../components/ContestsTable";
 import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Loader, Loader2 } from "lucide-react";
 
 // Helper to get contest status
 function getStatus(startTime, endTime) {
@@ -16,6 +17,7 @@ function getStatus(startTime, endTime) {
 
 // ContestCard component
 function ContestCard({
+  id,
   name,
   description,
   startTime,
@@ -29,10 +31,15 @@ function ContestCard({
     upcoming: "badge-warning",
     past: "badge-neutral",
   };
+  const navigate = useNavigate();
   return (
     <div className="card bg-base-100 shadow-md hover:shadow-xl transition-transform duration-300 hover:scale-105 w-full max-w-md mx-auto">
       <figure className="h-40 overflow-hidden rounded-t-xl">
-        <img src='/weekly1.avif' alt={name} className="object-cover w-full h-full" />
+        <img
+          src="/weekly1.avif"
+          alt={name}
+          className="object-cover w-full h-full"
+        />
       </figure>
       <div className="card-body">
         <div className="flex items-center justify-between mb-2">
@@ -46,20 +53,17 @@ function ContestCard({
           {new Date(startTime).toLocaleString()} -{" "}
           {new Date(endTime).toLocaleString()}
         </p>
-        <Link to={`/contest/${name}`}>
         <button
           className="btn btn-primary btn-sm w-full mt-2"
           disabled={status === "past"}
-          >
-          Register
+          onClick={() => navigate(`/dashboard/contest/register/${id}`)}
+        >
+          {status !== "past" ? "Register" : "View Details"}
         </button>
-          </Link>
       </div>
     </div>
   );
 }
-
-
 
 function ContestPage() {
   const { getAllContests, isContestsLoading, contests } = useContestStore();
@@ -79,8 +83,6 @@ function ContestPage() {
     (c) => getStatus(c.startTime, c.endTime) === "past",
   );
 
-  
-
   return (
     <div className="min-h-screen w-full px-4 sm:px-8 py-10 bg-base-200">
       <h1 className="text-4xl font-bold text-center mb-2">
@@ -89,6 +91,20 @@ function ContestPage() {
       <p className="text-lg text-center mb-8">
         Here you can find all the upcoming contests and their details.
       </p>
+
+      {isContestsLoading && (
+        <div className="flex items-center justify-center h-screen w-[100vw]">
+          <Loader className="size-10 " />
+        </div>
+      )}
+
+      
+      {!isContestsLoading && contests.length === 0 && (
+        <div className="alert alert-info">
+          No contests found. Please check back later.
+        </div>
+      )}
+
 
       {/* Live Contests */}
       <Section title="Live Contests" data={live} />

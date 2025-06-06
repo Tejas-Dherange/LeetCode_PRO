@@ -452,7 +452,48 @@ const registerForContest = async (req, res) => {
     });
   }
 };
+const isRegisteredForContest = async (req, res) => {
+  const userId = req.user.id;
+  const { contestId } = req.params;
+  const exists = await db.contestRegistration.findUnique({
+    where: { userId_contestId: { userId, contestId } }
+  });
+  res.json({ registered: !!exists });
+};
 
+const unRegisterContest = async (req, res) => {
+  const userId = req.user.id;
+  const { contestId } = req.params;
+
+  if (!userId || !contestId) {
+    return res.status(400).json({ message: "userId and contestId are required" });
+  }
+
+  try {
+    // Check if registration exists
+    const registration = await db.contestRegistration.findUnique({
+      where: { userId_contestId: { userId, contestId } }
+    });
+    if (!registration) {
+      return res.status(404).json({ message: "Not registered for this contest" });
+    }
+
+    await db.contestRegistration.delete({
+      where: { userId_contestId: { userId, contestId } }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Unregistered from contest successfully"
+    });
+  } catch (error) {
+    console.error("Error unregistering from contest", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error unregistering from contest"
+    });
+  }
+};
 export {
   createContest,
   getAllContest,
@@ -463,5 +504,7 @@ export {
   addProblemToContest,
   contestProblemSubmission,
   getAllProblemsInContest,
-  registerForContest
+  registerForContest,
+  isRegisteredForContest,
+  unRegisterContest,
 };
