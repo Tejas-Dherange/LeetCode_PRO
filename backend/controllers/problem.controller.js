@@ -137,6 +137,7 @@ const getProblemById = async (req, res) => {
       problem,
     });
   } catch (error) {
+    console.error("Error in fetching problem by id:", error);
     return res.status(400).json({
       success: false,
       message: "error in fetching problem by id",
@@ -376,6 +377,36 @@ const getAllProblemsSolvedByUser = async (req, res) => {
   }
 };
 
+const getProblemByMultipleIds = async (req, res) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ message: "Invalid problem IDs" });
+  }
+
+  try {
+    const problems = await db.problem.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    if (problems.length === 0) {
+      return res.status(404).json({ message: "No problems found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Problems fetched successfully",
+      problems,
+    });
+  } catch (error) {
+    console.error("Error fetching problems by multiple IDs:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 export {
   createProblem,
   getProblemById,
@@ -383,4 +414,5 @@ export {
   deleteProblem,
   updateProblem,
   getAllProblemsSolvedByUser,
+  getProblemByMultipleIds,
 };

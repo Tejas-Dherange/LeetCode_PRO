@@ -13,7 +13,7 @@ export const useProblemStore = create((set) => ({
     try {
       set({ isProblemLoading: true });
       const res = await axiosInstance.get("/problems/getAllProblems");
-    //   console.log(res);
+      //   console.log(res);
       set({ problems: res.data.allProblems });
     } catch (error) {
       console.error("error occured in fetching all problems", error);
@@ -23,6 +23,8 @@ export const useProblemStore = create((set) => ({
     }
   },
   getProblemById: async (id) => {
+    // console.log("Fetching problem with ID:", id);
+
     try {
       set({ isProblemLoading: true });
       const res = await axiosInstance.get(`/problems/get-problem-byId/${id}`);
@@ -50,33 +52,43 @@ export const useProblemStore = create((set) => ({
       toast.error("error in fetching problem");
     }
   },
-//   updateProblem: async (id) => {
-//     try {
-//       const res = await axiosInstance.get(`/problems/update-problem/${id}`);
-//       console.log(res);
-//       set({ solvedProblems: res.data.problemSolvedByUser });
-//       toast.success(res.data.message);
-//     } catch (error) {
-//       console.error("error occured in fetching  problem", error);
-//       toast.error("error in fetching problem");
-//     }
-//   },
+  //   updateProblem: async (id) => {
+  //     try {
+  //       const res = await axiosInstance.get(`/problems/update-problem/${id}`);
+  //       console.log(res);
+  //       set({ solvedProblems: res.data.problemSolvedByUser });
+  //       toast.success(res.data.message);
+  //     } catch (error) {
+  //       console.error("error occured in fetching  problem", error);
+  //       toast.error("error in fetching problem");
+  //     }
+  //   },
 
-     deleteProblem:async(id)=>{
-      try {
-        const res=await axiosInstance.delete(`/problems/delete-problem/${id}`)
+  deleteProblem: async (id) => {
+    try {
+      const res = await axiosInstance.delete(`/problems/delete-problem/${id}`);
 
-        console.log(res);
+      console.log(res);
 
-        toast.success(res.data.message || "problem deleted succesfully")
-        
-      } catch (error) {
-        console.error("error occured in deleting  problem", error);
+      toast.success(res.data.message || "problem deleted succesfully");
+    } catch (error) {
+      console.error("error occured in deleting  problem", error);
       toast.error("error in deleting problem");
-      }
-     }
-
+    }
+  },
+  getProblemByMultipleIds: async (ids) => {
+    try {
+      set({ isProblemsLoading: true });
+      const res = await axiosInstance.post("/problems/getProblemByMultipleIds", {
+        ids,
+      });
+      // console.log(res.data.problems, "problems fetched by multiple ids");
+      set({ problems: res.data.problems });
+    } catch (error) {
+      console.error("error occured in fetching problems by multiple ids", error);
+      toast.error("error in fetching problems");
+    } finally {
+      set({ isProblemsLoading: false });
+    }
+  }
 }));
-
-
-

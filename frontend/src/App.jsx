@@ -14,6 +14,7 @@ import ProblemPage from "./page/ProblemPage";
 import Dashboard from "./page/Dashboard";
 import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
+import CreateContestPage from "./page/CreateContestPage";
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -42,14 +43,22 @@ const App = () => {
             index
             element={authUser ? <Dashboard /> : <Navigate to={"/login"} />}
           />
-        <Route
-          path="/dashboard/contest"
-          element={authUser ? <ContestPage /> : <Navigate to={"/dashboard"} />}
-        />
-        <Route
-          path="/dashboard/contest/register/:id"
-          element={authUser ? <RegisterContestPage /> : <Navigate to={"/dashboard"} />}
-        />
+          <Route
+            path="/dashboard/contest"
+            element={
+              authUser ? <ContestPage /> : <Navigate to={"/dashboard"} />
+            }
+          />
+          <Route
+            path="/dashboard/contest/register/:id"
+            element={
+              authUser ? (
+                <RegisterContestPage />
+              ) : (
+                <Navigate to={"/dashboard"} />
+              )
+            }
+          />
         </Route>
         <Route
           path="profile"
@@ -71,6 +80,12 @@ const App = () => {
         <Route
           path="/problem/:id"
           element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/dashboard/contest/create-contest"
+          element={
+            authUser ? <CreateContestPage /> : <Navigate to={"/login"} />
+          }
         />
         <Route
           path="/"

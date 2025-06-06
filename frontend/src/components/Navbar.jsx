@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut } from "lucide-react";
+import { User, Code, LogOut, Trophy } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 
@@ -72,6 +72,17 @@ const Navbar = () => {
                   >
                     <Code className="w-4 h-4 mr-1" />
                     Add Problem
+                  </Link>
+                </li>
+              )}
+              {authUser?.role === "ADMIN" && (
+                <li>
+                  <Link
+                    to="/dashboard/contest/create-contest"
+                    className="hover:bg-primary hover:text-white text-base font-semibold"
+                  >
+                    <Trophy className="w-4 h-4 mr-1" />
+                   Create Contest
                   </Link>
                 </li>
               )}

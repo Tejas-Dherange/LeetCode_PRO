@@ -245,6 +245,7 @@ export const useContestStore = create((set) => ({
       toast.success(
         res.data.message || "Unregistered from contest successfully",
       );
+      return res.data; // Assuming the response contains relevant data
     } catch (error) {
       console.error("Error occurred in unregistering from contest", error);
       toast.error("Error in unregistering from contest");

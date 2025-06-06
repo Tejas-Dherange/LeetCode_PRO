@@ -7,10 +7,17 @@ const createContest = async (req, res) => {
       return res.status(400).json({ message: "unauthorized" });
     }
 
-    const { name, description, startTime, endTime, problemIds } = req.body;
+    const { name, description, startTime, endTime, problems } = req.body;
 
-    if (!name && !startTime && !endTime) {
-      return res.status(400).json({ message: "all fields are reuired" });
+    if (!name || !startTime || !endTime || !Array.isArray(problems) || problems.length === 0) {
+      return res.status(400).json({ message: "all fields are required, including problems with marks" });
+    }
+
+    // Validate problems array
+    for (const p of problems) {
+      if (!p.problemId || p.marks === undefined || p.marks === null || isNaN(p.marks) || parseInt(p.marks) < 0) {
+        return res.status(400).json({ message: "Each problem must have a valid problemId and non-negative marks" });
+      }
     }
 
     const contest = await db.contest.create({
@@ -21,8 +28,9 @@ const createContest = async (req, res) => {
         endTime,
         createdBy: userId,
         problems: {
-          create: problemIds.map((pid) => ({
-            problem: { connect: { id: pid } },
+          create: problems.map((p) => ({
+            problem: { connect: { id: p.problemId } },
+            marks: parseInt(p.marks),
           })),
         },
       },
@@ -47,6 +55,7 @@ const createContest = async (req, res) => {
     });
   }
 };
+
 const getAllContest = async (req, res) => {
   try {
     const contests = await db.contest.findMany({
@@ -72,6 +81,7 @@ const getAllContest = async (req, res) => {
     });
   }
 };
+
 const getContestById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -103,6 +113,7 @@ const getContestById = async (req, res) => {
     });
   }
 };
+
 const deleteContest = async (req, res) => {
   const { id } = req.params;
   try {
@@ -131,6 +142,7 @@ const deleteContest = async (req, res) => {
     });
   }
 };
+
 // const contestInterface = async (req, res) => {
 //   const { cid, pid } = req.params;
 //   try {
@@ -172,6 +184,7 @@ const deleteContest = async (req, res) => {
 //     });
 //   }
 // };
+
 const contestLeaderBoard = async (req, res) => {
   const { cid } = req.params;
   try {
@@ -247,13 +260,18 @@ const contestLeaderBoard = async (req, res) => {
 };
 
 const addProblemToContest = async (req, res) => {
-  const {  problemId } = req.body;
+  const { problemId, marks } = req.body;
   const { contestId } = req.params;
 
   if (!contestId || !problemId) {
     return res
       .status(400)
       .json({ message: "contestId and problemId are required" });
+  }
+
+  // Validate marks
+  if (marks === undefined || marks === null || isNaN(marks) || parseInt(marks) < 0) {
+    return res.status(400).json({ message: "Valid marks are required (must be a non-negative integer)" });
   }
 
   try {
@@ -293,6 +311,7 @@ const addProblemToContest = async (req, res) => {
       data: {
         contestId,
         problemId,
+        marks: parseInt(marks),
       },
     });
 
@@ -423,32 +442,36 @@ const registerForContest = async (req, res) => {
   const { contestId } = req.body;
 
   if (!userId || !contestId) {
-    return res.status(400).json({ message: "userId and contestId are required" });
+    return res
+      .status(400)
+      .json({ message: "userId and contestId are required" });
   }
 
   try {
     // Check if already registered
     const exists = await db.contestRegistration.findUnique({
-      where: { userId_contestId: { userId, contestId } }
+      where: { userId_contestId: { userId, contestId } },
     });
     if (exists) {
-      return res.status(400).json({ message: "Already registered for this contest" });
+      return res
+        .status(400)
+        .json({ message: "Already registered for this contest" });
     }
 
     const registration = await db.contestRegistration.create({
-      data: { userId, contestId }
+      data: { userId, contestId },
     });
 
     return res.status(201).json({
       success: true,
       message: "Registered for contest successfully",
-      registration
+      registration,
     });
   } catch (error) {
     console.error("Error registering for contest", error);
     return res.status(500).json({
       success: false,
-      message: "Error registering for contest"
+      message: "Error registering for contest",
     });
   }
 };
@@ -456,7 +479,7 @@ const isRegisteredForContest = async (req, res) => {
   const userId = req.user.id;
   const { contestId } = req.params;
   const exists = await db.contestRegistration.findUnique({
-    where: { userId_contestId: { userId, contestId } }
+    where: { userId_contestId: { userId, contestId } },
   });
   res.json({ registered: !!exists });
 };
@@ -466,34 +489,39 @@ const unRegisterContest = async (req, res) => {
   const { contestId } = req.params;
 
   if (!userId || !contestId) {
-    return res.status(400).json({ message: "userId and contestId are required" });
+    return res
+      .status(400)
+      .json({ message: "userId and contestId are required" });
   }
 
   try {
     // Check if registration exists
     const registration = await db.contestRegistration.findUnique({
-      where: { userId_contestId: { userId, contestId } }
+      where: { userId_contestId: { userId, contestId } },
     });
     if (!registration) {
-      return res.status(404).json({ message: "Not registered for this contest" });
+      return res
+        .status(404)
+        .json({ message: "Not registered for this contest" });
     }
 
     await db.contestRegistration.delete({
-      where: { userId_contestId: { userId, contestId } }
+      where: { userId_contestId: { userId, contestId } },
     });
 
     return res.status(200).json({
       success: true,
-      message: "Unregistered from contest successfully"
+      message: "Unregistered from contest successfully",
     });
   } catch (error) {
     console.error("Error unregistering from contest", error);
     return res.status(500).json({
       success: false,
-      message: "Error unregistering from contest"
+      message: "Error unregistering from contest",
     });
   }
 };
+
 export {
   createContest,
   getAllContest,

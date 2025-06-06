@@ -1,57 +1,79 @@
 import React, { useEffect, useState } from "react";
 import { useContestStore } from "../store/useContestStore";
 import { useProblemStore } from "../store/useProblemStore";
+import { Loader } from "lucide-react";
 
 function ContestProblem({ contestId }) {
-  const { getContestById, contest } = useContestStore();
-  const { getProblemById } = useProblemStore();
-  const [problems, setProblems] = useState([]);
+  const { getContestById, isContestLoading, contest } = useContestStore();
+  const { getProblemById, problem, isProblemLoading, getProblemByMultipleIds ,problems} =
+    useProblemStore();
+  const [Contest, setContest] = useState("");
+  // const [problems, setProblems] = useState([]);
 
-  // Only fetch contest when contestId changes
   useEffect(() => {
     getContestById(contestId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setContest(contest);
   }, [contestId]);
 
-  // Fetch problems only when contest changes
   useEffect(() => {
-    let ignore = false;
-    async function fetchProblems() {
-      if (contest && Array.isArray(contest.problems) && contest.problems.length > 0) {
-        const problemIds = contest.problems.map((p) => p.problemId || p.id || (p.problem && p.problem.id));
-        const validIds = problemIds.filter(Boolean);
-        const problemsData = await Promise.all(
-          validIds.map(async (problemId) => {
-            const res = await getProblemById(problemId);
-            return res && res.problem ? res.problem : undefined;
-          })
-        );
-        if (!ignore) setProblems(problemsData.filter(Boolean));
-      } else {
-        if (!ignore) setProblems([]);
+    if (!contest || !contest.problems || !Array.isArray(contest.problems)) return;
+    const fetchProblems = async () => {
+      const problemIds = contest.problems.map((p) => p.problemId);
+      console.log("Problem IDs:", problemIds);
+      try {
+        const fetchedProblems = await getProblemByMultipleIds(problemIds);
+        // console.log("Fetched Problems:", fetchedProblems);
+        // setProblems(fetchedProblems || []);
+      } catch (err) {
+        console.error("Error fetching problems:", err);
+        // setProblems([]);
       }
-    }
+    };
     fetchProblems();
-    return () => { ignore = true; };
-  }, [contest]);
-
-//   console.log("Contest Problems:", problems);
+    console.log("Fetched Problems:", problems);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contest]); // Only depend on contest, not getProblemById
   
-
   return (
     <div>
-      {contest && contest.problems &&
-        problems.map((problem) => (
-          <div key={problem.id} className="p-4 border-b">
-            <h2 className="text-xl font-bold">{problem.title}</h2>
-            <p>{problem.description}</p>
-            <p className="text-sm text-gray-500">
-              Difficulty: {problem.difficulty}
-            </p>
-          </div>
-        ))}
-
-        
+      {isContestLoading ? (
+        <div className="flex justify-center items-center h-screen">
+          <Loader className="animate-spin" />
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="table w-full border rounded-lg">
+            <thead>
+              <tr className="bg-base-200">
+                <th className="px-4 py-2">#</th>
+                <th className="px-4 py-2">Title</th>
+                <th className="px-4 py-2">Constraints</th>
+                <th className="px-4 py-2">Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              {problems.map((problem, idx) => (
+                <tr key={problem.id} className="border-b hover:bg-base-200">
+                  <td className="px-4 py-2 font-semibold">{idx + 1}</td>
+                  <td className="px-4 py-2 font-bold text-primary">{problem.title}</td>
+                  <td className="px-4 py-2 text-xs">{problem.constraints || "-"}</td>
+                  <td className="px-4 py-2 text-xs">
+                    {problem.examples && Object.entries(problem.examples).length > 0 ? (
+                      <ul className="list-disc list-inside">
+                        {Object.entries(problem.examples).map(([lang, ex]) => (
+                          <li key={lang}>
+                            <span className="font-semibold">{lang}:</span> Input: {ex.input}, Output: {ex.output}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : "-"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

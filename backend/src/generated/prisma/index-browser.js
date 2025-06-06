@@ -217,7 +217,8 @@ exports.Prisma.ContestScalarFieldEnum = {
 exports.Prisma.ContestProblemScalarFieldEnum = {
   id: 'id',
   contestId: 'contestId',
-  problemId: 'problemId'
+  problemId: 'problemId',
+  marks: 'marks'
 };
 
 exports.Prisma.ContestSubmissionScalarFieldEnum = {

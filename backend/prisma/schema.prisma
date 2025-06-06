@@ -172,6 +172,7 @@ model ContestProblem {
   contestId String
   problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
   problemId String
+  marks     Int     @default(0)
 }
 
 model ContestSubmission {
@@ -182,7 +183,7 @@ model ContestSubmission {
 
   sourceCode     Json
   language       String
-  stdin          String?
+  stdin          String? 
   stdout         String?
   time           String?
   stderr         String?
