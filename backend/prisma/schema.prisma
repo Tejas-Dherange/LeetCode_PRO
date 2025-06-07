@@ -176,14 +176,14 @@ model ContestProblem {
 }
 
 model ContestSubmission {
-  id        String @id @default(uuid())
-  userId    String
-  contestId String
-  problemId String
-
+  id             String  @id @default(uuid())
+  userId         String
+  contestId      String
+  problemId      String
+  obtainedMarks  Int      @default(0)
   sourceCode     Json
   language       String
-  stdin          String? 
+  stdin          String?
   stdout         String?
   time           String?
   stderr         String?

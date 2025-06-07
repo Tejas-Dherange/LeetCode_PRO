@@ -5,8 +5,42 @@ import useAuthStore from "../store/useAuthStore";
 import { ArrowLeft, Mail, User, Shield, Image } from "lucide-react";
 import ProblemSolvedByUser from "../components/ProblemSolvedByUser";
 import ProfileSubmission from "../components/ProfileSubmission";
+import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
+  const [contestRatings, setContestRatings] = useState([]);
+  const [currentRating, setCurrentRating] = useState(null);
+
+  useEffect(() => {
+    // Fetch contest rating history for the user
+    const fetchRatings = async () => {
+      if (!authUser?.id) return;
+      try {
+        // Example API endpoint, adjust as needed
+        const res = await fetch(`/api/contest/user-rating/${authUser.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setContestRatings(data.ratings || []);
+          if (data.ratings && data.ratings.length > 0) {
+            setCurrentRating(data.ratings[data.ratings.length - 1].rating);
+          }
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+    fetchRatings();
+  }, [authUser?.id]);
 
   return (
     <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-10 px-4   w-full">
@@ -130,14 +164,50 @@ const ProfilePage = () => {
             <ProfileSubmission />
           </div>
 
-
           <div>
-
-        <PlaylistProfile />
+            <PlaylistProfile />
           </div>
         </div>
       </div>
       <div>
+        {/* Contest Rating Section */}
+        <div className="mt-8">
+          <h3 className="text-xl font-bold mb-2 text-primary">
+            Contest Rating
+          </h3>
+          <div className="flex items-center gap-4 mb-4">
+            <span className="text-3xl font-bold text-success">
+              {currentRating !== null ? currentRating : "-"}
+            </span>
+            <span className="text-base-content/70">Current Rating</span>
+          </div>
+          <div className="bg-base-200 rounded-xl p-4">
+            {contestRatings.length > 0 ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart
+                  data={contestRatings}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="contestName" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="rating"
+                    stroke="#22c55e"
+                    strokeWidth={3}
+                    dot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="text-base-content/70 text-center">
+                No contest rating data yet
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* PLaylist created by the user and their actions */}

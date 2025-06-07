@@ -12393,8 +12393,18 @@ export namespace Prisma {
 
   export type AggregateContestSubmission = {
     _count: ContestSubmissionCountAggregateOutputType | null
+    _avg: ContestSubmissionAvgAggregateOutputType | null
+    _sum: ContestSubmissionSumAggregateOutputType | null
     _min: ContestSubmissionMinAggregateOutputType | null
     _max: ContestSubmissionMaxAggregateOutputType | null
+  }
+
+  export type ContestSubmissionAvgAggregateOutputType = {
+    obtainedMarks: number | null
+  }
+
+  export type ContestSubmissionSumAggregateOutputType = {
+    obtainedMarks: number | null
   }
 
   export type ContestSubmissionMinAggregateOutputType = {
@@ -12402,6 +12412,7 @@ export namespace Prisma {
     userId: string | null
     contestId: string | null
     problemId: string | null
+    obtainedMarks: number | null
     language: string | null
     stdin: string | null
     stdout: string | null
@@ -12419,6 +12430,7 @@ export namespace Prisma {
     userId: string | null
     contestId: string | null
     problemId: string | null
+    obtainedMarks: number | null
     language: string | null
     stdin: string | null
     stdout: string | null
@@ -12436,6 +12448,7 @@ export namespace Prisma {
     userId: number
     contestId: number
     problemId: number
+    obtainedMarks: number
     sourceCode: number
     language: number
     stdin: number
@@ -12451,11 +12464,20 @@ export namespace Prisma {
   }
 
 
+  export type ContestSubmissionAvgAggregateInputType = {
+    obtainedMarks?: true
+  }
+
+  export type ContestSubmissionSumAggregateInputType = {
+    obtainedMarks?: true
+  }
+
   export type ContestSubmissionMinAggregateInputType = {
     id?: true
     userId?: true
     contestId?: true
     problemId?: true
+    obtainedMarks?: true
     language?: true
     stdin?: true
     stdout?: true
@@ -12473,6 +12495,7 @@ export namespace Prisma {
     userId?: true
     contestId?: true
     problemId?: true
+    obtainedMarks?: true
     language?: true
     stdin?: true
     stdout?: true
@@ -12490,6 +12513,7 @@ export namespace Prisma {
     userId?: true
     contestId?: true
     problemId?: true
+    obtainedMarks?: true
     sourceCode?: true
     language?: true
     stdin?: true
@@ -12542,6 +12566,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ContestSubmissionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContestSubmissionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ContestSubmissionMinAggregateInputType
@@ -12572,6 +12608,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ContestSubmissionCountAggregateInputType | true
+    _avg?: ContestSubmissionAvgAggregateInputType
+    _sum?: ContestSubmissionSumAggregateInputType
     _min?: ContestSubmissionMinAggregateInputType
     _max?: ContestSubmissionMaxAggregateInputType
   }
@@ -12581,6 +12619,7 @@ export namespace Prisma {
     userId: string
     contestId: string
     problemId: string
+    obtainedMarks: number
     sourceCode: JsonValue
     language: string
     stdin: string | null
@@ -12593,6 +12632,8 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     _count: ContestSubmissionCountAggregateOutputType | null
+    _avg: ContestSubmissionAvgAggregateOutputType | null
+    _sum: ContestSubmissionSumAggregateOutputType | null
     _min: ContestSubmissionMinAggregateOutputType | null
     _max: ContestSubmissionMaxAggregateOutputType | null
   }
@@ -12616,6 +12657,7 @@ export namespace Prisma {
     userId?: boolean
     contestId?: boolean
     problemId?: boolean
+    obtainedMarks?: boolean
     sourceCode?: boolean
     language?: boolean
     stdin?: boolean
@@ -12634,6 +12676,7 @@ export namespace Prisma {
     userId?: boolean
     contestId?: boolean
     problemId?: boolean
+    obtainedMarks?: boolean
     sourceCode?: boolean
     language?: boolean
     stdin?: boolean
@@ -12652,6 +12695,7 @@ export namespace Prisma {
     userId?: boolean
     contestId?: boolean
     problemId?: boolean
+    obtainedMarks?: boolean
     sourceCode?: boolean
     language?: boolean
     stdin?: boolean
@@ -12670,6 +12714,7 @@ export namespace Prisma {
     userId?: boolean
     contestId?: boolean
     problemId?: boolean
+    obtainedMarks?: boolean
     sourceCode?: boolean
     language?: boolean
     stdin?: boolean
@@ -12683,7 +12728,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContestSubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contestId" | "problemId" | "sourceCode" | "language" | "stdin" | "stdout" | "time" | "stderr" | "compile_output" | "status" | "memory" | "createdAt" | "updatedAt", ExtArgs["result"]["contestSubmission"]>
+  export type ContestSubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contestId" | "problemId" | "obtainedMarks" | "sourceCode" | "language" | "stdin" | "stdout" | "time" | "stderr" | "compile_output" | "status" | "memory" | "createdAt" | "updatedAt", ExtArgs["result"]["contestSubmission"]>
 
   export type $ContestSubmissionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "ContestSubmission"
@@ -12693,6 +12738,7 @@ export namespace Prisma {
       userId: string
       contestId: string
       problemId: string
+      obtainedMarks: number
       sourceCode: Prisma.JsonValue
       language: string
       stdin: string | null
@@ -13131,6 +13177,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"ContestSubmission", 'String'>
     readonly contestId: FieldRef<"ContestSubmission", 'String'>
     readonly problemId: FieldRef<"ContestSubmission", 'String'>
+    readonly obtainedMarks: FieldRef<"ContestSubmission", 'Int'>
     readonly sourceCode: FieldRef<"ContestSubmission", 'Json'>
     readonly language: FieldRef<"ContestSubmission", 'String'>
     readonly stdin: FieldRef<"ContestSubmission", 'String'>
@@ -14724,6 +14771,7 @@ export namespace Prisma {
     userId: 'userId',
     contestId: 'contestId',
     problemId: 'problemId',
+    obtainedMarks: 'obtainedMarks',
     sourceCode: 'sourceCode',
     language: 'language',
     stdin: 'stdin',
@@ -15619,6 +15667,7 @@ export namespace Prisma {
     userId?: StringFilter<"ContestSubmission"> | string
     contestId?: StringFilter<"ContestSubmission"> | string
     problemId?: StringFilter<"ContestSubmission"> | string
+    obtainedMarks?: IntFilter<"ContestSubmission"> | number
     sourceCode?: JsonFilter<"ContestSubmission">
     language?: StringFilter<"ContestSubmission"> | string
     stdin?: StringNullableFilter<"ContestSubmission"> | string | null
@@ -15637,6 +15686,7 @@ export namespace Prisma {
     userId?: SortOrder
     contestId?: SortOrder
     problemId?: SortOrder
+    obtainedMarks?: SortOrder
     sourceCode?: SortOrder
     language?: SortOrder
     stdin?: SortOrderInput | SortOrder
@@ -15658,6 +15708,7 @@ export namespace Prisma {
     userId?: StringFilter<"ContestSubmission"> | string
     contestId?: StringFilter<"ContestSubmission"> | string
     problemId?: StringFilter<"ContestSubmission"> | string
+    obtainedMarks?: IntFilter<"ContestSubmission"> | number
     sourceCode?: JsonFilter<"ContestSubmission">
     language?: StringFilter<"ContestSubmission"> | string
     stdin?: StringNullableFilter<"ContestSubmission"> | string | null
@@ -15676,6 +15727,7 @@ export namespace Prisma {
     userId?: SortOrder
     contestId?: SortOrder
     problemId?: SortOrder
+    obtainedMarks?: SortOrder
     sourceCode?: SortOrder
     language?: SortOrder
     stdin?: SortOrderInput | SortOrder
@@ -15688,8 +15740,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ContestSubmissionCountOrderByAggregateInput
+    _avg?: ContestSubmissionAvgOrderByAggregateInput
     _max?: ContestSubmissionMaxOrderByAggregateInput
     _min?: ContestSubmissionMinOrderByAggregateInput
+    _sum?: ContestSubmissionSumOrderByAggregateInput
   }
 
   export type ContestSubmissionScalarWhereWithAggregatesInput = {
@@ -15700,6 +15754,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"ContestSubmission"> | string
     contestId?: StringWithAggregatesFilter<"ContestSubmission"> | string
     problemId?: StringWithAggregatesFilter<"ContestSubmission"> | string
+    obtainedMarks?: IntWithAggregatesFilter<"ContestSubmission"> | number
     sourceCode?: JsonWithAggregatesFilter<"ContestSubmission">
     language?: StringWithAggregatesFilter<"ContestSubmission"> | string
     stdin?: StringNullableWithAggregatesFilter<"ContestSubmission"> | string | null
@@ -16546,6 +16601,7 @@ export namespace Prisma {
     userId: string
     contestId: string
     problemId: string
+    obtainedMarks?: number
     sourceCode: JsonNullValueInput | InputJsonValue
     language: string
     stdin?: string | null
@@ -16564,6 +16620,7 @@ export namespace Prisma {
     userId: string
     contestId: string
     problemId: string
+    obtainedMarks?: number
     sourceCode: JsonNullValueInput | InputJsonValue
     language: string
     stdin?: string | null
@@ -16582,6 +16639,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     problemId?: StringFieldUpdateOperationsInput | string
+    obtainedMarks?: IntFieldUpdateOperationsInput | number
     sourceCode?: JsonNullValueInput | InputJsonValue
     language?: StringFieldUpdateOperationsInput | string
     stdin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16600,6 +16658,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     problemId?: StringFieldUpdateOperationsInput | string
+    obtainedMarks?: IntFieldUpdateOperationsInput | number
     sourceCode?: JsonNullValueInput | InputJsonValue
     language?: StringFieldUpdateOperationsInput | string
     stdin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16618,6 +16677,7 @@ export namespace Prisma {
     userId: string
     contestId: string
     problemId: string
+    obtainedMarks?: number
     sourceCode: JsonNullValueInput | InputJsonValue
     language: string
     stdin?: string | null
@@ -16636,6 +16696,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     problemId?: StringFieldUpdateOperationsInput | string
+    obtainedMarks?: IntFieldUpdateOperationsInput | number
     sourceCode?: JsonNullValueInput | InputJsonValue
     language?: StringFieldUpdateOperationsInput | string
     stdin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16654,6 +16715,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     contestId?: StringFieldUpdateOperationsInput | string
     problemId?: StringFieldUpdateOperationsInput | string
+    obtainedMarks?: IntFieldUpdateOperationsInput | number
     sourceCode?: JsonNullValueInput | InputJsonValue
     language?: StringFieldUpdateOperationsInput | string
     stdin?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17389,6 +17451,7 @@ export namespace Prisma {
     userId?: SortOrder
     contestId?: SortOrder
     problemId?: SortOrder
+    obtainedMarks?: SortOrder
     sourceCode?: SortOrder
     language?: SortOrder
     stdin?: SortOrder
@@ -17402,11 +17465,16 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type ContestSubmissionAvgOrderByAggregateInput = {
+    obtainedMarks?: SortOrder
+  }
+
   export type ContestSubmissionMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     contestId?: SortOrder
     problemId?: SortOrder
+    obtainedMarks?: SortOrder
     language?: SortOrder
     stdin?: SortOrder
     stdout?: SortOrder
@@ -17424,6 +17492,7 @@ export namespace Prisma {
     userId?: SortOrder
     contestId?: SortOrder
     problemId?: SortOrder
+    obtainedMarks?: SortOrder
     language?: SortOrder
     stdin?: SortOrder
     stdout?: SortOrder
@@ -17434,6 +17503,10 @@ export namespace Prisma {
     memory?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ContestSubmissionSumOrderByAggregateInput = {
+    obtainedMarks?: SortOrder
   }
 
   export type ContestRegistrationUserIdContestIdCompoundUniqueInput = {

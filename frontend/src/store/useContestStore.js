@@ -251,4 +251,52 @@ export const useContestStore = create((set) => ({
       toast.error("Error in unregistering from contest");
     }
   },
+
+  getContestByMultipleIds: async (ids) => {
+    try {
+      set({ isContestsLoading: true });
+      const res = await axiosInstance.post("/contest/get-contests-by-ids", {
+        ids,
+      });
+      set({ contests: res.data.contests });
+    } catch (error) {
+      console.error("Error occurred in fetching contests by IDs", error);
+      toast.error("Error in fetching contests by IDs");
+    } finally {
+      set({ isContestsLoading: false });
+    }
+  },
+
+  contestSubmitCode: async (
+    source_code,
+    language_id,
+    stdin,
+    expected_outputs,
+    problemId,
+    contestId,
+  ) => {
+    try {
+      // console.log("Submitting contest code with data:", submissionData);
+
+      set({ isContestLoading: true });
+      const res = await axiosInstance.post(
+        "/contest/contest-submission/submit-code",
+        {
+          source_code,
+          language_id,
+          stdin,
+          expected_outputs,
+          problemId,
+          contestId,
+        },
+      );
+      toast.success(res.data.message || "Code submitted successfully");
+      return res.data.submission; // Assuming the response contains the submission data
+    } catch (error) {
+      console.error("Error occurred in contest code submission", error);
+      toast.error("Error in contest code submission");
+    } finally {
+      set({ isContestLoading: false });
+    }
+  },
 }));

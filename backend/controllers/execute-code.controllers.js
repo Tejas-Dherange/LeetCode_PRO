@@ -120,6 +120,7 @@ const submitCode = async (req, res) => {
         status: result.status.description,
         memory: result.memory ? `${result.memory} KB` : undefined,
         time: result.time ? `${result.time} s` : undefined,
+        stdin: stdin[i] || null,
       };
     });
 

@@ -22,9 +22,10 @@ import Submission from "../components/Submission";
 import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
+import { useContestStore } from "../store/useContestStore";
 
 const ContestProblemExecPage = () => {
-  const { id } = useParams();
+  const { cid,id } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
   const {
     submission: submissions,
@@ -152,6 +153,8 @@ const ContestProblemExecPage = () => {
   const { runCode, submitCode, runResults, submission, isSubmitExecuting,isRunExecuting } =
     useExecutionStore();
 
+    const { contestSubmitCode,isContestLoading}=useContestStore();
+
   const handleRunCode = (e) => {
     e.preventDefault();
     try {
@@ -172,7 +175,7 @@ const ContestProblemExecPage = () => {
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
-      submitCode(code, language_id, stdin, expected_outputs, id);
+      contestSubmitCode(code, language_id, stdin, expected_outputs, id,cid);
     } catch (error) {
       console.error("error in submitting code", error);
     }
@@ -305,12 +308,12 @@ const ContestProblemExecPage = () => {
 
                   <button
                     className={`btn btn-success gap-2 ${
-                      isSubmitExecuting ? "loading" : ""
+                      isContestLoading ? "loading" : ""
                     }`}
                     onClick={handleSubmitCode}
-                    disabled={isSubmitExecuting}
+                    disabled={isContestLoading}
                   >
-                    {!isSubmitExecuting && <Play className="w-4 h-4" />}
+                    {!isContestLoading && <Play className="w-4 h-4" />}
                     Submit Solution
                   </button>
                 </div>

@@ -3,8 +3,8 @@ import { isLoggedIn } from "../middleware/isLoggedIn.js";
 import {
   addProblemToContest,
   // contestInterface,
-  contestLeaderBoard,
-  contestProblemSubmission,
+  contestLeaderBoard, 
+  contestSubmitCode,
   createContest,
   deleteContest,
   getAllContest,
@@ -13,6 +13,7 @@ import {
   isRegisteredForContest,
   registerForContest,
   unRegisterContest,
+  getUserContestRating,
 } from "../controllers/contest.controllers.js";
 
 const router = express.Router();
@@ -24,10 +25,15 @@ router.delete("/delete-contest/:id", isLoggedIn, deleteContest);
 router.post("/contest/:cid/leaderboard", isLoggedIn, contestLeaderBoard); //remaining to check
 router.post("/add-problem-to-contest/:cid", isLoggedIn, addProblemToContest); //remaining to check
 
+// router.post(
+//   "/contest-submission/:cid/:pid",
+//   isLoggedIn,
+//   contestProblemSubmission,
+// ); //remaining to check
 router.post(
-  "/contest-submission/:cid/:pid",
+  "/contest-submission/submit-code",
   isLoggedIn,
-  contestProblemSubmission,
+  contestSubmitCode,
 ); //remaining to check
 router.get(
   "/get-all-problems-in-contest/:cid",
@@ -36,6 +42,7 @@ router.get(
 );
 router.post("/register", isLoggedIn, registerForContest);
 router.get("/is-registered/:contestId", isLoggedIn, isRegisteredForContest);
+router.get("/user-rating/:userId", isLoggedIn, getUserContestRating);
 
 router.delete("/unregister/:contestId", isLoggedIn, unRegisterContest);
 

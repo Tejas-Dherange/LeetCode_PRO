@@ -1,4 +1,3 @@
-
 import {
   CheckCircle2,
   XCircle,
@@ -10,6 +9,7 @@ import {
 const SubmissionsList = ({ submissions, isLoading }) => {
   // Helper function to safely parse JSON strings
   const safeParse = (data) => {
+    if (!data) return [];
     try {
       return JSON.parse(data);
     } catch (error) {

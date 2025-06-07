@@ -83,7 +83,7 @@ const App = () => {
           element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
         />
         <Route
-          path="/dashboard/contest-execution/:id"
+          path="/dashboard/contest-execution/:cid/:id"
           element={
             authUser ? <ContestProblemExecPage /> : <Navigate to={"/login"} />
           }
