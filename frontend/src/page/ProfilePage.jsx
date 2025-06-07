@@ -1,45 +1,42 @@
 import { Link } from "react-router-dom";
 import PlaylistProfile from "../components/PlaylistProfile";
 import useAuthStore from "../store/useAuthStore";
+import Ratings from "../components/Ratings";
 
 import { ArrowLeft, Mail, User, Shield, Image } from "lucide-react";
 import ProblemSolvedByUser from "../components/ProblemSolvedByUser";
 import ProfileSubmission from "../components/ProfileSubmission";
 import { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useContestStore } from "../store/useContestStore";
 
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
   const [contestRatings, setContestRatings] = useState([]);
   const [currentRating, setCurrentRating] = useState(null);
+  const [currentRank, setCurrentRank] = useState(null);
 
+  const { getUserContestRating } = useContestStore();
   useEffect(() => {
     // Fetch contest rating history for the user
-    const fetchRatings = async () => {
-      if (!authUser?.id) return;
-      try {
-        // Example API endpoint, adjust as needed
-        const res = await fetch(`/api/contest/user-rating/${authUser.id}`);
-        if (res.ok) {
-          const data = await res.json();
-          setContestRatings(data.ratings || []);
-          if (data.ratings && data.ratings.length > 0) {
-            setCurrentRating(data.ratings[data.ratings.length - 1].rating);
-          }
+    getUserContestRating(authUser?.id)
+      .then((ratings) => {
+        if (ratings && ratings.length > 0) {
+          setContestRatings(ratings);
+          // Set the current rating to the latest rating
+          setCurrentRating(ratings[ratings.length - 1].rating);
+          setCurrentRank(ratings[ratings.length - 1].rank ?? null);
+        } else {
+          setContestRatings([]);
+          setCurrentRating(null);
+          setCurrentRank(null);
         }
-      } catch (err) {
-        // ignore
-      }
-    };
-    fetchRatings();
+      })
+      .catch((error) => {
+        console.error("Error fetching contest ratings:", error);
+        setContestRatings([]);
+        setCurrentRating(null);
+        setCurrentRank(null);
+      });
   }, [authUser?.id]);
 
   return (
@@ -153,11 +150,41 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        
         {/* {proble solved by users} */}
         <div className="right flex flex-col gap-8 w-[60%]">
+
+          <div>
+             {/* Contest Ratings Section */}
+          <div className="mt-8 flex gap-10">
+            <h3 className="text-xl font-bold mb-2 text-primary">
+              Contest Rating
+            </h3>
+            <div className="flex items-center gap-8 mb-4">
+              <div className="flex flex-col items-center">
+                <span className="text-3xl font-bold text-success">
+                  {currentRating !== null ? currentRating : "-"}
+                </span>
+                <span className="text-base-content/70">Current Rating</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-3xl font-bold text-primary">
+                  {currentRank !== null ? `#${currentRank}` : "-"}
+                </span>
+                <span className="text-base-content/70">Current Rank</span>
+              </div>
+            </div>
+
+          </div>
+            <div>
+              <Ratings contestRatings={contestRatings} />
+            </div>
+          </div>
           <div>
             <ProblemSolvedByUser />
           </div>
+
+         
 
           {/* Submissions */}
           <div className="Submissions">
@@ -169,46 +196,7 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      <div>
-        {/* Contest Rating Section */}
-        <div className="mt-8">
-          <h3 className="text-xl font-bold mb-2 text-primary">
-            Contest Rating
-          </h3>
-          <div className="flex items-center gap-4 mb-4">
-            <span className="text-3xl font-bold text-success">
-              {currentRating !== null ? currentRating : "-"}
-            </span>
-            <span className="text-base-content/70">Current Rating</span>
-          </div>
-          <div className="bg-base-200 rounded-xl p-4">
-            {contestRatings.length > 0 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart
-                  data={contestRatings}
-                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="contestName" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Line
-                    type="monotone"
-                    dataKey="rating"
-                    stroke="#22c55e"
-                    strokeWidth={3}
-                    dot={{ r: 5 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="text-base-content/70 text-center">
-                No contest rating data yet
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <div>{/* Contest Rating Section */}</div>
 
       {/* PLaylist created by the user and their actions */}
     </div>

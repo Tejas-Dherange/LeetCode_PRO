@@ -299,4 +299,15 @@ export const useContestStore = create((set) => ({
       set({ isContestLoading: false });
     }
   },
+
+  getUserContestRating: async (userId) => {
+    try {
+      const res = await axiosInstance.get(`/contest/user-rating/${userId}`);
+      return res.data.ratings || []; // Assuming the response contains a list of ratings
+    } catch (error) {
+      console.error("Error occurred in fetching user contest ratings", error);
+      toast.error("Error in fetching user contest ratings");
+      return []; // Default to empty array on error
+    }
+  },
 }));
