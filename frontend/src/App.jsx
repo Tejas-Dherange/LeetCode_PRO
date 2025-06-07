@@ -11,7 +11,7 @@ import ProfilePage from "./page/ProfilePage";
 import AddProblemPage from "./page/AddProblemPage";
 import AdminRoute from "./components/AdminRoute";
 import ProblemPage from "./page/ProblemPage";
-import Dashboard from "./page/Dashboard";
+import Dashboard from "./page/dashboard";
 import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
