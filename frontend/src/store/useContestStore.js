@@ -29,7 +29,7 @@ export const useContestStore = create((set) => ({
       const res = await axiosInstance.get(`/contest/get-contest/${id}`);
       console.log("Contest fetched successfully:", res.data);
       set({ contest: res.data.contest });
-      toast.success(res.data.message || "Contest fetched successfully");
+      // toast.success(res.data.message || "Contest fetched successfully");
     } catch (error) {
       console.error("Error occurred in fetching contest", error);
       toast.error("Error in fetching contest");
@@ -96,7 +96,7 @@ export const useContestStore = create((set) => ({
       return res.data.leaderboard; // Assuming the response contains a leaderboard
     } catch (error) {
       console.error("Error occurred in fetching contest leaderboard", error);
-      toast.error("Error in fetching contest leaderboard");
+      // toast.error("Error in fetching contest leaderboard");
     } finally {
       set({ isContestLoading: false });
     }

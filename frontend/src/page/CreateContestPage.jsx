@@ -2,10 +2,17 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { axiosInstance } from "../libs/axios.js";
 import { useContestStore } from "../store/useContestStore.js";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useProblemStore } from "../store/useProblemStore";
 
 function CreateContestPage() {
   const { createContest } = useContestStore();
   const navigate = useNavigate();
+  const { problems, getAllProblems } = useProblemStore();
+
+  useEffect(() => {
+    getAllProblems();
+  }, [getAllProblems]);
 
   const {
     register,
@@ -50,44 +57,54 @@ function CreateContestPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-base-200 rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Create Contest</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="label">Name</label>
-          <input
-            className="input input-bordered w-full"
-            {...register("name", { required: true })}
-          />
-          {errors.name && <span className="text-error">Name is required</span>}
+    <div className="max-w-3xl mx-auto p-8 bg-gradient-to-br from-primary/10 to-base-200/80 rounded-3xl shadow-2xl border border-primary/20 mt-10 animate-fade-in">
+      <h1 className="text-4xl font-extrabold text-primary mb-2 tracking-tight drop-shadow">
+        Create a New Contest
+      </h1>
+      <p className="text-base-content/70 mb-8 text-lg">
+        Fill in the details below to launch a new coding contest. Add problems,
+        set marks, and schedule the event.
+      </p>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="label font-semibold">Name</label>
+            <input
+              className="input input-bordered w-full text-lg"
+              {...register("name", { required: true })}
+              placeholder="Contest Name"
+            />
+            {errors.name && <span className="text-error">Name is required</span>}
+          </div>
+          <div>
+            <label className="label font-semibold">Description</label>
+            <textarea
+              className="textarea textarea-bordered w-full text-lg min-h-[48px]"
+              {...register("description", { required: true })}
+              placeholder="Short contest description"
+            />
+            {errors.description && (
+              <span className="text-error">Description is required</span>
+            )}
+          </div>
         </div>
-        <div>
-          <label className="label">Description</label>
-          <textarea
-            className="textarea textarea-bordered w-full"
-            {...register("description", { required: true })}
-          />
-          {errors.description && (
-            <span className="text-error">Description is required</span>
-          )}
-        </div>
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="label">Start Time</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="label font-semibold">Start Time</label>
             <input
               type="datetime-local"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full text-lg"
               {...register("startTime", { required: true })}
             />
             {errors.startTime && (
               <span className="text-error">Start time is required</span>
             )}
           </div>
-          <div className="flex-1">
-            <label className="label">End Time</label>
+          <div>
+            <label className="label font-semibold">End Time</label>
             <input
               type="datetime-local"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full text-lg"
               {...register("endTime", { required: true })}
             />
             {errors.endTime && (
@@ -95,48 +112,68 @@ function CreateContestPage() {
             )}
           </div>
         </div>
-        <div>
-          <label className="label">Problems</label>
-          {fields.map((field, idx) => (
-            <div key={field.id} className="flex gap-2 items-end mb-2">
-              <input
-                className="input input-bordered"
-                placeholder="Problem ID"
-                {...register(`problems.${idx}.problemId`, { required: true })}
-              />
-              <input
-                className="input input-bordered w-24"
-                type="number"
-                min="0"
-                placeholder="Marks"
-                {...register(`problems.${idx}.marks`, {
-                  required: true,
-                  min: 0,
-                })}
-              />
-              <button
-                type="button"
-                className="btn btn-error btn-sm"
-                onClick={() => remove(idx)}
-                disabled={fields.length === 1}
+        <div className="mt-8">
+          <label className="label font-bold text-lg mb-2">Problems</label>
+          <div className="space-y-4">
+            {fields.map((field, idx) => (
+              <div
+                key={field.id}
+                className="flex flex-col md:flex-row gap-3 items-end bg-base-100/80 rounded-xl p-4 shadow border border-primary/10"
               >
-                Remove
-              </button>
-            </div>
-          ))}
+                <div className="flex-1">
+                  <label className="label text-sm">Select Problem</label>
+                  <select
+                    className="input input-bordered w-full text-base"
+                    {...register(`problems.${idx}.problemId`, { required: true })}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Select Problem
+                    </option>
+                    {problems.map((problem) => (
+                      <option key={problem.id} value={problem.id}>
+                        {problem.title || problem.name || `Problem ${problem.id}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="label text-sm">Marks</label>
+                  <input
+                    className="input input-bordered w-24 text-base"
+                    type="number"
+                    min="0"
+                    placeholder="Marks"
+                    {...register(`problems.${idx}.marks`, {
+                      required: true,
+                      min: 0,
+                    })}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-error btn-sm mt-4 md:mt-0"
+                  onClick={() => remove(idx)}
+                  disabled={fields.length === 1}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
           <button
             type="button"
-            className="btn btn-primary btn-sm mt-2"
+            className="btn btn-primary btn-outline mt-4"
             onClick={() => append({ problemId: "", marks: "" })}
           >
-            Add Problem
+            + Add Another Problem
           </button>
           {errors.problems && (
             <span className="text-error">At least one problem is required</span>
           )}
         </div>
         <button
-          className="btn btn-success w-full"
+          className="btn btn-success btn-lg w-full mt-8 shadow-xl text-lg tracking-wide"
           type="submit"
           disabled={isSubmitting}
         >

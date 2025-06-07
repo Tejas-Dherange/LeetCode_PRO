@@ -56,14 +56,14 @@ const App = () => {
               authUser ? (
                 <RegisterContestPage />
               ) : (
-                <Navigate to={"/dashboard"} />
+                <Navigate to={"/"} />
               )
             }
           />
         </Route>
         <Route
           path="profile"
-          element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+          element={authUser ? <ProfilePage /> : <Navigate to={"/dashboard"} />}
         />
         <Route
           path="/login"
@@ -80,23 +80,23 @@ const App = () => {
 
         <Route
           path="/problem/:id"
-          element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
+          element={authUser ? <ProblemPage /> : <Navigate to={"/dashboard"} />}
         />
         <Route
           path="/dashboard/contest-execution/:cid/:id"
           element={
-            authUser ? <ContestProblemExecPage /> : <Navigate to={"/login"} />
+            authUser ? <ContestProblemExecPage /> : <Navigate to={"/dashboard"} />
           }
         />
         <Route
           path="/dashboard/contest/create-contest"
           element={
-            authUser ? <CreateContestPage /> : <Navigate to={"/login"} />
+            authUser ? <CreateContestPage /> : <Navigate to={"/dashboard"} />
           }
         />
         <Route
           path="/"
-          element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
+          element={ <HomePage />}
         />
       </Routes>
     </div>
