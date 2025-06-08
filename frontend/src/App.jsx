@@ -16,7 +16,7 @@ import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
 import ContestProblemExecPage from "./page/ContestProblemExecPage";
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from '@vercel/analytics/react';
 
 
 const App = () => {
