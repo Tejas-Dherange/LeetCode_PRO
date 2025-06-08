@@ -28,8 +28,7 @@ const useAuthStore = create((set) => ({
     try {
       const res = await axiosInstance.post("/user/register", data);
 
-      // console.log("registered user data", res.data);
-      set({ authUser: res.data.user });
+      // Do NOT set authUser here to avoid auto-login after signup
       toast.success(res.data.message);
     } catch (error) {
       console.error("error occured while registering user", error);
