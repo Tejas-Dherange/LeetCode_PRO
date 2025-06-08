@@ -9,6 +9,7 @@ import {
   TrashIcon,
   Plus,
   Loader2,
+  MoreHorizontal,
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
@@ -33,6 +34,9 @@ const ProblemTable = ({ problems: initialProblems }) => {
   const { isLoading, createPlayList, addProblemToPlayList } =
     usePlaylistStore();
   const difficulties = ["EASY", "MEDIUM", "HARD"];
+
+  const [showTagsPopup, setShowTagsPopup] = useState(null);
+  const [showCompanyTagsPopup, setShowCompanyTagsPopup] = useState(null);
 
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];
@@ -89,7 +93,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
     }
   };
   return (
-    <div className="w-full max-w-6xl mx-auto mt-10">
+    <div className="w-full max-w-7xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
         <button
@@ -169,7 +173,20 @@ const ProblemTable = ({ problems: initialProblems }) => {
         >
           <option value="ALL">All Tags</option>
           {allTags.map((tag) => (
-            <option key={tag} value={tag}>
+            <option
+              key={tag}
+              value={tag}
+              style={
+                tag === "demo"
+                  ? {
+                      backgroundColor: '#6366f1', // indigo-500
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                    }
+                  : {}
+              }
+            >
               {tag}
             </option>
           ))}
@@ -183,6 +200,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
               <th>Solved</th>
               <th>Title</th>
               <th>Tags</th>
+              <th>Company</th>
               <th>Difficulty</th>
               <th>Actions</th>
             </tr>
@@ -213,19 +231,147 @@ const ProblemTable = ({ problems: initialProblems }) => {
                       </Link>
                     </td>
                     <td>
-                      <div className="flex flex-wrap gap-1">
-                        {(problem.tags || []).map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className={
-                              tag === "demo"
-                                ? "badge px-5 py-3 text-lg  text-white bg-indigo-500 uppercase animate-pulse transition-all duration-300 ease-in-out"
-                                : "badge badge-outline badge-warning text-xs font-bold"
-                            }
+                      <div className="flex flex-wrap gap-1 items-center relative">
+                        {(() => {
+                          const validTags = (problem.tags || []).filter(
+                            (tag) => tag && tag.trim(),
+                          );
+                          const showEllipsis = validTags.length > 2;
+                          const displayTags = showEllipsis
+                            ? validTags.slice(0, 2)
+                            : validTags;
+                          return (
+                            <>
+                              {displayTags.length > 0 ? (
+                                displayTags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={
+                                      tag === "demo"
+                                        ? "badge px-5 py-3 text-lg text-white bg-indigo-500 uppercase animate-pulse transition-all duration-300 ease-in-out"
+                                        : "badge badge-outline badge-warning text-xs font-bold"
+                                    }
+                                  >
+                                    {tag}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-xs text-gray-400 italic">
+                                  -
+                                </span>
+                              )}
+                              {showEllipsis && (
+                                <button
+                                  type="button"
+                                  className="btn btn-ghost btn-xs px-1"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowTagsPopup(
+                                      showTagsPopup === problem.id ? null : problem.id,
+                                    );
+                                  }}
+                                >
+                                  <MoreHorizontal className="w-6 h-4 bg-amber-900 rounded-xl" />
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                        {/* Popup for all tags */}
+                        {showTagsPopup === problem.id && (
+                          <div
+                            className="absolute left-0 z-50 bg-base-100 border rounded shadow-lg p-2 mt-2"
+                            style={{ top: "100%", marginTop: 8 }}
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            <div className="flex flex-wrap gap-1 max-w-xs">
+                              {problem.tags
+                                .filter((tag) => tag && tag.trim())
+                                .map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={
+                                      tag === "demo"
+                                        ? "badge px-5 py-3 text-lg text-white bg-indigo-500 uppercase animate-pulse transition-all duration-300 ease-in-out"
+                                        : "badge badge-outline badge-warning text-xs font-bold"
+                                    }
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                            </div>
+                            <button
+                              className="btn btn-xs btn-error mt-2 w-full"
+                              onClick={() => setShowTagsPopup(null)}
+                            >
+                              Close
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-1 items-center relative">
+                        {(() => {
+                          const validCompanyTags = (problem.companyTags || []).filter((tag) => tag && tag.trim());
+                          const showEllipsis = validCompanyTags.length > 2;
+                          const displayTags = showEllipsis ? validCompanyTags.slice(0, 2) : validCompanyTags;
+                          return (
+                            <>
+                              {displayTags.length > 0 ? (
+                                displayTags.map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="badge badge-info text-xs font-bold"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="text-xs text-gray-400 italic">-</span>
+                              )}
+                              {showEllipsis && (
+                                <button
+                                  type="button"
+                                  className="btn btn-ghost btn-xs px-1"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setShowCompanyTagsPopup(showCompanyTagsPopup === problem.id ? null : problem.id);
+                                  }}
+                                >
+                                  <MoreHorizontal className="w-6 h-4 bg-amber-900 rounded-xl" />
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                        {/* Popup for all company tags */}
+                        {showCompanyTagsPopup === problem.id && (
+                          <div
+                            className="absolute left-0 z-50 bg-base-100 border rounded shadow-lg p-2 mt-2"
+                            style={{ top: "100%", marginTop: 8 }}
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <div className="flex flex-wrap gap-1 max-w-xs">
+                              {problem.companyTags
+                                .filter((tag) => tag && tag.trim())
+                                .map((tag, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="badge badge-info text-xs font-bold"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                            </div>
+                            <button
+                              className="btn btn-xs btn-error mt-2 w-full"
+                              onClick={() => setShowCompanyTagsPopup(null)}
+                            >
+                              Close
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td>

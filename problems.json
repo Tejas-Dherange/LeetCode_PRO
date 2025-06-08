@@ -1,0 +1,341 @@
+[
+    {
+        "title": "Pow(x, n)",
+        "description": "Implement pow(x, n), which calculates x raised to the power n (i.e., x^n).",
+        "difficulty": "MEDIUM",
+        "tags": [
+            "recursion",
+            "divide-and-conquer",
+            "demo"
+        ],
+        "companyTags": [],
+        "examples": {
+            "PYTHON": {
+                "input": "2.00000 10",
+                "output": "1024.00000",
+                "explanation": "2^10 = 1024.00000"
+            },
+            "JAVASCRIPT": {
+                "input": "2.10000 3",
+                "output": "9.26100",
+                "explanation": "2.1^3 = 9.26100"
+            }
+        },
+        "constraints": "-100.0 < x < 100.0, -2^31 <= n <= 2^31-1, n is an integer, Either x is not zero or n > 0, -10^4 <= x^n <= 10^4",
+        "testcases": [
+            {
+                "input": "2.00000 10",
+                "output": "1024.00000"
+            },
+            {
+                "input": "2.10000 3",
+                "output": "9.26100"
+            },
+            {
+                "input": "2.00000 -2",
+                "output": "0.25000"
+            },
+            {
+                "input": "1.00000 -2147483648",
+                "output": "1.00000"
+            },
+            {
+                "input": "0.00001 2147483647",
+                "output": "0.00000"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\nfunction myPow(x, n) {\n    // Write your code here\n    // Return x raised to the power n\n    if (n === 0) return 1;\n    if (n < 0) {\n        x = 1 / x;\n        n = -n;\n    }\n    \n    let result = 1;\n    while (n > 0) {\n        if (n % 2 === 1) {\n            result *= x;\n        }\n        x *= x;\n        n = Math.floor(n / 2);\n    }\n    return result;\n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst [x, n] = input.split(' ');\nconsole.log(myPow(parseFloat(x), parseInt(n)).toFixed(5));",
+            "PYTHON": "def my_pow(x, n):\n    # Write your code here\n    # Return x raised to the power n\n    if n == 0:\n        return 1\n    if n < 0:\n        x = 1 / x\n        n = -n\n    \n    result = 1\n    while n > 0:\n        if n % 2 == 1:\n            result *= x\n        x *= x\n        n //= 2\n    return result\n\nimport sys\ninput_line = sys.stdin.read().strip()\nx, n = input_line.split()\nprint(f\"{my_pow(float(x), int(n)):.5f}\")",
+            "JAVA": "import java.util.Scanner;\n\npublic class Main {\n    public static double myPow(double x, int n) {\n        // Write your code here\n        // Return x raised to the power n\n        if (n == 0) return 1;\n        long longN = n;\n        if (longN < 0) {\n            x = 1 / x;\n            longN = -longN;\n        }\n        \n        double result = 1;\n        while (longN > 0) {\n            if (longN % 2 == 1) {\n                result *= x;\n            }\n            x *= x;\n            longN /= 2;\n        }\n        return result;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        double x = sc.nextDouble();\n        int n = sc.nextInt();\n        System.out.printf(\"%.5f\", myPow(x, n));\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst [x, n] = input.split(' ');\n\nfunction myPow(x, n) {\n    if (n === 0) return 1;\n    if (n < 0) {\n        x = 1 / x;\n        n = -n;\n    }\n    \n    let result = 1;\n    while (n > 0) {\n        if (n % 2 === 1) {\n            result *= x;\n        }\n        x *= x;\n        n = Math.floor(n / 2);\n    }\n    return result;\n}\n\nconsole.log(myPow(parseFloat(x), parseInt(n)).toFixed(5));",
+            "PYTHON": "import sys\ninput_line = sys.stdin.read().strip()\nx, n = input_line.split()\n\ndef my_pow(x, n):\n    if n == 0:\n        return 1\n    if n < 0:\n        x = 1 / x\n        n = -n\n    \n    result = 1\n    while n > 0:\n        if n % 2 == 1:\n            result *= x\n        x *= x\n        n //= 2\n    return result\n\nprint(f\"{my_pow(float(x), int(n)):.5f}\")",
+            "JAVA": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        double x = sc.nextDouble();\n        int n = sc.nextInt();\n        \n        double result = myPow(x, n);\n        System.out.printf(\"%.5f\", result);\n    }\n    \n    public static double myPow(double x, int n) {\n        if (n == 0) return 1;\n        long longN = n;\n        if (longN < 0) {\n            x = 1 / x;\n            longN = -longN;\n        }\n        \n        double result = 1;\n        while (longN > 0) {\n            if (longN % 2 == 1) {\n                result *= x;\n            }\n            x *= x;\n            longN /= 2;\n        }\n        return result;\n    }\n}"
+        }
+    },
+    {
+        "title": "Top K Frequent Elements",
+        "description": "Given an integer array nums and an integer k, return the k most frequent elements. You may return the answer in any order.",
+        "difficulty": "MEDIUM",
+        "tags": [
+            "array",
+            "hash table",
+            "demo"
+        ],
+        "companyTags": [
+            "Google",
+            "Facebook"
+        ],
+        "examples": {
+            "PYTHON": {
+                "input": "6 2\n1 1 1 2 2 3",
+                "output": "[1, 2]",
+                "explanation": "Element 1 appears 3 times, element 2 appears 2 times, and element 3 appears 1 time. The 2 most frequent elements are 1 and 2."
+            },
+            "JAVASCRIPT": {
+                "input": "1 1\n1",
+                "output": "[1]",
+                "explanation": "There is only one element in the array, so it is the most frequent element."
+            }
+        },
+        "constraints": "1 <= nums.length <= 10^5, -10^4 <= nums[i] <= 10^4, k is in the range [1, the number of unique elements in the array], It is guaranteed that the answer is unique.",
+        "testcases": [
+            {
+                "input": "6 2\n1 1 1 2 2 3",
+                "output": "[1, 2]"
+            },
+            {
+                "input": "1 1\n1",
+                "output": "[1]"
+            },
+            {
+                "input": "5 3\n4 1 -1 2 -1",
+                "output": "[-1, 1, 2]"
+            },
+            {
+                "input": "7 1\n3 0 1 0 0 2 3",
+                "output": "[0]"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\nfunction topKFrequent(nums, k) {\n    const frequencyMap = {};\n    \n    // Count frequencies\n    for (const num of nums) {\n        frequencyMap[num] = (frequencyMap[num] || 0) + 1;\n    }\n    \n    // Sort by frequency (descending) and then by value (ascending) for consistency\n    return Object.keys(frequencyMap)\n        .sort((a, b) => {\n            const freqDiff = frequencyMap[b] - frequencyMap[a];\n            return freqDiff !== 0 ? freqDiff : a - b;\n        })\n        .slice(0, k)\n        .map(Number);\n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, k] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\nconst result = topKFrequent(nums, k);\nconsole.log('[' + result.join(', ') + ']');",
+            "PYTHON": "def top_k_frequent(nums, k):\n    from collections import Counter\n    \n    # Count frequencies\n    frequency_map = Counter(nums)\n    \n    # Sort by frequency (descending) and then by value (ascending) for consistency\n    sorted_items = sorted(frequency_map.items(), key=lambda x: (-x[1], x[0]))\n    \n    # Return top k elements\n    return [num for num, freq in sorted_items[:k]]\n\nimport sys\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, k = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\nresult = top_k_frequent(nums, k)\nprint(result)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static int[] topKFrequent(int[] nums, int k) {\n        Map<Integer, Integer> frequencyMap = new HashMap<>();\n        \n        // Count frequencies\n        for (int num : nums) {\n            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);\n        }\n        \n        // Create list of entries and sort by frequency (desc) then by value (asc)\n        List<Map.Entry<Integer, Integer>> entries = new ArrayList<>(frequencyMap.entrySet());\n        entries.sort((a, b) -> {\n            int freqCompare = b.getValue().compareTo(a.getValue());\n            return freqCompare != 0 ? freqCompare : a.getKey().compareTo(b.getKey());\n        });\n        \n        int[] result = new int[k];\n        for (int i = 0; i < k; i++) {\n            result[i] = entries.get(i).getKey();\n        }\n        \n        return result;\n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int k = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        int[] result = topKFrequent(nums, k);\n        System.out.println(Arrays.toString(result));\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, k] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\nconst frequencyMap = {};\n\n// Count frequencies\nfor (const num of nums) {\n    frequencyMap[num] = (frequencyMap[num] || 0) + 1;\n}\n\n// Sort by frequency (descending) and then by value (ascending) for consistency\nconst result = Object.keys(frequencyMap)\n    .sort((a, b) => {\n        const freqDiff = frequencyMap[b] - frequencyMap[a];\n        return freqDiff !== 0 ? freqDiff : a - b;\n    })\n    .slice(0, k)\n    .map(Number);\n\nconsole.log('[' + result.join(', ') + ']');",
+            "PYTHON": "import sys\nfrom collections import Counter\n\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, k = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\n# Count frequencies\nfrequency_map = Counter(nums)\n\n# Sort by frequency (descending) and then by value (ascending) for consistency\nsorted_items = sorted(frequency_map.items(), key=lambda x: (-x[1], x[0]))\n\n# Get top k frequent elements\nresult = [num for num, freq in sorted_items[:k]]\n\nprint(result)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int k = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        Map<Integer, Integer> frequencyMap = new HashMap<>();\n        \n        // Count frequencies\n        for (int num : nums) {\n            frequencyMap.put(num, frequencyMap.getOrDefault(num, 0) + 1);\n        }\n        \n        // Create list of entries and sort by frequency (desc) then by value (asc)\n        List<Map.Entry<Integer, Integer>> entries = new ArrayList<>(frequencyMap.entrySet());\n        entries.sort((a, b) -> {\n            int freqCompare = b.getValue().compareTo(a.getValue());\n            return freqCompare != 0 ? freqCompare : a.getKey().compareTo(b.getKey());\n        });\n        \n        int[] result = new int[k];\n        for (int i = 0; i < k; i++) {\n            result[i] = entries.get(i).getKey();\n        }\n        \n        System.out.println(Arrays.toString(result));\n    }\n}"
+        }
+    },
+    {
+        "title": "Two Sum",
+        "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target. You may assume that each input would have exactly one solution, and you may not use the same element twice. You can return the answer in any order.",
+        "difficulty": "EASY",
+        "tags": [
+            "array",
+            "hash table",
+            "two pointers"
+        ],
+        "companyTags": [
+            "Adobe"
+        ],
+        "examples": {
+            "PYTHON": {
+                "input": "4 9\n2 7 11 15",
+                "output": "[0, 1]",
+                "explanation": "Because nums[0] + nums[1] == 9, we return [0, 1]."
+            },
+            "JAVASCRIPT": {
+                "input": "3 6\n3 2 4",
+                "output": "[1, 2]",
+                "explanation": "Because nums[1] + nums[2] == 6, we return [1, 2]."
+            }
+        },
+        "constraints": "2 <= nums.length <= 10^4, -10^9 <= nums[i] <= 10^9, -10^9 <= target <= 10^9, Only one valid answer exists.",
+        "testcases": [
+            {
+                "input": "4 9\n2 7 11 15",
+                "output": "[0, 1]"
+            },
+            {
+                "input": "3 6\n3 2 4",
+                "output": "[1, 2]"
+            },
+            {
+                "input": "2 6\n3 3",
+                "output": "[0, 1]"
+            },
+            {
+                "input": "4 13\n2 7 11 15",
+                "output": "[0, 2]"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\nfunction twoSum(nums, target) {\n    // Write your code here\n    // Return indices of two numbers that add up to target\n    \n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, target] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\nconst result = twoSum(nums, target);\nconsole.log('[' + result.join(', ') + ']');",
+            "PYTHON": "def two_sum(nums, target):\n    # Write your code here\n    # Return indices of two numbers that add up to target\n    \n\nimport sys\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, target = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\nresult = two_sum(nums, target)\nprint(result)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static int[] twoSum(int[] nums, int target) {\n        // Write your code here\n        // Return indices of two numbers that add up to target\n        \n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int target = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        int[] result = twoSum(nums, target);\n        System.out.println(Arrays.toString(result));\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, target] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\nconst numMap = new Map();\n\nfor (let i = 0; i < nums.length; i++) {\n    const complement = target - nums[i];\n    \n    if (numMap.has(complement)) {\n        const result = [numMap.get(complement), i];\n        console.log('[' + result.join(', ') + ']');\n        break;\n    }\n    \n    numMap.set(nums[i], i);\n}",
+            "PYTHON": "import sys\n\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, target = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\nnum_map = {}\n\nfor i, num in enumerate(nums):\n    complement = target - num\n    \n    if complement in num_map:\n        result = [num_map[complement], i]\n        print(result)\n        break\n    \n    num_map[num] = i",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int target = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        Map<Integer, Integer> numMap = new HashMap<>();\n        \n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            \n            if (numMap.containsKey(complement)) {\n                int[] result = {numMap.get(complement), i};\n                System.out.println(Arrays.toString(result));\n                break;\n            }\n            \n            numMap.put(nums[i], i);\n        }\n    }\n}"
+        }
+    },
+    {
+        "title": "Find Positive Integer Solution for a Given Equation",
+        "description": "Given a callable function f(x, y) with a hidden formula and a value z, reverse engineer the formula and return all positive integer pairs x and y where f(x,y) == z. You may return the pairs in any order. The function is monotonically increasing: f(x, y) < f(x + 1, y) and f(x, y) < f(x, y + 1).",
+        "difficulty": "MEDIUM",
+        "tags": [
+            "math",
+            "two pointers",
+            "binary search",
+            "interactive"
+        ],
+        "companyTags": [
+            "Google"
+        ],
+        "examples": {
+            "PYTHON": {
+                "input": "1 5",
+                "output": "[[1, 4], [2, 3], [3, 2], [4, 1]]",
+                "explanation": "The hidden formula for function_id = 1 is f(x, y) = x + y. The pairs (1,4), (2,3), (3,2), (4,1) all satisfy f(x,y) = 5."
+            },
+            "JAVASCRIPT": {
+                "input": "2 5",
+                "output": "[[1, 5], [5, 1]]",
+                "explanation": "The hidden formula for function_id = 2 is f(x, y) = x * y. The pairs (1,5) and (5,1) satisfy f(x,y) = 5."
+            }
+        },
+        "constraints": "1 <= function_id <= 9, 1 <= z <= 100, It is guaranteed that the solutions of f(x, y) == z will be in the range 1 <= x, y <= 1000, f(x, y) will fit in 32 bit signed integer if 1 <= x, y <= 1000.",
+        "testcases": [
+            {
+                "input": "1 5",
+                "output": "[[1, 4], [2, 3], [3, 2], [4, 1]]"
+            },
+            {
+                "input": "2 5",
+                "output": "[[1, 5], [5, 1]]"
+            },
+            {
+                "input": "1 3",
+                "output": "[[1, 2], [2, 1]]"
+            },
+            {
+                "input": "2 12",
+                "output": "[[1, 12], [2, 6], [3, 4], [4, 3], [6, 2], [12, 1]]"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Custom function implementations based on function_id\nfunction customFunction(function_id, x, y) {\n    switch(function_id) {\n        case 1: return x + y;\n        case 2: return x * y;\n        case 3: return x * x + y;\n        case 4: return x + y * y;\n        case 5: return x * x + y * y;\n        case 6: return x * y * y;\n        case 7: return x * x * y;\n        case 8: return x * x * x + y * y * y;\n        case 9: return Math.pow(x, 3) + Math.pow(y, 2);\n        default: return x + y;\n    }\n}\n\nfunction findSolution(function_id, z) {\n    // Write your code here\n    // Return all pairs [x, y] where customFunction(function_id, x, y) == z\n    \n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst [function_id, z] = input.split(' ').map(Number);\n\nconst result = findSolution(function_id, z);\n// Format output to match expected format with spaces\nconst formatted = '[' + result.map(pair => '[' + pair.join(', ') + ']').join(', ') + ']';\nconsole.log(formatted);",
+            "PYTHON": "def custom_function(function_id, x, y):\n    if function_id == 1:\n        return x + y\n    elif function_id == 2:\n        return x * y\n    elif function_id == 3:\n        return x * x + y\n    elif function_id == 4:\n        return x + y * y\n    elif function_id == 5:\n        return x * x + y * y\n    elif function_id == 6:\n        return x * y * y\n    elif function_id == 7:\n        return x * x * y\n    elif function_id == 8:\n        return x * x * x + y * y * y\n    elif function_id == 9:\n        return x ** 3 + y ** 2\n    else:\n        return x + y\n\ndef find_solution(function_id, z):\n    # Write your code here\n    # Return all pairs [x, y] where custom_function(function_id, x, y) == z\n    \n\nimport sys\nimport json\n\ninput_line = sys.stdin.read().strip()\nfunction_id, z = map(int, input_line.split())\n\nresult = find_solution(function_id, z)\n# Format output to match expected format with spaces\nformatted = '[' + ', '.join('[' + ', '.join(map(str, pair)) + ']' for pair in result) + ']'\nprint(formatted)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static int customFunction(int functionId, int x, int y) {\n        switch(functionId) {\n            case 1: return x + y;\n            case 2: return x * y;\n            case 3: return x * x + y;\n            case 4: return x + y * y;\n            case 5: return x * x + y * y;\n            case 6: return x * y * y;\n            case 7: return x * x * y;\n            case 8: return x * x * x + y * y * y;\n            case 9: return (int)(Math.pow(x, 3) + Math.pow(y, 2));\n            default: return x + y;\n        }\n    }\n    \n    public static List<List<Integer>> findSolution(int functionId, int z) {\n        // Write your code here\n        // Return all pairs [x, y] where customFunction(functionId, x, y) == z\n        \n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] input = br.readLine().split(\" \");\n        int functionId = Integer.parseInt(input[0]);\n        int z = Integer.parseInt(input[1]);\n        \n        List<List<Integer>> result = findSolution(functionId, z);\n        \n        System.out.print(\"[\");\n        for (int i = 0; i < result.size(); i++) {\n            System.out.print(\"[\" + result.get(i).get(0) + \", \" + result.get(i).get(1) + \"]\");\n            if (i < result.size() - 1) System.out.print(\", \");\n        }\n        System.out.println(\"]\");\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Custom function implementations based on function_id\nfunction customFunction(function_id, x, y) {\n    switch(function_id) {\n        case 1: return x + y;\n        case 2: return x * y;\n        case 3: return x * x + y;\n        case 4: return x + y * y;\n        case 5: return x * x + y * y;\n        case 6: return x * y * y;\n        case 7: return x * x * y;\n        case 8: return x * x * x + y * y * y;\n        case 9: return Math.pow(x, 3) + Math.pow(y, 2);\n        default: return x + y;\n    }\n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst [function_id, z] = input.split(' ').map(Number);\n\nconst result = [];\n\n// Two pointer approach\nlet x = 1, y = 1000;\n\nwhile (x <= 1000 && y >= 1) {\n    const val = customFunction(function_id, x, y);\n    \n    if (val === z) {\n        result.push([x, y]);\n        x++;\n        y--;\n    } else if (val < z) {\n        x++;\n    } else {\n        y--;\n    }\n}\n\n// Format output to match expected format with spaces\nconst formatted = '[' + result.map(pair => '[' + pair.join(', ') + ']').join(', ') + ']';\nconsole.log(formatted);",
+            "PYTHON": "import sys\nimport json\n\ndef custom_function(function_id, x, y):\n    if function_id == 1:\n        return x + y\n    elif function_id == 2:\n        return x * y\n    elif function_id == 3:\n        return x * x + y\n    elif function_id == 4:\n        return x + y * y\n    elif function_id == 5:\n        return x * x + y * y\n    elif function_id == 6:\n        return x * y * y\n    elif function_id == 7:\n        return x * x * y\n    elif function_id == 8:\n        return x * x * x + y * y * y\n    elif function_id == 9:\n        return x ** 3 + y ** 2\n    else:\n        return x + y\n\ninput_line = sys.stdin.read().strip()\nfunction_id, z = map(int, input_line.split())\n\nresult = []\n\n# Two pointer approach\nx, y = 1, 1000\n\nwhile x <= 1000 and y >= 1:\n    val = custom_function(function_id, x, y)\n    \n    if val == z:\n        result.append([x, y])\n        x += 1\n        y -= 1\n    elif val < z:\n        x += 1\n    else:\n        y -= 1\n\n# Format output to match expected format with spaces\nformatted = '[' + ', '.join('[' + ', '.join(map(str, pair)) + ']' for pair in result) + ']'\nprint(formatted)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static int customFunction(int functionId, int x, int y) {\n        switch(functionId) {\n            case 1: return x + y;\n            case 2: return x * y;\n            case 3: return x * x + y;\n            case 4: return x + y * y;\n            case 5: return x * x + y * y;\n            case 6: return x * y * y;\n            case 7: return x * x * y;\n            case 8: return x * x * x + y * y * y;\n            case 9: return (int)(Math.pow(x, 3) + Math.pow(y, 2));\n            default: return x + y;\n        }\n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] input = br.readLine().split(\" \");\n        int functionId = Integer.parseInt(input[0]);\n        int z = Integer.parseInt(input[1]);\n        \n        List<List<Integer>> result = new ArrayList<>();\n        \n        // Two pointer approach\n        int x = 1, y = 1000;\n        \n        while (x <= 1000 && y >= 1) {\n            int val = customFunction(functionId, x, y);\n            \n            if (val == z) {\n                result.add(Arrays.asList(x, y));\n                x++;\n                y--;\n            } else if (val < z) {\n                x++;\n            } else {\n                y--;\n            }\n        }\n        \n        System.out.print(\"[\");\n        for (int i = 0; i < result.size(); i++) {\n            System.out.print(\"[\" + result.get(i).get(0) + \", \" + result.get(i).get(1) + \"]\");\n            if (i < result.size() - 1) System.out.print(\", \");\n        }\n        System.out.println(\"]\");\n    }\n}"
+        }
+    },
+    {
+        "title": "Kth Largest Element in an Array",
+        "description": "Given an integer array nums and an integer k, return the kth largest element in the array. Note that it is the kth largest element in the sorted order, not the kth distinct element. Can you solve it without sorting?",
+        "difficulty": "MEDIUM",
+        "tags": [
+            "array",
+            "divide and conquer",
+            "sorting",
+            "heap",
+            "quickselect"
+        ],
+        "companyTags": [
+            "Google",
+            "Amazon",
+            "Uber"
+        ],
+        "examples": {
+            "PYTHON": {
+                "input": "6 2\n3 2 1 5 6 4",
+                "output": "5",
+                "explanation": "The array in sorted order is [6, 5, 4, 3, 2, 1]. The 2nd largest element is 5."
+            },
+            "JAVASCRIPT": {
+                "input": "9 4\n3 2 3 1 2 4 5 5 6",
+                "output": "4",
+                "explanation": "The array in sorted order is [6, 5, 5, 4, 3, 3, 2, 2, 1]. The 4th largest element is 4."
+            }
+        },
+        "constraints": "1 <= k <= nums.length <= 10^5, -10^4 <= nums[i] <= 10^4",
+        "testcases": [
+            {
+                "input": "6 2\n3 2 1 5 6 4",
+                "output": "5"
+            },
+            {
+                "input": "9 4\n3 2 3 1 2 4 5 5 6",
+                "output": "4"
+            },
+            {
+                "input": "3 1\n7 10 4",
+                "output": "10"
+            },
+            {
+                "input": "5 3\n1 2 3 4 5",
+                "output": "3"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\nfunction findKthLargest(nums, k) {\n    // Write your code here\n    // Return the kth largest element in the array\n    \n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, k] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\nconst result = findKthLargest(nums, k);\nconsole.log(result);",
+            "PYTHON": "def find_kth_largest(nums, k):\n    # Write your code here\n    # Return the kth largest element in the array\n    \n\nimport sys\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, k = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\nresult = find_kth_largest(nums, k)\nprint(result)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static int findKthLargest(int[] nums, int k) {\n        // Write your code here\n        // Return the kth largest element in the array\n        \n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int k = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        int result = findKthLargest(nums, k);\n        System.out.println(result);\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim().split('\\n');\nconst [n, k] = input[0].split(' ').map(Number);\nconst nums = input[1].split(' ').map(Number);\n\n// QuickSelect algorithm - average O(n) time complexity\nfunction quickSelect(arr, left, right, k) {\n    if (left === right) {\n        return arr[left];\n    }\n    \n    const pivotIndex = partition(arr, left, right);\n    \n    if (k === pivotIndex) {\n        return arr[k];\n    } else if (k < pivotIndex) {\n        return quickSelect(arr, left, pivotIndex - 1, k);\n    } else {\n        return quickSelect(arr, pivotIndex + 1, right, k);\n    }\n}\n\nfunction partition(arr, left, right) {\n    const pivot = arr[right];\n    let i = left;\n    \n    for (let j = left; j < right; j++) {\n        if (arr[j] >= pivot) {\n            [arr[i], arr[j]] = [arr[j], arr[i]];\n            i++;\n        }\n    }\n    \n    [arr[i], arr[right]] = [arr[right], arr[i]];\n    return i;\n}\n\nconst result = quickSelect(nums, 0, nums.length - 1, k - 1);\nconsole.log(result);",
+            "PYTHON": "import sys\n\ninput_lines = sys.stdin.read().strip().split('\\n')\nn, k = map(int, input_lines[0].split())\nnums = list(map(int, input_lines[1].split()))\n\n# QuickSelect algorithm - average O(n) time complexity\ndef quick_select(arr, left, right, k):\n    if left == right:\n        return arr[left]\n    \n    pivot_index = partition(arr, left, right)\n    \n    if k == pivot_index:\n        return arr[k]\n    elif k < pivot_index:\n        return quick_select(arr, left, pivot_index - 1, k)\n    else:\n        return quick_select(arr, pivot_index + 1, right, k)\n\ndef partition(arr, left, right):\n    pivot = arr[right]\n    i = left\n    \n    for j in range(left, right):\n        if arr[j] >= pivot:\n            arr[i], arr[j] = arr[j], arr[i]\n            i += 1\n    \n    arr[i], arr[right] = arr[right], arr[i]\n    return i\n\nresult = quick_select(nums, 0, len(nums) - 1, k - 1)\nprint(result)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    // QuickSelect algorithm - average O(n) time complexity\n    public static int quickSelect(int[] nums, int left, int right, int k) {\n        if (left == right) {\n            return nums[left];\n        }\n        \n        int pivotIndex = partition(nums, left, right);\n        \n        if (k == pivotIndex) {\n            return nums[k];\n        } else if (k < pivotIndex) {\n            return quickSelect(nums, left, pivotIndex - 1, k);\n        } else {\n            return quickSelect(nums, pivotIndex + 1, right, k);\n        }\n    }\n    \n    public static int partition(int[] nums, int left, int right) {\n        int pivot = nums[right];\n        int i = left;\n        \n        for (int j = left; j < right; j++) {\n            if (nums[j] >= pivot) {\n                int temp = nums[i];\n                nums[i] = nums[j];\n                nums[j] = temp;\n                i++;\n            }\n        }\n        \n        int temp = nums[i];\n        nums[i] = nums[right];\n        nums[right] = temp;\n        \n        return i;\n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String[] firstLine = br.readLine().split(\" \");\n        int n = Integer.parseInt(firstLine[0]);\n        int k = Integer.parseInt(firstLine[1]);\n        \n        String[] numsStr = br.readLine().split(\" \");\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) {\n            nums[i] = Integer.parseInt(numsStr[i]);\n        }\n        \n        int result = quickSelect(nums, 0, nums.length - 1, k - 1);\n        System.out.println(result);\n    }\n}"
+        }
+    },
+    {
+        "title": "Remove Invalid Parentheses",
+        "description": "Given a string s that contains parentheses and letters, remove the minimum number of invalid parentheses to make the input string valid. Return a list of unique strings that are valid with the minimum number of removals. You may return the answer in any order.",
+        "difficulty": "HARD",
+        "tags": [
+            "string",
+            "backtracking",
+            "breadth-first search",
+            "depth-first search"
+        ],
+        "companyTags": [
+            "Facebook",
+            "Google",
+            "Microsoft"
+        ],
+        "examples": {
+            "PYTHON": {
+                "input": "()())()",
+                "output": "[\"(())()\" \"()()()\"]\n",
+                "explanation": "Remove one ')' to get \"(())()\" or \"()()()\"."
+            },
+            "JAVASCRIPT": {
+                "input": "(a)())()",
+                "output": "[\"(a())()\" \"(a)()()\"]\n",
+                "explanation": "Remove one ')' to get \"(a())()\" or \"(a)()()\"."
+            }
+        },
+        "constraints": "1 <= s.length <= 25, s consists of lowercase English letters and parentheses '(' and ')', There will be at most 20 parentheses in s.",
+        "testcases": [
+            {
+                "input": "()())()",
+                "output": "[\"(())()\" \"()()()\"]\n"
+            },
+            {
+                "input": "(a)())()",
+                "output": "[\"(a())()\" \"(a)()()\"]\n"
+            },
+            {
+                "input": ")(",
+                "output": "[\"\"]\n"
+            },
+            {
+                "input": "(()",
+                "output": "[\"()\"]\n"
+            },
+            {
+                "input": "())",
+                "output": "[\"()\"]\n"
+            }
+        ],
+        "codeSnippets": {
+            "JAVASCRIPT": "const fs = require('fs');\n\nfunction removeInvalidParentheses(s) {\n    // Write your code here\n    // Return array of valid strings with minimum removals\n    \n}\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst s = input;\n\nconst result = removeInvalidParentheses(s);\nresult.sort();\nconst output = '[' + result.map(str => `\"${str}\"`).join(' ') + ']';\nconsole.log(output);",
+            "PYTHON": "def remove_invalid_parentheses(s):\n    # Write your code here\n    # Return list of valid strings with minimum removals\n    \n\nimport sys\ninput_line = sys.stdin.read().strip()\ns = input_line\n\nresult = remove_invalid_parentheses(s)\nresult.sort()\noutput = '[' + ' '.join(f'\"{string}\"' for string in result) + ']'\nprint(output)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    public static List<String> removeInvalidParentheses(String s) {\n        // Write your code here\n        // Return list of valid strings with minimum removals\n        \n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        \n        List<String> result = removeInvalidParentheses(s);\n        Collections.sort(result);\n        \n        StringBuilder output = new StringBuilder(\"[\");\n        for (int i = 0; i < result.size(); i++) {\n            if (i > 0) output.append(\" \");\n            output.append(\"\\\"\").append(result.get(i)).append(\"\\\"\");\n        }\n        output.append(\"]\");\n        System.out.println(output.toString());\n    }\n}"
+        },
+        "referenceSolutions": {
+            "JAVASCRIPT": "const fs = require('fs');\n\n// Reading input from stdin\nconst input = fs.readFileSync(0, 'utf-8').trim();\nconst s = input;\n\n// BFS approach to find all valid strings with minimum removals\nfunction removeInvalidParentheses(s) {\n    const result = [];\n    const visited = new Set();\n    const queue = [s];\n    let found = false;\n    \n    while (queue.length > 0 && !found) {\n        const size = queue.length;\n        \n        for (let i = 0; i < size; i++) {\n            const current = queue.shift();\n            \n            if (isValid(current)) {\n                result.push(current);\n                found = true;\n            }\n            \n            if (!found) {\n                for (let j = 0; j < current.length; j++) {\n                    if (current[j] === '(' || current[j] === ')') {\n                        const next = current.slice(0, j) + current.slice(j + 1);\n                        if (!visited.has(next)) {\n                            visited.add(next);\n                            queue.push(next);\n                        }\n                    }\n                }\n            }\n        }\n    }\n    \n    return result;\n}\n\nfunction isValid(s) {\n    let count = 0;\n    for (const char of s) {\n        if (char === '(') {\n            count++;\n        } else if (char === ')') {\n            count--;\n            if (count < 0) {\n                return false;\n            }\n        }\n    }\n    return count === 0;\n}\n\nconst result = removeInvalidParentheses(s);\nresult.sort();\nconst output = '[' + result.map(str => `\"${str}\"`).join(' ') + ']';\nconsole.log(output);",
+            "PYTHON": "import sys\nfrom collections import deque\n\ninput_line = sys.stdin.read().strip()\ns = input_line\n\n# BFS approach to find all valid strings with minimum removals\ndef remove_invalid_parentheses(s):\n    result = []\n    visited = set()\n    queue = deque([s])\n    found = False\n    \n    while queue and not found:\n        size = len(queue)\n        \n        for _ in range(size):\n            current = queue.popleft()\n            \n            if is_valid(current):\n                result.append(current)\n                found = True\n            \n            if not found:\n                for j in range(len(current)):\n                    if current[j] in '()':\n                        next_str = current[:j] + current[j+1:]\n                        if next_str not in visited:\n                            visited.add(next_str)\n                            queue.append(next_str)\n    \n    return result\n\ndef is_valid(s):\n    count = 0\n    for char in s:\n        if char == '(':\n            count += 1\n        elif char == ')':\n            count -= 1\n            if count < 0:\n                return False\n    return count == 0\n\nresult = remove_invalid_parentheses(s)\nresult.sort()\noutput = '[' + ' '.join(f'\"{string}\"' for string in result) + ']'\nprint(output)",
+            "JAVA": "import java.util.*;\nimport java.io.*;\n\npublic class Main {\n    // BFS approach to find all valid strings with minimum removals\n    public static List<String> removeInvalidParentheses(String s) {\n        List<String> result = new ArrayList<>();\n        Set<String> visited = new HashSet<>();\n        Queue<String> queue = new LinkedList<>();\n        queue.offer(s);\n        boolean found = false;\n        \n        while (!queue.isEmpty() && !found) {\n            int size = queue.size();\n            \n            for (int i = 0; i < size; i++) {\n                String current = queue.poll();\n                \n                if (isValid(current)) {\n                    result.add(current);\n                    found = true;\n                }\n                \n                if (!found) {\n                    for (int j = 0; j < current.length(); j++) {\n                        if (current.charAt(j) == '(' || current.charAt(j) == ')') {\n                            String next = current.substring(0, j) + current.substring(j + 1);\n                            if (!visited.contains(next)) {\n                                visited.add(next);\n                                queue.offer(next);\n                            }\n                        }\n                    }\n                }\n            }\n        }\n        \n        return result;\n    }\n    \n    private static boolean isValid(String s) {\n        int count = 0;\n        for (char c : s.toCharArray()) {\n            if (c == '(') {\n                count++;\n            } else if (c == ')') {\n                count--;\n                if (count < 0) {\n                    return false;\n                }\n            }\n        }\n        return count == 0;\n    }\n\n    public static void main(String[] args) throws IOException {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String s = br.readLine();\n        \n        List<String> result = removeInvalidParentheses(s);\n        Collections.sort(result);\n        \n        StringBuilder output = new StringBuilder(\"[\");\n        for (int i = 0; i < result.size(); i++) {\n            if (i > 0) output.append(\" \");\n            output.append(\"\\\"\").append(result.get(i)).append(\"\\\"\");\n        }\n        output.append(\"]\");\n        System.out.println(output.toString());\n    }\n}"
+        }
+    }
+]

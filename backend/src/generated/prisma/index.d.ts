@@ -3298,6 +3298,7 @@ export namespace Prisma {
     description: number
     difficulty: number
     tags: number
+    companyTags: number
     userId: number
     examples: number
     constraints: number
@@ -3344,6 +3345,7 @@ export namespace Prisma {
     description?: true
     difficulty?: true
     tags?: true
+    companyTags?: true
     userId?: true
     examples?: true
     constraints?: true
@@ -3435,6 +3437,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags: string[]
+    companyTags: string[]
     userId: string
     examples: JsonValue
     constraints: string
@@ -3470,6 +3473,7 @@ export namespace Prisma {
     description?: boolean
     difficulty?: boolean
     tags?: boolean
+    companyTags?: boolean
     userId?: boolean
     examples?: boolean
     constraints?: boolean
@@ -3494,6 +3498,7 @@ export namespace Prisma {
     description?: boolean
     difficulty?: boolean
     tags?: boolean
+    companyTags?: boolean
     userId?: boolean
     examples?: boolean
     constraints?: boolean
@@ -3513,6 +3518,7 @@ export namespace Prisma {
     description?: boolean
     difficulty?: boolean
     tags?: boolean
+    companyTags?: boolean
     userId?: boolean
     examples?: boolean
     constraints?: boolean
@@ -3532,6 +3538,7 @@ export namespace Prisma {
     description?: boolean
     difficulty?: boolean
     tags?: boolean
+    companyTags?: boolean
     userId?: boolean
     examples?: boolean
     constraints?: boolean
@@ -3544,7 +3551,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProblemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "difficulty" | "tags" | "userId" | "examples" | "constraints" | "hints" | "editorial" | "testcase" | "codeSnippet" | "referenceSolution" | "createdAt" | "updatedAt", ExtArgs["result"]["problem"]>
+  export type ProblemOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "difficulty" | "tags" | "companyTags" | "userId" | "examples" | "constraints" | "hints" | "editorial" | "testcase" | "codeSnippet" | "referenceSolution" | "createdAt" | "updatedAt", ExtArgs["result"]["problem"]>
   export type ProblemInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     Submission?: boolean | Problem$SubmissionArgs<ExtArgs>
@@ -3575,6 +3582,7 @@ export namespace Prisma {
       description: string
       difficulty: $Enums.Difficulty
       tags: string[]
+      companyTags: string[]
       userId: string
       examples: Prisma.JsonValue
       constraints: string
@@ -4018,6 +4026,7 @@ export namespace Prisma {
     readonly description: FieldRef<"Problem", 'String'>
     readonly difficulty: FieldRef<"Problem", 'Difficulty'>
     readonly tags: FieldRef<"Problem", 'String[]'>
+    readonly companyTags: FieldRef<"Problem", 'String[]'>
     readonly userId: FieldRef<"Problem", 'String'>
     readonly examples: FieldRef<"Problem", 'Json'>
     readonly constraints: FieldRef<"Problem", 'String'>
@@ -14655,6 +14664,7 @@ export namespace Prisma {
     description: 'description',
     difficulty: 'difficulty',
     tags: 'tags',
+    companyTags: 'companyTags',
     userId: 'userId',
     examples: 'examples',
     constraints: 'constraints',
@@ -15043,6 +15053,7 @@ export namespace Prisma {
     description?: StringFilter<"Problem"> | string
     difficulty?: EnumDifficultyFilter<"Problem"> | $Enums.Difficulty
     tags?: StringNullableListFilter<"Problem">
+    companyTags?: StringNullableListFilter<"Problem">
     userId?: StringFilter<"Problem"> | string
     examples?: JsonFilter<"Problem">
     constraints?: StringFilter<"Problem"> | string
@@ -15066,6 +15077,7 @@ export namespace Prisma {
     description?: SortOrder
     difficulty?: SortOrder
     tags?: SortOrder
+    companyTags?: SortOrder
     userId?: SortOrder
     examples?: SortOrder
     constraints?: SortOrder
@@ -15092,6 +15104,7 @@ export namespace Prisma {
     description?: StringFilter<"Problem"> | string
     difficulty?: EnumDifficultyFilter<"Problem"> | $Enums.Difficulty
     tags?: StringNullableListFilter<"Problem">
+    companyTags?: StringNullableListFilter<"Problem">
     userId?: StringFilter<"Problem"> | string
     examples?: JsonFilter<"Problem">
     constraints?: StringFilter<"Problem"> | string
@@ -15115,6 +15128,7 @@ export namespace Prisma {
     description?: SortOrder
     difficulty?: SortOrder
     tags?: SortOrder
+    companyTags?: SortOrder
     userId?: SortOrder
     examples?: SortOrder
     constraints?: SortOrder
@@ -15139,6 +15153,7 @@ export namespace Prisma {
     description?: StringWithAggregatesFilter<"Problem"> | string
     difficulty?: EnumDifficultyWithAggregatesFilter<"Problem"> | $Enums.Difficulty
     tags?: StringNullableListFilter<"Problem">
+    companyTags?: StringNullableListFilter<"Problem">
     userId?: StringWithAggregatesFilter<"Problem"> | string
     examples?: JsonWithAggregatesFilter<"Problem">
     constraints?: StringWithAggregatesFilter<"Problem"> | string
@@ -15930,6 +15945,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -15952,6 +15968,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -15974,6 +15991,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15996,6 +16014,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -16018,6 +16037,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -16036,6 +16056,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16053,6 +16074,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -17048,6 +17070,7 @@ export namespace Prisma {
     description?: SortOrder
     difficulty?: SortOrder
     tags?: SortOrder
+    companyTags?: SortOrder
     userId?: SortOrder
     examples?: SortOrder
     constraints?: SortOrder
@@ -17768,6 +17791,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type ProblemCreatecompanyTagsInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutProblemInput = {
     create?: XOR<UserCreateWithoutProblemInput, UserUncheckedCreateWithoutProblemInput>
     connectOrCreate?: UserCreateOrConnectWithoutProblemInput
@@ -17835,6 +17862,11 @@ export namespace Prisma {
   }
 
   export type ProblemUpdatetagsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type ProblemUpdatecompanyTagsInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -18519,6 +18551,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -18540,6 +18573,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -18710,6 +18744,7 @@ export namespace Prisma {
     description?: StringFilter<"Problem"> | string
     difficulty?: EnumDifficultyFilter<"Problem"> | $Enums.Difficulty
     tags?: StringNullableListFilter<"Problem">
+    companyTags?: StringNullableListFilter<"Problem">
     userId?: StringFilter<"Problem"> | string
     examples?: JsonFilter<"Problem">
     constraints?: StringFilter<"Problem"> | string
@@ -19156,6 +19191,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -19177,6 +19213,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -19295,6 +19332,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19316,6 +19354,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -19491,6 +19530,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -19512,6 +19552,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -19590,6 +19631,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19611,6 +19653,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -19771,6 +19814,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -19792,6 +19836,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -19858,6 +19903,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19879,6 +19925,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -20005,6 +20052,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -20026,6 +20074,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     userId: string
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
@@ -20096,6 +20145,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20117,6 +20167,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     userId?: StringFieldUpdateOperationsInput | string
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
@@ -20274,6 +20325,7 @@ export namespace Prisma {
     description: string
     difficulty: $Enums.Difficulty
     tags?: ProblemCreatetagsInput | string[]
+    companyTags?: ProblemCreatecompanyTagsInput | string[]
     examples: JsonNullValueInput | InputJsonValue
     constraints: string
     hints?: string | null
@@ -20329,6 +20381,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20350,6 +20403,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20371,6 +20425,7 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     difficulty?: EnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty
     tags?: ProblemUpdatetagsInput | string[]
+    companyTags?: ProblemUpdatecompanyTagsInput | string[]
     examples?: JsonNullValueInput | InputJsonValue
     constraints?: StringFieldUpdateOperationsInput | string
     hints?: NullableStringFieldUpdateOperationsInput | string | null

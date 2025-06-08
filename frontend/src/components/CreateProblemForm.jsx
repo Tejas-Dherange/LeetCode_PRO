@@ -16,12 +16,14 @@ import { useState } from "react";
 import { axiosInstance } from "../libs/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useProblemStore } from "../store/useProblemStore";
 
 const problemSchema = z.object({
   title: z.string().min(3, "title must be atleast 3 character"),
   description: z.string().min(10, "description must be atleast 10 character"),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
   tags: z.array(z.string()).min(1, "tags must be atleast one"),
+  companyTags: z.array(z.string()).optional(),
   constraints: z.string().min(1, "atleast one constraint is required"),
   hints: z.string().optional(),
   editorial: z.string().optional(),
@@ -523,6 +525,7 @@ const CreateProblemForm = () => {
     defaultValues: {
       testcases: [{ input: "", output: "" }],
       tags: [""],
+      companyTags: [""],
       examples: {
         JAVASCRIPT: { input: "", output: "", explanation: "" },
         PYTHON: { input: "", output: "", explanation: "" },
@@ -559,17 +562,26 @@ const CreateProblemForm = () => {
     name: "tags",
     control,
   });
+  const {
+    fields: companyTagFields,
+    append: appendCompanyTag,
+    remove: removeCompanyTag,
+    replace: replaceCompanyTag,
+  } = useFieldArray({
+    name: "companyTags",
+    control,
+  });
 
   const [isLoading, setIsLoading] = useState(false);
+  const { getAllProblems } = useProblemStore();
 
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
-
       const res = await axiosInstance.post("/problems/create-problem", data);
-      // console.log("hello data", data);
-      
-      navigation("/");
+      // Refresh problems in store so dashboard is up-to-date
+      await getAllProblems();
+      navigation("/dashboard");
       toast.success(res.message || "Problem created successfully");
     } catch (error) {
       console.error("error while creating problem", error);
@@ -707,7 +719,7 @@ const CreateProblemForm = () => {
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
-                  onClick={() => appendTag("")}
+                  onClick={() => appendTags("")}
                 >
                   <Plus className="w-4 h-4 mr-1" /> Add Tag
                 </button>
@@ -724,7 +736,7 @@ const CreateProblemForm = () => {
                     <button
                       type="button"
                       className="btn btn-ghost btn-square btn-sm"
-                      onClick={() => removeTag(index)}
+                      onClick={() => removeTags(index)}
                       disabled={tagFields.length === 1}
                     >
                       <Trash2 className="w-4 h-4 text-error" />
@@ -736,6 +748,50 @@ const CreateProblemForm = () => {
                 <div className="mt-2">
                   <span className="text-error text-sm">
                     {errors.tags.message}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Company Tags */}
+            <div className="card bg-base-200 p-4 md:p-6 shadow-md">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  Company Tags
+                </h3>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => appendCompanyTag("")}
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Add Company Tag
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {companyTagFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      className="input input-bordered flex-1"
+                      {...register(`companyTags.${index}`)}
+                      placeholder="Enter company tag"
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-square btn-sm"
+                      onClick={() => removeCompanyTag(index)}
+                      disabled={companyTagFields.length === 1}
+                    >
+                      <Trash2 className="w-4 h-4 text-error" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              {errors.companyTags && (
+                <div className="mt-2">
+                  <span className="text-error text-sm">
+                    {errors.companyTags.message}
                   </span>
                 </div>
               )}

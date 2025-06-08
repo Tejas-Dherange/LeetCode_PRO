@@ -16,6 +16,7 @@ const createProblem = async (req, res) => {
     description,
     difficulty,
     tags,
+    companyTags, // <-- add this
     examples,
     constraints,
     testcases,
@@ -84,6 +85,7 @@ const createProblem = async (req, res) => {
         description,
         difficulty,
         tags,
+        companyTags, // <-- add this
         examples,
         constraints,
         testcase: testcases,
@@ -227,6 +229,7 @@ const updateProblem = async (req, res) => {
     description,
     difficulty,
     tags,
+    companyTags, // <-- add this
     examples,
     constraints,
     testcases,
@@ -304,6 +307,7 @@ const updateProblem = async (req, res) => {
         description,
         difficulty,
         tags,
+        companyTags, // <-- add this
         examples,
         constraints,
         testcase: testcases,

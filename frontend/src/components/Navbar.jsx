@@ -63,7 +63,7 @@ const Navbar = () => {
                     "https://avatar.iran.liara.run/public/boy"
                   }
                   alt="User Avatar"
-                  className="object-cover"
+                  className="object-cover border rounded-full w-10 h-10"
                 />
               </div>
             </label>
