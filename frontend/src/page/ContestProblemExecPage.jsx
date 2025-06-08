@@ -48,6 +48,8 @@ const ContestProblemExecPage = () => {
   useEffect(() => {
     getProblemById(id);
     getSubmissionCountForProblem(id);
+    // Clear run results when navigating to a new problem
+    useExecutionStore.getState().clearRunResults();
   }, [id]);
 
   //   console.log("Problem", problem);

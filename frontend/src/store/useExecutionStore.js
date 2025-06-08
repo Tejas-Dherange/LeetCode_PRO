@@ -61,4 +61,5 @@ export const useExecutionStore = create((set) => ({
       set({ isSubmitExecuting: false });
     }
   },
+  clearRunResults: () => set({ runResults: null }),
 }));
