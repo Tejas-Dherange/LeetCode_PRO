@@ -16,6 +16,8 @@ import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
 import ContestProblemExecPage from "./page/ContestProblemExecPage";
+import { Analytics } from "@vercel/analytics/next"
+
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
@@ -37,6 +39,8 @@ const App = () => {
 
   return (
     <div className="flex flex-col items-center justify-start">
+      
+      <Analytics />
       <Toaster />
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
