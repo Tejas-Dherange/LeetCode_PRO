@@ -2,15 +2,20 @@ import { loginSchema } from "../schema/loginSchema";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Code, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
 import useAuthStore from "../store/useAuthStore";
 
 function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  // Set default theme to black (dark) on mount
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
 
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const { login, isLogingIn } = useAuthStore();
 
   const {
@@ -22,6 +27,7 @@ function LoginPage() {
   const onSubmit = async (data) => {
     try {
       await login(data);
+      navigate("/dashboard");
       console.log("Login in data", data);
     } catch (error) {
       console.error("error in log in");

@@ -1,12 +1,24 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut, Trophy } from "lucide-react";
+import { User, Code, LogOut, Trophy, Moon, Sun } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const { authUser } = useAuthStore();
+  // Set default theme to dark on mount
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "dark");
+  }, []);
+  const [theme, setTheme] = useState(() =>
+    document.documentElement.getAttribute("data-theme") || "dark"
+  );
 
-  console.log("AUTH_USER", authUser);
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
 
   return (
     <nav className="sticky top-0 z-50 w-full py-5">
@@ -21,13 +33,24 @@ const Navbar = () => {
             CodeLoom
           </span>
         </Link>
-        <Link to="/dashboard/contest" className="hidden md:flex items-center gap-2">
-          <div className="text-xl badge font-bold p-4 cursor-pointer animate-pulse bg-red-600 text-white">
-            contest
-          </div>
-        </Link>
+        {/* Theme Toggle Button and Contests Button */}
+        
         {/* User Profile and Dropdown */}
         <div className="flex items-center gap-8">
+          <div className="flex items-center  gap-2 ml-4">
+          <button
+            onClick={toggleTheme}
+            className="btn btn-sm btn-ghost text-xl"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ?  <Sun />: <Moon/>}
+          </button>
+          <Link to="/dashboard/contest">
+  <button className="btn btn-warning btn-sm font-bold  shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:brightness-110">
+    Contests
+  </button>
+</Link>
+        </div>
           <div className="dropdown dropdown-end">
             <label
               tabIndex={0}
