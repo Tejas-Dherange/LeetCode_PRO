@@ -7,6 +7,10 @@ import { Code, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import { signupSchema } from "../schema/signupSchema";
 import AuthImagePattern from "../components/AuthImagePattern";
 import useAuthStore from "../store/useAuthStore";
+
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +27,7 @@ const SignUpPage = () => {
       // Redirect to login page after successful signup
       navigate("/login");
 
-      console.log("signup data", data);
+      // console.log("signup data", data);
     } catch (error) {
       console.error("error in signup");
     }
@@ -147,6 +151,21 @@ const SignUpPage = () => {
               )}
             </button>
           </form>
+      {/* <div className="flex justify-center w-full  p-2 rounded-lg ">
+        <GoogleLogin
+          width={"420px"}
+          logo_alignment="left"
+          theme="filled_blue"
+          shape="rectangular"
+          onSuccess={(credentialResponse) => {
+            const decoded = jwtDecode(credentialResponse.credential);
+            console.log("Decoded Google User Data:", decoded);
+          }}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
+      </div> */}
 
           {/* Footer */}
           <div className="text-center">

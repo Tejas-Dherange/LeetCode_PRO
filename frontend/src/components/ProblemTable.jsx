@@ -97,12 +97,12 @@ const ProblemTable = ({ problems: initialProblems }) => {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
         <button
-          className="btn btn-primary gap-2"
+          className="btn btn-success text-white font-bold gap-2"
           onClick={() => {
             setShowPopup(true);
           }}
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 " />
           Create Playlist
         </button>
       </div>
@@ -322,7 +322,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                                 displayTags.map((tag, idx) => (
                                   <span
                                     key={idx}
-                                    className="badge badge-info text-xs font-bold"
+                                    className="badge badge-primary text-xs font-bold"
                                   >
                                     {tag}
                                   </span>
@@ -403,13 +403,11 @@ const ProblemTable = ({ problems: initialProblems }) => {
                           </div>
                         )}
                         <button
-                          className="btn btn-sm btn-outline flex gap-2 items-center"
+                          className="btn btn-sm hover:bg-gray-400 flex gap-2 items-center"
                           onClick={() => handleAddToPlaylist(problem.id)}
                         >
                           <Bookmark className="w-4 h-4" />
-                          <span className="hidden sm:inline">
-                            Save to Playlist
-                          </span>
+                          
                         </button>
                       </div>
                     </td>

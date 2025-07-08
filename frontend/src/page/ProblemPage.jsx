@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import {
@@ -16,6 +16,10 @@ import {
   Users,
   ThumbsUp,
   Home,
+  GripVertical,
+  GripHorizontal,
+  Fullscreen,
+  Maximize,
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import myCustomTheme from "../themes/customTheme";
@@ -42,6 +46,14 @@ const ProblemPage = () => {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [testCases, setTestCases] = useState([]);
 
+  // Resizable split pane state
+  const [leftPanelWidth, setLeftPanelWidth] = useState(50); // percentage
+  const [rightPanelEditorHeight, setRightPanelEditorHeight] = useState(70); // percentage - start with more editor space
+  const [isDraggingHorizontal, setIsDraggingHorizontal] = useState(false);
+  const [isDraggingVertical, setIsDraggingVertical] = useState(false);
+  const containerRef = useRef(null);
+  const rightPanelRef = useRef(null);
+
   const handleEditorMount = (editor, monaco) => {
     monaco.editor.defineTheme("my-dark-theme", myCustomTheme);
     monaco.editor.setTheme("my-dark-theme");
@@ -53,8 +65,6 @@ const ProblemPage = () => {
     // Clear run results when navigating to a new problem
     useExecutionStore.getState().clearRunResults && useExecutionStore.getState().clearRunResults();
   }, [id]);
-
-  //   console.log("Problem", problem);
 
   useEffect(() => {
     if (problem) {
@@ -74,13 +84,103 @@ const ProblemPage = () => {
     }
   }, [activeTab, id]);
 
-  // console.log("Submission",submissions);
-
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
     setCode(problem.codeSnippet?.[lang] || "");
   };
+
+  // Horizontal resizable split pane handlers
+  const handleHorizontalMouseDown = (e) => {
+    setIsDraggingHorizontal(true);
+    e.preventDefault();
+  };
+
+  const handleHorizontalMouseMove = (e) => {
+    if (!isDraggingHorizontal || !containerRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+    
+    // Apply constraints: min 20%, max 80%
+    const constrainedWidth = Math.max(20, Math.min(80, newLeftWidth));
+    setLeftPanelWidth(constrainedWidth);
+  };
+
+  const handleHorizontalMouseUp = () => {
+    setIsDraggingHorizontal(false);
+  };
+
+  // Vertical resizable split pane handlers for right panel
+  const handleVerticalMouseDown = (e) => {
+    setIsDraggingVertical(true);
+    e.preventDefault();
+  };
+
+  const handleVerticalMouseMove = (e) => {
+    if (!isDraggingVertical || !rightPanelRef.current) return;
+
+    const rightPanelRect = rightPanelRef.current.getBoundingClientRect();
+    const newEditorHeight = ((e.clientY - rightPanelRect.top) / rightPanelRect.height) * 100;
+    
+    // Apply constraints: min 30%, max 100% (allow full height)
+    const constrainedHeight = Math.max(30, Math.min(100, newEditorHeight));
+    setRightPanelEditorHeight(constrainedHeight);
+  };
+
+  const handleVerticalMouseUp = () => {
+    setIsDraggingVertical(false);
+  };
+
+  useEffect(() => {
+    if (isDraggingHorizontal) {
+      document.addEventListener('mousemove', handleHorizontalMouseMove);
+      document.addEventListener('mouseup', handleHorizontalMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleHorizontalMouseMove);
+      document.removeEventListener('mouseup', handleHorizontalMouseUp);
+      if (!isDraggingVertical) {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleHorizontalMouseMove);
+      document.removeEventListener('mouseup', handleHorizontalMouseUp);
+      if (!isDraggingVertical) {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+  }, [isDraggingHorizontal]);
+
+  useEffect(() => {
+    if (isDraggingVertical) {
+      document.addEventListener('mousemove', handleVerticalMouseMove);
+      document.addEventListener('mouseup', handleVerticalMouseUp);
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleVerticalMouseMove);
+      document.removeEventListener('mouseup', handleVerticalMouseUp);
+      if (!isDraggingHorizontal) {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleVerticalMouseMove);
+      document.removeEventListener('mouseup', handleVerticalMouseUp);
+      if (!isDraggingHorizontal) {
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+  }, [isDraggingVertical]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -176,7 +276,7 @@ const ProblemPage = () => {
     }
   };
 
-  const { runCode, submitCode, runResults, submission, isSubmitExecuting,isRunExecuting } =
+  const { runCode, submitCode, runResults, submission, isSubmitExecuting, isRunExecuting } =
     useExecutionStore();
 
   const handleRunCode = (e) => {
@@ -184,7 +284,6 @@ const ProblemPage = () => {
     try {
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
-
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       console.log(expected_outputs);
       runCode(code, language_id, stdin, expected_outputs, id);
@@ -203,12 +302,46 @@ const ProblemPage = () => {
     } catch (error) {
       console.error("error in submitting code", error);
     }
-  }
+  };
 
+  const renderBottomPanel = () => {
+    if (runResults) {
+      return <RunResultsTable results={runResults} />;
+    } else if (submission) {
+      return <Submission submission={submission} />;
+    } else {
+      return (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold">Test Cases</h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Input</th>
+                  <th>Expected Output</th>
+                </tr>
+              </thead>
+              <tbody>
+                {testCases.map((testCase, index) => (
+                  <tr key={index}>
+                    <td className="font-mono">{testCase.input}</td>
+                    <td className="font-mono">{testCase.output}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      );
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br w-[87vw] from-base-300 to-base-200">
-      <nav className="navbar bg-base-100 shadow-lg px-10 ">
+    <div className="min-h-screen w-[90vw] bg-gradient-to-br from-base-300 to-base-200">
+      {/* Navigation */}
+      <nav className="navbar bg-base-100 shadow-lg px-10">
         <div className="flex-1 gap-2">
           <Link to={"/dashboard"} className="flex items-center gap-2 text-primary">
             <Home className="w-6 h-6" />
@@ -261,142 +394,164 @@ const ProblemPage = () => {
         </div>
       </nav>
 
-      <div className="container mx-auto p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-0">
-              <div className="tabs tabs-bordered">
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "description" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("description")}
-                >
-                  <FileText className="w-4 h-4" />
-                  Description
-                </button>
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "submissions" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("submissions")}
-                >
-                  <Code2 className="w-4 h-4" />
-                  Submissions
-                </button>
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "discussion" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("discussion")}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Discussion
-                </button>
-                <button
-                  className={`tab gap-2 ${
-                    activeTab === "hints" ? "tab-active" : ""
-                  }`}
-                  onClick={() => setActiveTab("hints")}
-                >
-                  <Lightbulb className="w-4 h-4" />
-                  Hints
-                </button>
-              </div>
-
-              <div className="p-6">{renderTabContent()}</div>
-            </div>
+      {/* Main Content - Resizable Split Layout */}
+      <div className="h-[calc(100vh-120px)] flex" ref={containerRef}>
+        {/* Left Panel - Problem Description */}
+        <div 
+          className="bg-base-100 shadow-xl border-r border-base-300 flex flex-col"
+          style={{ width: `${leftPanelWidth}%` }}
+        >
+          {/* Tabs */}
+          <div className="tabs tabs-bordered bg-gray-700">
+            <button
+              className={`tab gap-2 ${
+                activeTab === "description" ? "tab-active" : ""
+              }`}
+              onClick={() => setActiveTab("description")}
+            >
+              <FileText className="w-4 h-4" />
+              Description
+            </button>
+            <button
+              className={`tab gap-2 ${
+                activeTab === "submissions" ? "tab-active" : ""
+              }`}
+              onClick={() => setActiveTab("submissions")}
+            >
+              <Code2 className="w-4 h-4" />
+              Submissions
+            </button>
+            <button
+              className={`tab gap-2 ${
+                activeTab === "discussion" ? "tab-active" : ""
+              }`}
+              onClick={() => setActiveTab("discussion")}
+            >
+              <MessageSquare className="w-4 h-4" />
+              Discussion
+            </button>
+            <button
+              className={`tab gap-2 ${
+                activeTab === "hints" ? "tab-active" : ""
+              }`}
+              onClick={() => setActiveTab("hints")}
+            >
+              <Lightbulb className="w-4 h-4" />
+              Hints
+            </button>
           </div>
-          <div className="card bg-base-100 shadow-xl">
-            <div className="card-body p-0">
-              <div className="tabs tabs-bordered">
-                <button className="tab tab-active gap-2">
-                  <Terminal className="w-4 h-4" />
-                  Code Editor
-                </button>
-              </div>
 
-              <div className="h-[600px] w-full">
-                <Editor
-                  height="100%"
-                  language={selectedLanguage.toLowerCase()}
-                  onMount={handleEditorMount}
-                  value={code}
-                  onChange={(value) => setCode(value || "")}
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 22,
-                    lineNumbers: "on",
-                    roundedSelection: false,
-                    scrollBeyondLastLine: false,
-                    readOnly: false,
-                    automaticLayout: true,
-                  }}
-                />
-              </div>
-
-              <div className="p-4 border-t border-base-300 bg-base-200">
-                <div className="flex justify-between items-center">
-                  <button
-                    className={`btn btn-primary gap-2 ${
-                      isRunExecuting ? "loading" : ""
-                    }`}
-                    onClick={handleRunCode}
-                    disabled={isRunExecuting}
-                  >
-                    {!isRunExecuting && <Play className="w-4 h-4" />}
-                    Run Code
-                  </button>
-
-                  <button
-                    className={`btn btn-success gap-2 ${
-                      isSubmitExecuting ? "loading" : ""
-                    }`}
-                    onClick={handleSubmitCode}
-                    disabled={isSubmitExecuting}
-                  >
-                    {!isSubmitExecuting && <Play className="w-4 h-4" />}
-                    Submit Solution
-                  </button>
-                </div>
-              </div>
-            </div>
+          {/* Tab Content */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {renderTabContent()}
           </div>
         </div>
 
-        <div className="card bg-base-100 shadow-xl mt-6">
-          <div className="card-body">
-            {runResults ? (
-              // Render your run results here (custom component or table)
-              <RunResultsTable results={runResults} />
-            ) : submission ? (
-              <Submission submission={submission} />
-            ) : (
-              <>
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold">Test Cases</h3>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra w-full">
-                    <thead>
-                      <tr>
-                        <th>Input</th>
-                        <th>Expected Output</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {testCases.map((testCase, index) => (
-                        <tr key={index}>
-                          <td className="font-mono">{testCase.input}</td>
-                          <td className="font-mono">{testCase.output}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
+        {/* Horizontal Resizable Divider */}
+        <div
+          className={`w-3 bg-base-300 hover:bg-primary/20 cursor-col-resize flex items-center justify-center transition-colors ${
+            isDraggingHorizontal ? 'bg-primary/30' : ''
+          }`}
+          onMouseDown={handleHorizontalMouseDown}
+        >
+          <GripVertical className="w-6 h-7 text-base-content/50" />
+        </div>
+
+        {/* Right Panel - Code Editor and Results */}
+        <div 
+          className="bg-base-100 shadow-xl flex flex-col"
+          style={{ width: `${100 - leftPanelWidth}%` }}
+          ref={rightPanelRef}
+        >
+          {/* Code Editor Section */}
+          <div 
+            className="flex flex-col"
+            style={{ height: `${rightPanelEditorHeight}%` }}
+          >
+            {/* Code Editor Header */}
+            <div className="tabs tabs-bordered flex-shrink-0 border-b border-base-300">
+              <button className="tab tab-active gap-2">
+                <Terminal className="w-4 h-4" />
+                Code Editor
+              </button>
+              <div className="flex-1"></div>
+              <button 
+                className="btn hover:btn-primary btn-sm mr-2"
+                onClick={() => setRightPanelEditorHeight(rightPanelEditorHeight === 100 ? 70 : 100)}
+              >
+                {rightPanelEditorHeight === 100 ? 'Show Results' : <Maximize/>}
+              </button>
+            </div>
+
+            {/* Code Editor */}
+            <div className="flex-1 min-h-0">
+              <Editor
+                height="100%"
+                language={selectedLanguage.toLowerCase()}
+                onMount={handleEditorMount}
+                value={code}
+                onChange={(value) => setCode(value || "")}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 22,
+                  lineNumbers: "on",
+                  roundedSelection: false,
+                  scrollBeyondLastLine: false,
+                  readOnly: false,
+                  automaticLayout: true,
+                }}
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="p-4 border-t border-base-300 bg-base-200 flex-shrink-0">
+              <div className="flex justify-between items-center">
+                <button
+                  className={`btn btn-primary gap-2 ${
+                    isRunExecuting ? "loading" : ""
+                  }`}
+                  onClick={handleRunCode}
+                  disabled={isRunExecuting}
+                >
+                  {!isRunExecuting && <Play className="w-4 h-4" />}
+                  Run Code
+                </button>
+
+                <button
+                  className={`btn btn-success gap-2 ${
+                    isSubmitExecuting ? "loading" : ""
+                  }`}
+                  onClick={handleSubmitCode}
+                  disabled={isSubmitExecuting}
+                >
+                  {!isSubmitExecuting && <Play className="w-4 h-4" />}
+                  Submit Solution
+                </button>
+              </div>
+            </div>
           </div>
+
+          {/* Vertical Resizable Divider - Hide when editor is fullscreen */}
+          {rightPanelEditorHeight < 100 && (
+            <div
+              className={`h-1 bg-base-300 hover:bg-primary/20 cursor-row-resize flex items-center justify-center transition-colors flex-shrink-0 ${
+                isDraggingVertical ? 'bg-primary/30' : ''
+              }`}
+              onMouseDown={handleVerticalMouseDown}
+            >
+              <GripHorizontal className="w-4 h-4 text-base-content/50" />
+            </div>
+          )}
+
+          {/* Results Section - Hide when editor is fullscreen */}
+          {rightPanelEditorHeight < 100 && (
+            <div 
+              className="flex-1 overflow-y-auto p-4 bg-base-50"
+              style={{ height: `${100 - rightPanelEditorHeight}%`, minHeight: '100px' }}
+            >
+              {renderBottomPanel()}
+            </div>
+          )}
         </div>
       </div>
     </div>

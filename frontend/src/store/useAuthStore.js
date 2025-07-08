@@ -32,7 +32,7 @@ const useAuthStore = create((set) => ({
       toast.success(res.data.message);
     } catch (error) {
       console.error("error occured while registering user", error);
-      toast.error("error in signup");
+      toast.error(error.response?.data?.message || "error in signup");
     } finally {
       set({ isSigningUp: false });
     }
@@ -48,7 +48,7 @@ const useAuthStore = create((set) => ({
       toast.success(res.data.message);
     } catch (error) {
       console.error("error occured while login in user", error);
-      toast.error("error in login");
+      toast.error(error.response?.data?.message || "error in login");
     } finally {
       set({ isLogingIn: false });
     }

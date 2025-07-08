@@ -7,6 +7,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Code, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import AuthImagePattern from "../components/AuthImagePattern";
 import useAuthStore from "../store/useAuthStore";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 function LoginPage() {
   // Set default theme to black (dark) on mount
@@ -28,7 +30,7 @@ function LoginPage() {
     try {
       await login(data);
       navigate("/dashboard");
-      console.log("Login in data", data);
+      // console.log("Login in data", data);
     } catch (error) {
       console.error("error in log in");
     }
@@ -74,7 +76,6 @@ function LoginPage() {
                 </p>
               )}
             </div>
-
             {/* Password */}
             <div className="form-control">
               <label className="label">
@@ -110,6 +111,7 @@ function LoginPage() {
                 </p>
               )}
             </div>
+            {/* Google Login Button */}
 
             {/* Submit Button */}
             <button
@@ -127,6 +129,21 @@ function LoginPage() {
               )}
             </button>
           </form>
+          {/* <div className="flex justify-center w-full  p-2 rounded-lg ">
+            <GoogleLogin
+              width={"420px"}
+              logo_alignment="left"
+              theme="filled_blue"
+              shape="rectangular"
+              onSuccess={(credentialResponse) => {
+                const decoded = jwtDecode(credentialResponse.credential);
+                console.log("Decoded Google User Data:", decoded);
+              }}
+              onError={() => {
+                console.log("Login Failed");
+              }}
+            />
+          </div> */}
 
           {/* Footer */}
           <div className="text-center">
