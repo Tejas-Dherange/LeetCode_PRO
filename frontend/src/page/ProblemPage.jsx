@@ -63,7 +63,8 @@ const ProblemPage = () => {
     getProblemById(id);
     getSubmissionCountForProblem(id);
     // Clear run results when navigating to a new problem
-    useExecutionStore.getState().clearRunResults && useExecutionStore.getState().clearRunResults();
+    useExecutionStore.getState().clearRunResults &&
+      useExecutionStore.getState().clearRunResults();
   }, [id]);
 
   useEffect(() => {
@@ -100,8 +101,9 @@ const ProblemPage = () => {
     if (!isDraggingHorizontal || !containerRef.current) return;
 
     const containerRect = containerRef.current.getBoundingClientRect();
-    const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-    
+    const newLeftWidth =
+      ((e.clientX - containerRect.left) / containerRect.width) * 100;
+
     // Apply constraints: min 20%, max 80%
     const constrainedWidth = Math.max(20, Math.min(80, newLeftWidth));
     setLeftPanelWidth(constrainedWidth);
@@ -121,8 +123,9 @@ const ProblemPage = () => {
     if (!isDraggingVertical || !rightPanelRef.current) return;
 
     const rightPanelRect = rightPanelRef.current.getBoundingClientRect();
-    const newEditorHeight = ((e.clientY - rightPanelRect.top) / rightPanelRect.height) * 100;
-    
+    const newEditorHeight =
+      ((e.clientY - rightPanelRect.top) / rightPanelRect.height) * 100;
+
     // Apply constraints: min 30%, max 100% (allow full height)
     const constrainedHeight = Math.max(30, Math.min(100, newEditorHeight));
     setRightPanelEditorHeight(constrainedHeight);
@@ -134,50 +137,50 @@ const ProblemPage = () => {
 
   useEffect(() => {
     if (isDraggingHorizontal) {
-      document.addEventListener('mousemove', handleHorizontalMouseMove);
-      document.addEventListener('mouseup', handleHorizontalMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleHorizontalMouseMove);
+      document.addEventListener("mouseup", handleHorizontalMouseUp);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
     } else {
-      document.removeEventListener('mousemove', handleHorizontalMouseMove);
-      document.removeEventListener('mouseup', handleHorizontalMouseUp);
+      document.removeEventListener("mousemove", handleHorizontalMouseMove);
+      document.removeEventListener("mouseup", handleHorizontalMouseUp);
       if (!isDraggingVertical) {
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       }
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleHorizontalMouseMove);
-      document.removeEventListener('mouseup', handleHorizontalMouseUp);
+      document.removeEventListener("mousemove", handleHorizontalMouseMove);
+      document.removeEventListener("mouseup", handleHorizontalMouseUp);
       if (!isDraggingVertical) {
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       }
     };
   }, [isDraggingHorizontal]);
 
   useEffect(() => {
     if (isDraggingVertical) {
-      document.addEventListener('mousemove', handleVerticalMouseMove);
-      document.addEventListener('mouseup', handleVerticalMouseUp);
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleVerticalMouseMove);
+      document.addEventListener("mouseup", handleVerticalMouseUp);
+      document.body.style.cursor = "row-resize";
+      document.body.style.userSelect = "none";
     } else {
-      document.removeEventListener('mousemove', handleVerticalMouseMove);
-      document.removeEventListener('mouseup', handleVerticalMouseUp);
+      document.removeEventListener("mousemove", handleVerticalMouseMove);
+      document.removeEventListener("mouseup", handleVerticalMouseUp);
       if (!isDraggingHorizontal) {
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       }
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleVerticalMouseMove);
-      document.removeEventListener('mouseup', handleVerticalMouseUp);
+      document.removeEventListener("mousemove", handleVerticalMouseMove);
+      document.removeEventListener("mouseup", handleVerticalMouseUp);
       if (!isDraggingHorizontal) {
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
+        document.body.style.cursor = "";
+        document.body.style.userSelect = "";
       }
     };
   }, [isDraggingVertical]);
@@ -187,6 +190,9 @@ const ProblemPage = () => {
       case "description":
         return (
           <div className="prose max-w-none">
+            <h1 className="text-2xl mb-2 text-green-500 font-bold">
+              {problem?.title}
+            </h1>
             <p className="text-lg mb-6">{problem?.description}</p>
 
             {problem?.examples && (
@@ -276,8 +282,14 @@ const ProblemPage = () => {
     }
   };
 
-  const { runCode, submitCode, runResults, submission, isSubmitExecuting, isRunExecuting } =
-    useExecutionStore();
+  const {
+    runCode,
+    submitCode,
+    runResults,
+    submission,
+    isSubmitExecuting,
+    isRunExecuting,
+  } = useExecutionStore();
 
   const handleRunCode = (e) => {
     e.preventDefault();
@@ -339,70 +351,115 @@ const ProblemPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-[90vw] bg-gradient-to-br from-base-300 to-base-200">
+    <div className="min-h-screen w-[98vw] bg-gradient-to-br from-base-300 to-base-200">
       {/* Navigation */}
-      <nav className="navbar bg-base-100 shadow-lg px-10">
-        <div className="flex-1 gap-2">
-          <Link to={"/dashboard"} className="flex items-center gap-2 text-primary">
-            <Home className="w-6 h-6" />
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-          <div className="mt-2">
-            <h1 className="text-xl font-bold">{problem?.title}</h1>
-            <div className="flex items-center gap-2 text-sm text-base-content/70 mt-5">
+      <nav className="w-full bg-base-100 shadow-lg px-4 md:px-10 py-2 border-b border-base-300 z-10 sticky top-0">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
+          {/* Breadcrumb and Problem Title */}
+          <div className="flex items-center gap-2 flex-shrink-0 min-w-0">
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-2 text-primary font-semibold hover:underline"
+            >
+              <Home className="w-6 h-6" />
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+            <span className="text-base-content/80 font-semibold text-lg truncate max-w-[200px] md:max-w-xs lg:max-w-sm">
+              {problem?.title || "..."}
+            </span>
+          </div>
+
+          {/* Problem Info */}
+
+          {/* Actions */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              className={`btn btn-ghost btn-circle ${
+                isBookmarked ? "text-primary" : ""
+              }`}
+              onClick={() => setIsBookmarked(!isBookmarked)}
+              title="Bookmark"
+            >
+              <Bookmark className="w-5 h-5" />
+            </button>
+            <button className="btn btn-ghost btn-circle" title="Share">
+              <Share2 className="w-5 h-5" />
+            </button>
+            <select
+              className="select select-bordered select-primary w-32 md:w-40"
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+            >
+              {Object.keys(problem?.codeSnippet || {}).map((lang) => (
+                <option key={lang} value={lang}>
+                  {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Centered small Run/Submit buttons */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-2 items-center z-20">
+            {/* Run Button */}
+            <button
+              className="btn btn-primary btn-sm gap-2 min-w-[90px] flex items-center justify-center"
+              onClick={handleRunCode}
+              disabled={isRunExecuting}
+            >
+              {isRunExecuting ? (
+                <span className="loading loading-spinner w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">Run</span>
+            </button>
+
+            {/* Submit Button */}
+            <button
+              className="btn btn-success btn-sm gap-2 min-w-[90px] flex items-center justify-center"
+              onClick={handleSubmitCode}
+              disabled={isSubmitExecuting}
+            >
+              {isSubmitExecuting ? (
+                <span className="loading loading-spinner w-4 h-4" />
+              ) : (
+                <Play className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">Submit</span>
+            </button>
+          </div>
+        </div>
+        
+        {/* // if want to show data of submission succes rate uncomment this */}
+        {/* <div className="flex flex-wrap w-[40%] items-center gap-4 text-sm text-base-content/70 bg-base-200 rounded-lg px-4 py-2 shadow-sm">
+            <div className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               <span>
-                Updated{" "}
-                {new Date(problem?.createdAt).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
+                Updated {problem?.createdAt ? new Date(problem.createdAt).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}
               </span>
-              <span className="text-base-content/30">•</span>
+            </div>
+            <span className="text-base-content/30 hidden md:inline">•</span>
+            <div className="flex items-center gap-1">
               <Users className="w-4 h-4" />
               <span>{submissionCount} Submissions</span>
-              <span className="text-base-content/30">•</span>
+            </div>
+            <span className="text-base-content/30 hidden md:inline">•</span>
+            <div className="flex items-center gap-1">
               <ThumbsUp className="w-4 h-4" />
               <span>95% Success Rate</span>
             </div>
-          </div>
-        </div>
-        <div className="flex-none gap-4">
-          <button
-            className={`btn btn-ghost btn-circle ${
-              isBookmarked ? "text-primary" : ""
-            }`}
-            onClick={() => setIsBookmarked(!isBookmarked)}
-          >
-            <Bookmark className="w-5 h-5" />
-          </button>
-          <button className="btn btn-ghost btn-circle">
-            <Share2 className="w-5 h-5" />
-          </button>
-          <select
-            className="select select-bordered select-primary w-40"
-            value={selectedLanguage}
-            onChange={handleLanguageChange}
-          >
-            {Object.keys(problem?.codeSnippet || {}).map((lang) => (
-              <option key={lang} value={lang}>
-                {lang.charAt(0).toUpperCase() + lang.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
+          </div> */}
       </nav>
 
       {/* Main Content - Resizable Split Layout */}
-      <div className="h-[calc(100vh-120px)] flex" ref={containerRef}>
+      <div className="h-[calc(100vh-78px)] flex gap-1 " ref={containerRef}>
         {/* Left Panel - Problem Description */}
-        <div 
-          className="bg-base-100 shadow-xl border-r border-base-300 flex flex-col"
+        <div
+          className="bg-base-100 shadow-xl rounded-xl border-1 border-gray-600 flex flex-col"
           style={{ width: `${leftPanelWidth}%` }}
         >
           {/* Tabs */}
-          <div className="tabs tabs-bordered bg-gray-700">
+          <div className="tabs tabs-bordered rounded-t-xl bg-gray-900">
             <button
               className={`tab gap-2 ${
                 activeTab === "description" ? "tab-active" : ""
@@ -442,15 +499,13 @@ const ProblemPage = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {renderTabContent()}
-          </div>
+          <div className="flex-1 overflow-y-auto p-6">{renderTabContent()}</div>
         </div>
 
         {/* Horizontal Resizable Divider */}
         <div
-          className={`w-3 bg-base-300 hover:bg-primary/20 cursor-col-resize flex items-center justify-center transition-colors ${
-            isDraggingHorizontal ? 'bg-primary/30' : ''
+          className={`w-1 bg-base-300 hover:bg-blue-700 cursor-ew-resize flex items-center justify-center transition-colors ${
+            isDraggingHorizontal ? "bg-primary/30" : ""
           }`}
           onMouseDown={handleHorizontalMouseDown}
         >
@@ -458,33 +513,35 @@ const ProblemPage = () => {
         </div>
 
         {/* Right Panel - Code Editor and Results */}
-        <div 
-          className="bg-base-100 shadow-xl flex flex-col"
+        <div
+          className="bg-base-100 shadow-xl flex flex-col gap-1 min-w-[200px] min-h-0 rounded-xl "
           style={{ width: `${100 - leftPanelWidth}%` }}
           ref={rightPanelRef}
         >
           {/* Code Editor Section */}
-          <div 
-            className="flex flex-col"
+          <div
+            className="flex flex-col rounded-xl min-h-0   border-1 border-gray-600"
             style={{ height: `${rightPanelEditorHeight}%` }}
           >
             {/* Code Editor Header */}
-            <div className="tabs tabs-bordered flex-shrink-0 border-b border-base-300">
+            <div className="tabs tabs-bordered flex-shrink-0 border-b bg-gray-900 rounded-t-xl border-base-300">
               <button className="tab tab-active gap-2">
-                <Terminal className="w-4 h-4" />
+                <Terminal className="w-4 h-4 " />
                 Code Editor
               </button>
               <div className="flex-1"></div>
-              <button 
-                className="btn hover:btn-primary btn-sm mr-2"
-                onClick={() => setRightPanelEditorHeight(rightPanelEditorHeight === 100 ? 70 : 100)}
+              <button
+                className="cursor-pointer p-2 rounded-xl hover:bg-gray-800 btn-sm mr-2"
+                onClick={() =>
+                  setRightPanelEditorHeight(
+                    rightPanelEditorHeight === 100 ? 70 : 100,
+                  )
+                }
               >
-                {rightPanelEditorHeight === 100 ? 'Show Results' : <Maximize/>}
+                {rightPanelEditorHeight === 100 ? "Show Results" : <Maximize />}
               </button>
             </div>
-
-            {/* Code Editor */}
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 min-h-0  rounded-xl overflow-hidden">
               <Editor
                 height="100%"
                 language={selectedLanguage.toLowerCase()}
@@ -493,49 +550,23 @@ const ProblemPage = () => {
                 onChange={(value) => setCode(value || "")}
                 options={{
                   minimap: { enabled: false },
-                  fontSize: 22,
+                  fontSize: 18,
                   lineNumbers: "on",
                   roundedSelection: false,
                   scrollBeyondLastLine: false,
                   readOnly: false,
                   automaticLayout: true,
+                  smoothScrolling: true,
                 }}
               />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="p-4 border-t border-base-300 bg-base-200 flex-shrink-0">
-              <div className="flex justify-between items-center">
-                <button
-                  className={`btn btn-primary gap-2 ${
-                    isRunExecuting ? "loading" : ""
-                  }`}
-                  onClick={handleRunCode}
-                  disabled={isRunExecuting}
-                >
-                  {!isRunExecuting && <Play className="w-4 h-4" />}
-                  Run Code
-                </button>
-
-                <button
-                  className={`btn btn-success gap-2 ${
-                    isSubmitExecuting ? "loading" : ""
-                  }`}
-                  onClick={handleSubmitCode}
-                  disabled={isSubmitExecuting}
-                >
-                  {!isSubmitExecuting && <Play className="w-4 h-4" />}
-                  Submit Solution
-                </button>
-              </div>
             </div>
           </div>
 
           {/* Vertical Resizable Divider - Hide when editor is fullscreen */}
           {rightPanelEditorHeight < 100 && (
             <div
-              className={`h-1 bg-base-300 hover:bg-primary/20 cursor-row-resize flex items-center justify-center transition-colors flex-shrink-0 ${
-                isDraggingVertical ? 'bg-primary/30' : ''
+              className={`h-[4px] bg-base-300 hover:bg-blue-700 cursor-ns-resize flex items-center justify-center transition-colors flex-shrink-0 ${
+                isDraggingVertical ? "bg-primary/30" : ""
               }`}
               onMouseDown={handleVerticalMouseDown}
             >
@@ -545,9 +576,12 @@ const ProblemPage = () => {
 
           {/* Results Section - Hide when editor is fullscreen */}
           {rightPanelEditorHeight < 100 && (
-            <div 
-              className="flex-1 overflow-y-auto p-4 bg-base-50"
-              style={{ height: `${100 - rightPanelEditorHeight}%`, minHeight: '100px' }}
+            <div
+              className="flex-1 overflow-y-auto  border-1 border-gray-600 rounded-xl p-4 bg-base-50 min-h-[100px]"
+              style={{
+                height: `${100 - rightPanelEditorHeight}%`,
+                minHeight: "100px",
+              }}
             >
               {renderBottomPanel()}
             </div>
