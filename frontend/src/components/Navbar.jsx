@@ -3,16 +3,15 @@ import { User, Code, LogOut, Trophy, Moon, Sun } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 import { useEffect, useState } from "react";
+import { useThemeStore } from "../store/useThemeStore";
 
 const Navbar = () => {
   const { authUser } = useAuthStore();
-  // Set default theme to dark on mount
+  // Theme sync with Zustand store
+  const { theme, setTheme } = useThemeStore();
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }, []);
-  const [theme, setTheme] = useState(() =>
-    document.documentElement.getAttribute("data-theme") || "dark"
-  );
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";

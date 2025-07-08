@@ -51,8 +51,8 @@ export const useExecutionStore = create((set) => ({
         problemId,
       });
 
-      console.log(res.data);
-      set({ submission: res.data.submission });
+      // console.log(res.data);
+      set({ submission: res.data.submission, runResults: null });
       toast.success(res.data.message || "code executed succesfully");
     } catch (error) {
       console.error("error in execution", error);
@@ -61,5 +61,6 @@ export const useExecutionStore = create((set) => ({
       set({ isSubmitExecuting: false });
     }
   },
+
   clearRunResults: () => set({ runResults: null }),
 }));

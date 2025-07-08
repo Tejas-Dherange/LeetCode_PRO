@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import myCustomTheme from "../themes/customTheme";
+import { useThemeStore } from "../store/useThemeStore";
 import { useExecutionStore } from "../store/useExecutionStore";
 import { getLaguageId } from "../libs/utils";
 import Submission from "../components/Submission";
@@ -54,17 +55,41 @@ const ProblemPage = () => {
   const containerRef = useRef(null);
   const rightPanelRef = useRef(null);
 
+
+  const { theme } = useThemeStore();
+
+  // Set Monaco theme based on app theme
   const handleEditorMount = (editor, monaco) => {
     monaco.editor.defineTheme("my-dark-theme", myCustomTheme);
-    monaco.editor.setTheme("my-dark-theme");
+    if (theme === "dark") {
+      monaco.editor.setTheme("my-dark-theme");
+    } else {
+      monaco.editor.setTheme("vs-light");
+    }
   };
 
+  // React to theme changes
   useEffect(() => {
+    if (window.monaco && window.monaco.editor) {
+      if (theme === "dark") {
+        window.monaco.editor.setTheme("my-dark-theme");
+      } else {
+        window.monaco.editor.setTheme("vs-light");
+      }
+    }
+  }, [theme]);
+
+useEffect(() => {
     getProblemById(id);
     getSubmissionCountForProblem(id);
-    // Clear run results when navigating to a new problem
-    useExecutionStore.getState().clearRunResults &&
+    // Clear run results and submission when navigating to a new problem
+    if (useExecutionStore.getState().clearRunResults) {
       useExecutionStore.getState().clearRunResults();
+    }
+    // Clear submission state if present
+    if (useExecutionStore.getState().submission !== null) {
+      useExecutionStore.setState({ submission: null });
+    }
   }, [id]);
 
   useEffect(() => {
@@ -351,9 +376,9 @@ const ProblemPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-[98vw] bg-gradient-to-br from-base-300 to-base-200">
+    <div className="min-h-screen w-[98vw] ">
       {/* Navigation */}
-      <nav className="w-full bg-base-100 shadow-lg px-4 md:px-10 py-2 border-b border-base-300 z-10 sticky top-0">
+      <nav className="w-full  shadow-lg px-4 md:px-10 py-2 border-b border-base-300 z-10 sticky top-0">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
           {/* Breadcrumb and Problem Title */}
           <div className="flex items-center gap-2 flex-shrink-0 min-w-0">
@@ -429,7 +454,7 @@ const ProblemPage = () => {
             </button>
           </div>
         </div>
-        
+
         {/* // if want to show data of submission succes rate uncomment this */}
         {/* <div className="flex flex-wrap w-[40%] items-center gap-4 text-sm text-base-content/70 bg-base-200 rounded-lg px-4 py-2 shadow-sm">
             <div className="flex items-center gap-1">
@@ -452,14 +477,14 @@ const ProblemPage = () => {
       </nav>
 
       {/* Main Content - Resizable Split Layout */}
-      <div className="h-[calc(100vh-78px)] flex gap-1 " ref={containerRef}>
+      <div className="h-[calc(100vh-68px)] flex gap-1 " ref={containerRef}>
         {/* Left Panel - Problem Description */}
         <div
           className="bg-base-100 shadow-xl rounded-xl border-1 border-gray-600 flex flex-col"
           style={{ width: `${leftPanelWidth}%` }}
         >
           {/* Tabs */}
-          <div className="tabs tabs-bordered rounded-t-xl bg-gray-900">
+          <div className="tabs tabs-bordered rounded-t-xl bg-base-300">
             <button
               className={`tab gap-2 ${
                 activeTab === "description" ? "tab-active" : ""
@@ -504,12 +529,12 @@ const ProblemPage = () => {
 
         {/* Horizontal Resizable Divider */}
         <div
-          className={`w-1 bg-base-300 hover:bg-blue-700 cursor-ew-resize flex items-center justify-center transition-colors ${
+          className={`w-[4px] bg-base-300 hover:bg-blue-700 cursor-ew-resize flex items-center justify-center transition-colors ${
             isDraggingHorizontal ? "bg-primary/30" : ""
           }`}
           onMouseDown={handleHorizontalMouseDown}
         >
-          <GripVertical className="w-6 h-7 text-base-content/50" />
+          <GripVertical className="w-4 h-4 text-base-content/50" />
         </div>
 
         {/* Right Panel - Code Editor and Results */}
@@ -524,7 +549,7 @@ const ProblemPage = () => {
             style={{ height: `${rightPanelEditorHeight}%` }}
           >
             {/* Code Editor Header */}
-            <div className="tabs tabs-bordered flex-shrink-0 border-b bg-gray-900 rounded-t-xl border-base-300">
+            <div className="tabs tabs-bordered flex-shrink-0 border-b bg-base-300 rounded-t-xl border-base-300">
               <button className="tab tab-active gap-2">
                 <Terminal className="w-4 h-4 " />
                 Code Editor
