@@ -8,6 +8,7 @@ export const useProblemStore = create((set) => ({
   problems: [],
   problem: null,
   solvedProblems: [],
+  multipleIdProblems:[],
 
   getAllProblems: async () => {
     try {
@@ -83,7 +84,7 @@ export const useProblemStore = create((set) => ({
         ids,
       });
       // console.log(res.data.problems, "problems fetched by multiple ids");
-      set({ problems: res.data.problems });
+      set({ multipleIdProblems: res.data.problems });
     } catch (error) {
       console.error("error occured in fetching problems by multiple ids", error);
       toast.error("error in fetching problems");

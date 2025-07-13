@@ -12,7 +12,7 @@ function ContestProblem({ contestId }) {
     problem,
     isProblemLoading,
     getProblemByMultipleIds,
-    problems,
+    multipleIdProblems
   } = useProblemStore();
 
   const [contestproblems, setContestproblems] = useState([]);
@@ -56,7 +56,7 @@ function ContestProblem({ contestId }) {
       }
     };
     fetchProblems();
-    console.log("Fetched Problems:", problems);
+    // console.log("Fetched Problems:", problems);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contest]); // Only depend on contest, not getProblemById
 

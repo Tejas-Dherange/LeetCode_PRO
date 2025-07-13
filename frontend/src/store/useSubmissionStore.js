@@ -38,7 +38,7 @@ export const useSubmissionStore = create((set) => ({
     } finally {
       set({ isLoading: false });
     }
-  },
+  }, 
 
   getSubmissionCountForProblem: async (problemId) => {
     try {

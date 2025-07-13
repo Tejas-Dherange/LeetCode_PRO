@@ -46,4 +46,5 @@ router.get("/user-rating/:userId", isLoggedIn, getUserContestRating);
 
 router.delete("/unregister/:contestId", isLoggedIn, unRegisterContest);
 
+
 export default router;

@@ -9,7 +9,7 @@ import submissionRouter from "../routes/submission.route.js";
 import playListRoutes from "../routes/playlists.routes.js";
 import contestRoutes from "../routes/contest.routes.js";
 import aiRoutes from "../routes/ai.routes.js";
-
+import contestSubmissionRoutes from "../routes/contest-submission.routes.js";
 dotenv.config();
 
 const port = process.env.PORT || 4000;
@@ -34,6 +34,7 @@ app.use("/api/v1/execute-code", codeExecutionRouter);
 app.use("/api/v1/submissions", submissionRouter);
 app.use("/api/v1/playlist", playListRoutes);
 app.use("/api/v1/contest", contestRoutes);
+app.use("/api/v1/contest-submission", contestSubmissionRoutes);
 app.use("/api/v1/ai", aiRoutes);
 
 app.listen(port, () => {

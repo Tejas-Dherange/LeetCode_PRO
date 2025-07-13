@@ -7,6 +7,10 @@ export const useContestStore = create((set) => ({
   isContestsLoading: false,
   contests: [],
   contest: null,
+  contestSubmissions: [],
+  contestSubmission: null,
+  contestSubmissionCount: null,
+  runResults:null,
 
   getAllContests: async () => {
     try {
@@ -267,6 +271,43 @@ export const useContestStore = create((set) => ({
     }
   },
 
+  getContestSubmissionForProblem: async (problemId) => {
+    set({ isContestLoading: true });
+    try {
+      const res = await axiosInstance.get(
+        `/contest-submission/get-submission-for-problem/${problemId}`,
+      );
+      set({ contestSubmissions: res.data.submissions || [] });
+      toast.success(res.data.message || "Submissions fetched successfully");
+    } catch (error) {
+      console.error("Error occurred in fetching contest submissions", error);
+      toast.error("Error in fetching contest submissions");
+    } finally {
+      set({ isContestLoading: false });
+    }
+  },
+
+  getContestSubmissionCount: async (problemId) => {
+    set({ isContestLoading: true });
+    try {
+      const res = await axiosInstance.get(
+        `/contest/contest-submission/get-count-of-submissions/${problemId}`,
+      );
+      set({ contestSubmissionCount: res.data.count || 0 });
+      toast.success(
+        res.data.message || "Submission count fetched successfully",
+      );
+    } catch (error) {
+      console.error(
+        "Error occurred in fetching contest submission count",
+        error,
+      );
+      toast.error("Error in fetching contest submission count");
+    } finally {
+      set({ isContestLoading: false });
+    }
+  },
+
   contestSubmitCode: async (
     source_code,
     language_id,
@@ -291,7 +332,7 @@ export const useContestStore = create((set) => ({
         },
       );
       toast.success(res.data.message || "Code submitted successfully");
-      return res.data.submission; // Assuming the response contains the submission data
+      set({ contestSubmission: res.data.submission ,runResults: null }); // Assuming the response contains the submission data
     } catch (error) {
       console.error("Error occurred in contest code submission", error);
       toast.error("Error in contest code submission");
