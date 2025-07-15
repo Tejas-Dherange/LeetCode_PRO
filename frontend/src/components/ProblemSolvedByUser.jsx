@@ -110,7 +110,7 @@ const ProblemSolvedByUser = () => {
                 <span className="text-sm">
                   Total problems solved: <span className="font-bold">{solvedProblems.length}</span>
                 </span>
-                <Link to="/" className="btn btn-sm btn-primary">
+                <Link to="/dashboard" className="btn btn-sm btn-primary">
                   Solve more problems
                 </Link>
               </div>

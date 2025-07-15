@@ -769,7 +769,7 @@ const getUserContestRating = async (req, res) => {
         delta = Math.round(100 * (n - rank) / (n - 1 || 1)); // 0-100 scale
       }
       rating += delta - 50; // Centered at 0, so top = +50, bottom = -50
-      ratings.push({ contestName: reg.contest.name, rating });
+      ratings.push({ contestName: reg.contest.name, rating,rank });
     }
     return res.json({ ratings });
   } catch (error) {

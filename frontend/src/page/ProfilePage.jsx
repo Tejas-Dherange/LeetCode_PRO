@@ -47,7 +47,7 @@ const ProfilePage = () => {
           <Link to={"/dashboard"} className="btn btn-circle btn-ghost">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-3xl font-bold text-primary">Profile</h1>
+          <h1 className="text-3xl font-bold text-green-500">Profile</h1>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ const ProfilePage = () => {
               {/* Name and Role Badge */}
               <div className="text-center md:text-left">
                 <h2 className="text-2xl font-bold">{authUser.name}</h2>
-                <div className="badge badge-primary mt-2">{authUser.role}</div>
+                <div className="badge badge-success mt-2">{authUser.role}</div>
               </div>
             </div>
 
@@ -89,7 +89,7 @@ const ProfilePage = () => {
             <div className="flex flex-col gap-4">
               {/* Email */}
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-primary">
+                <div className="stat-figure text-success">
                   <Mail className="w-8 h-8" />
                 </div>
                 <div className="stat-title">Email</div>
@@ -100,7 +100,7 @@ const ProfilePage = () => {
 
               {/* User ID */}
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-primary">
+                <div className="stat-figure text-success">
                   <User className="w-8 h-8" />
                 </div>
                 <div className="stat-title">User ID</div>
@@ -111,7 +111,7 @@ const ProfilePage = () => {
 
               {/* Role Status */}
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-primary">
+                <div className="stat-figure text-success">
                   <Shield className="w-8 h-8" />
                 </div>
                 <div className="stat-title">Role</div>
@@ -125,7 +125,7 @@ const ProfilePage = () => {
 
               {/* Profile Image Status */}
               <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-primary">
+                <div className="stat-figure text-success">
                   <Image className="w-8 h-8" />
                 </div>
                 <div className="stat-title">Profile Image</div>
@@ -141,11 +141,11 @@ const ProfilePage = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="card-actions justify-end mt-6">
-              <button className="btn btn-outline btn-primary">
+            <div className="card-actions justify-end mt-6 text-white">
+              <button className="btn btn-outline text-shadow-base-100 btn-success">
                 Edit Profile
               </button>
-              <button className="btn btn-primary">Change Password</button>
+              <button className="btn btn-outline text-shadow-base-100 btn-error">Change Password</button>
             </div>
           </div>
         </div>
@@ -157,18 +157,18 @@ const ProfilePage = () => {
           <div>
              {/* Contest Ratings Section */}
           <div className="mt-8 flex gap-10">
-            <h3 className="text-xl font-bold mb-2 text-primary">
+            <h3 className="text-xl font-bold mb-2 text-secondary">
               Contest Rating
             </h3>
             <div className="flex items-center gap-8 mb-4">
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-success">
+                <span className="text-3xl font-bold text-secondary">
                   {currentRating !== null ? currentRating : "-"}
                 </span>
                 <span className="text-base-content/70">Current Rating</span>
               </div>
               <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-primary">
+                <span className="text-3xl font-bold text-secondary">
                   {currentRank !== null ? `#${currentRank}` : "-"}
                 </span>
                 <span className="text-base-content/70">Current Rank</span>

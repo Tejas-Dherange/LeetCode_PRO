@@ -48,14 +48,14 @@ const Ratings = ({ contestRatings = [] }) => (
           <defs>
             <linearGradient id="colorRating" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#22c55e" stopOpacity={0.1} />
+              <stop offset="95%" stopColor="#22c55e" stopOpacity={0.08} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" />
+          {/* <CartesianGrid strokeDasharray="3 3" /> */}
           <XAxis dataKey="contestName" tick={{ fontSize: 12 }} />
           <YAxis
             yAxisId="left"
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 14 }}
             label={{ value: "Rating", angle: -90, position: "insideLeft", fill: "#22c55e" }}
             domain={['auto', 'auto']}
           />
@@ -63,7 +63,7 @@ const Ratings = ({ contestRatings = [] }) => (
             yAxisId="right"
             orientation="right"
             tick={{ fontSize: 12 }}
-            label={{ value: "Rank (lower is better)", angle: 90, position: "insideRight", fill: "#3b82f6" }}
+            label={{ value: "Rank (higher is better)", angle: 90, position: "insideRight", fill: "#3b82f6" }}
             domain={[(dataMin) => Math.max(...contestRatings.map((d) => d.rank || 1)), (dataMax) => 1]}
             allowDecimals={false}
             reversed
@@ -71,13 +71,13 @@ const Ratings = ({ contestRatings = [] }) => (
           <Tooltip content={<CustomTooltip />} />
           <Area
             yAxisId="left"
-            type="monotone"
+            type="natural"
             dataKey="rating"
             stroke="#22c55e"
             fillOpacity={1}
             fill="url(#colorRating)"
-            strokeWidth={3}
-            dot={{ r: 5, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
+            strokeWidth={2}
+            dot={{ r: 5, stroke: '#22c55e', strokeWidth: 1, fill: '#fff' }}
             activeDot={{ r: 7 }}
             name="Rating"
           />

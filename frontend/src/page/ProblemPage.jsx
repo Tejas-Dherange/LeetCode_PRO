@@ -556,7 +556,7 @@ useEffect(() => {
               </button>
               <div className="flex-1"></div>
               <button
-                className="cursor-pointer p-2 rounded-xl hover:bg-gray-800 btn-sm mr-2"
+                className="cursor-pointer p-2 rounded-xl hover:bg-base-100 btn-sm mr-2"
                 onClick={() =>
                   setRightPanelEditorHeight(
                     rightPanelEditorHeight === 100 ? 70 : 100,
