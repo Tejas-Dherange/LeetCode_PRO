@@ -39,6 +39,9 @@ const ProfilePage = () => {
       });
   }, [authUser?.id]);
 
+  const handleClickEditProfile = () => {
+    // Navigate to the edit profile page
+  }
   return (
     <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-10 px-4   w-full">
       {/* Header with back button */}
@@ -142,7 +145,9 @@ const ProfilePage = () => {
 
             {/* Action Buttons */}
             <div className="card-actions justify-end mt-6 text-white">
-              <button className="btn btn-outline text-shadow-base-100 btn-success">
+              <button className="btn btn-outline text-shadow-base-100 btn-success" 
+               onClick={handleClickEditProfile}
+              >
                 Edit Profile
               </button>
               <button className="btn btn-outline text-shadow-base-100 btn-error">Change Password</button>

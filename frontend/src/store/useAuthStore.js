@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../libs/axios";
 import toast from "react-hot-toast";
+import { editProfile } from "../../../backend/controllers/auth.controllers";
 const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
@@ -64,6 +65,19 @@ const useAuthStore = create((set) => ({
     } catch (error) {
       console.error("error occured while login in user", error);
       toast.error("error in login");
+    }
+  },
+
+  editProfile: async (data) => {
+    try {
+      const res = await axiosInstance.put("/user/edit-profile", data);
+
+      console.log("edit profile data", res.data);
+      set({ authUser: res.data.user });
+      toast.success(res.data.message);
+    } catch (error) {
+      console.error("error occured while editing profile", error);
+      toast.error(error.response?.data?.message || "error in editing profile");
     }
   },
 }));

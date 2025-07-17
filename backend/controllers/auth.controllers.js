@@ -132,4 +132,29 @@ const me = async (req, res) => {
   }
 };
 
-export { register, login, logout, me };
+const editProfile = async (req, res) => {
+  try {
+    const { name, email, image } = req.body;
+    const userId = req.user.id;
+
+    if (!name || !email) {
+      return res.status(400).json({ message: "Name and email are required" });
+    }
+
+    const updatedUser = await db.user.update({
+      where: { id: userId },
+      data: { name, email, image },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export { register, login, logout, me, editProfile };
