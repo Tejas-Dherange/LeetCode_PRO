@@ -17,6 +17,7 @@ import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
 import ContestProblemExecPage from "./page/ContestProblemExecPage";
 import { Analytics } from '@vercel/analytics/react';
+import EditProfileForm from "./components/EditProfileForm";
 
 
 const App = () => {
@@ -68,6 +69,10 @@ const App = () => {
         <Route
           path="profile"
           element={authUser ? <ProfilePage /> : <Navigate to={"/dashboard"} />}
+        />
+        <Route
+          path="edit-profile"
+          element={authUser ? <EditProfileForm /> : <Navigate to={"/edit-profile"} />}
         />
         <Route
           path="/login"

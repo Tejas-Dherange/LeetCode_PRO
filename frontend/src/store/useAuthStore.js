@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../libs/axios";
 import toast from "react-hot-toast";
-import { editProfile } from "../../../backend/controllers/auth.controllers";
+
 const useAuthStore = create((set) => ({
   authUser: null,
   isSigningUp: false,
@@ -68,9 +68,17 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  editProfile: async (data) => {
+  editProfile: async (formData) => {
     try {
-      const res = await axiosInstance.put("/user/edit-profile", data);
+      // Debug: log FormData keys and values
+      for (let pair of formData.entries()) {
+        console.log("formdata pair", pair[0], pair[1]);
+      }
+
+      // Send FormData directly, do NOT convert to object
+      const res = await axiosInstance.put("/user/edit-profile", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       console.log("edit profile data", res.data);
       set({ authUser: res.data.user });

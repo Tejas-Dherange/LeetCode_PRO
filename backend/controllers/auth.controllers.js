@@ -2,6 +2,8 @@ import db from "../libs/db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserRole } from "../src/generated/prisma/index.js";
+import { uploadImage } from "../libs/cloudinary.lib.js";
+
 
 const register = async (req, res) => {
   try {
@@ -134,22 +136,48 @@ const me = async (req, res) => {
 
 const editProfile = async (req, res) => {
   try {
-    const { name, email, image } = req.body;
+    // Debug log to see what is received
+    console.log("req.body:", req.body);
+    console.log("req.file:", req.file);
+
+    const body = req.body || {};
+    const { name, email } = body;
     const userId = req.user.id;
+    let imageUrl = undefined;
+
+    console.log("file in request", req.file);
+    
+    // If file is present, upload to Cloudinary and get URL
+    if (req.file) {
+      const result = await uploadImage(req.file.buffer);
+      imageUrl = result.secure_url;
+    }
 
     if (!name || !email) {
       return res.status(400).json({ message: "Name and email are required" });
     }
 
-    const updatedUser = await db.user.update({
-      where: { id: userId },
-      data: { name, email, image },
-    });
+    // Update user in DB
+    // const updatedUser = await db.user.update({
+    //   where: { id: userId },
+    //   data: {
+    //     name,
+    //     email,
+    //     ...(imageUrl ? { image: imageUrl } : {}),
+    //   },
+    // });
 
+    console.log("Updating user with data:", {
+      name,
+      email,
+      image: imageUrl,
+    });
+    
     return res.status(200).json({
       success: true,
       message: "Profile updated successfully",
-      user: updatedUser,
+      imageUrl,
+      // user: updatedUser,
     });
   } catch (error) {
     console.log(error);

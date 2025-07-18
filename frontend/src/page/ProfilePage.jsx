@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PlaylistProfile from "../components/PlaylistProfile";
 import useAuthStore from "../store/useAuthStore";
 import Ratings from "../components/Ratings";
@@ -11,6 +11,7 @@ import { useContestStore } from "../store/useContestStore";
 
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
+  const navigate=useNavigate();
   const [contestRatings, setContestRatings] = useState([]);
   const [currentRating, setCurrentRating] = useState(null);
   const [currentRank, setCurrentRank] = useState(null);
@@ -41,7 +42,8 @@ const ProfilePage = () => {
 
   const handleClickEditProfile = () => {
     // Navigate to the edit profile page
-  }
+    navigate("/edit-profile");
+  };
   return (
     <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-10 px-4   w-full">
       {/* Header with back button */}
