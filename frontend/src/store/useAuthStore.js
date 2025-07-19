@@ -7,6 +7,7 @@ const useAuthStore = create((set) => ({
   isSigningUp: false,
   isLogingIn: false,
   isCheckingAuth: false,
+  isEditingProfile: false,
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
@@ -69,6 +70,7 @@ const useAuthStore = create((set) => ({
   },
 
   editProfile: async (formData) => {
+    set({ isEditingProfile: true });
     try {
       // Debug: log FormData keys and values
       for (let pair of formData.entries()) {
@@ -76,9 +78,7 @@ const useAuthStore = create((set) => ({
       }
 
       // Send FormData directly, do NOT convert to object
-      const res = await axiosInstance.put("/user/edit-profile", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axiosInstance.put("/user/edit-profile", formData);
 
       console.log("edit profile data", res.data);
       set({ authUser: res.data.user });
@@ -86,6 +86,8 @@ const useAuthStore = create((set) => ({
     } catch (error) {
       console.error("error occured while editing profile", error);
       toast.error(error.response?.data?.message || "error in editing profile");
+    } finally {
+      set({ isEditingProfile: false });
     }
   },
 }));
