@@ -18,6 +18,7 @@ import CreateContestPage from "./page/CreateContestPage";
 import ContestProblemExecPage from "./page/ContestProblemExecPage";
 import { Analytics } from '@vercel/analytics/react';
 import EditProfileForm from "./components/EditProfileForm";
+import ServiceDownPopUp from "./components/ServiceDownPopUp";
 
 
 const App = () => {
@@ -43,6 +44,9 @@ const App = () => {
       
       <Analytics />
       <Toaster />
+         <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
+          <ServiceDownPopUp />
+        </div>
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
           <Route
