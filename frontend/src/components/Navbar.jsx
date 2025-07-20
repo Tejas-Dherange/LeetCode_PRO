@@ -86,6 +86,15 @@ const Navbar = () => {
                   My Profile
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/sheets"
+                  className="hover:bg-primary hover:text-white text-base font-semibold"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Sheets
+                </Link>
+              </li>
               {authUser?.role === "ADMIN" && (
                 <li>
                   <Link
