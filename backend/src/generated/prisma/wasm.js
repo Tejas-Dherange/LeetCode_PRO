@@ -249,6 +249,85 @@ exports.Prisma.ContestRegistrationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  plan: 'plan',
+  status: 'status',
+  paymentProvider: 'paymentProvider',
+  providerSubscriptionId: 'providerSubscriptionId',
+  providerCustomerId: 'providerCustomerId',
+  priceId: 'priceId',
+  amount: 'amount',
+  currency: 'currency',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  trialEndDate: 'trialEndDate',
+  billingCycle: 'billingCycle',
+  canAccessCompanySheets: 'canAccessCompanySheets',
+  canAccessAIAnalysis: 'canAccessAIAnalysis',
+  maxProblemsPerMonth: 'maxProblemsPerMonth',
+  maxAIAnalysisPerMonth: 'maxAIAnalysisPerMonth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subscriptionId: 'subscriptionId',
+  paymentProvider: 'paymentProvider',
+  providerPaymentId: 'providerPaymentId',
+  providerInvoiceId: 'providerInvoiceId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  description: 'description',
+  receiptUrl: 'receiptUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.UsageTrackerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subscriptionId: 'subscriptionId',
+  currentMonth: 'currentMonth',
+  currentYear: 'currentYear',
+  problemsSolvedThisMonth: 'problemsSolvedThisMonth',
+  aiAnalysisUsedThisMonth: 'aiAnalysisUsedThisMonth',
+  companySheetAccessCount: 'companySheetAccessCount',
+  monthlyUsageHistory: 'monthlyUsageHistory',
+  lastResetDate: 'lastResetDate',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CompanySheetScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  color: 'color',
+  logoUrl: 'logoUrl',
+  isPremium: 'isPremium',
+  requiredPlan: 'requiredPlan',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CompanySheetProblemScalarFieldEnum = {
+  id: 'id',
+  companySheetId: 'companySheetId',
+  problemId: 'problemId',
+  difficulty: 'difficulty',
+  frequency: 'frequency',
+  lastAskedDate: 'lastAskedDate',
+  tags: 'tags',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -284,6 +363,25 @@ exports.Difficulty = exports.$Enums.Difficulty = {
   HARD: 'HARD'
 };
 
+exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
+  FREE: 'FREE',
+  BASIC: 'BASIC',
+  PREMIUM: 'PREMIUM'
+};
+
+exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
+  ACTIVE: 'ACTIVE',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED',
+  TRIAL: 'TRIAL'
+};
+
+exports.PaymentProvider = exports.$Enums.PaymentProvider = {
+  STRIPE: 'STRIPE',
+  RAZORPAY: 'RAZORPAY',
+  PAYPAL: 'PAYPAL'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Problem: 'Problem',
@@ -295,7 +393,12 @@ exports.Prisma.ModelName = {
   Contest: 'Contest',
   ContestProblem: 'ContestProblem',
   ContestSubmission: 'ContestSubmission',
-  ContestRegistration: 'ContestRegistration'
+  ContestRegistration: 'ContestRegistration',
+  Subscription: 'Subscription',
+  Payment: 'Payment',
+  UsageTracker: 'UsageTracker',
+  CompanySheet: 'CompanySheet',
+  CompanySheetProblem: 'CompanySheetProblem'
 };
 
 /**

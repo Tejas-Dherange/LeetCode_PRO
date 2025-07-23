@@ -11,6 +11,9 @@ import contestRoutes from "../routes/contest.routes.js";
 import aiRoutes from "../routes/ai.routes.js";
 import contestSubmissionRoutes from "../routes/contest-submission.routes.js";
 import uploadRoutes from "../routes/upload.routes.js";
+import subscriptionRouter from "../routes/subscription.routes.js";
+import paymentRouter from "../routes/payment.routes.js";
+import companySheetsRouter from "../routes/companySheets.routes.js";
 dotenv.config();
 
 const port = process.env.PORT || 4000;
@@ -38,6 +41,9 @@ app.use("/api/v1/contest", contestRoutes);
 app.use("/api/v1/contest-submission", contestSubmissionRoutes);
 app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/upload", uploadRoutes);
+app.use("/api/v1/subscription", subscriptionRouter);
+app.use("/api/v1/payment", paymentRouter);
+app.use("/api/v1/company-sheets", companySheetsRouter);
 
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);

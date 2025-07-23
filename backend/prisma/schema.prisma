@@ -25,6 +25,25 @@ enum Difficulty {
   HARD
 }
 
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  TRIAL
+}
+
+enum PaymentProvider {
+  STRIPE
+  RAZORPAY
+  PAYPAL
+}
+
 model User {
   id                  String                @id @default(uuid())
   name                String?
@@ -39,6 +58,9 @@ model User {
   solvedProblem       ProblemSolved[]
   playlists           Playlist[]
   ContestRegistration ContestRegistration[]
+  Subscription        Subscription?
+  Payment             Payment[]
+  UsageTracker        UsageTracker?
 }
 
 model Problem {
@@ -62,11 +84,12 @@ model Problem {
   updatedAt DateTime @updatedAt
 
   //relationShip
-  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Submission         Submission[]
-  solvedBy           ProblemSolved[]
-  problemInPlayLists ProblemInPlayList[]
-  ContestProblem     ContestProblem[]
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Submission          Submission[]
+  solvedBy            ProblemSolved[]
+  problemInPlayLists  ProblemInPlayList[]
+  ContestProblem      ContestProblem[]
+  CompanySheetProblem CompanySheetProblem[]
 }
 
 model Submission {
@@ -207,4 +230,123 @@ model ContestRegistration {
   updatedAt DateTime @updatedAt
 
   @@unique([userId, contestId])
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  plan                   SubscriptionPlan   @default(FREE)
+  status                 SubscriptionStatus @default(ACTIVE)
+  paymentProvider        PaymentProvider?
+  providerSubscriptionId String? // Stripe subscription ID
+  providerCustomerId     String? // Stripe customer ID
+
+  priceId  String? // Price ID from payment provider
+  amount   Float? // Subscription amount
+  currency String? @default("INR")
+
+  startDate    DateTime  @default(now())
+  endDate      DateTime?
+  trialEndDate DateTime?
+
+  billingCycle String? // "monthly", "yearly"
+
+  canAccessCompanySheets Boolean @default(false)
+  canAccessAIAnalysis    Boolean @default(false)
+  maxProblemsPerMonth    Int     @default(50)
+  maxAIAnalysisPerMonth  Int     @default(10)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments     Payment[]
+  usageTracker UsageTracker?
+}
+
+model Payment {
+  id             String  @id @default(uuid())
+  userId         String
+  subscriptionId String?
+
+  paymentProvider   PaymentProvider
+  providerPaymentId String // Stripe payment intent ID
+  providerInvoiceId String? // Stripe invoice ID
+
+  amount   Float
+  currency String @default("USD")
+  status   String // "succeeded", "pending", "failed"
+
+  // Payment metadata
+  description String?
+  receiptUrl  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+model UsageTracker {
+  id             String @id @default(uuid())
+  userId         String @unique
+  subscriptionId String @unique
+
+  currentMonth Int @default(1) // 1-12
+  currentYear  Int @default(2024)
+
+  problemsSolvedThisMonth Int @default(0)
+  aiAnalysisUsedThisMonth Int @default(0)
+  companySheetAccessCount Int @default(0)
+
+  // Usage history (JSON field for detailed tracking)
+  monthlyUsageHistory Json @default("{}")
+
+  lastResetDate DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+}
+
+model CompanySheet {
+  id          String  @id @default(uuid())
+  name        String // "Google", "Microsoft", etc.
+  slug        String  @unique // "google", "microsoft"
+  description String?
+  color       String  @default("#3B82F6") // Tailwind color
+  logoUrl     String?
+
+  isPremium    Boolean          @default(false)
+  requiredPlan SubscriptionPlan @default(FREE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  problems CompanySheetProblem[]
+}
+
+model CompanySheetProblem {
+  id             String @id @default(uuid())
+  companySheetId String
+  problemId      String
+
+  // Problem metadata for company sheet
+  difficulty    String // "Easy", "Medium", "Hard"
+  frequency     Int       @default(0) // How often asked (1-5)
+  lastAskedDate DateTime?
+  tags          String[] // Additional company-specific tags
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  companySheet CompanySheet @relation(fields: [companySheetId], references: [id], onDelete: Cascade)
+  problem      Problem      @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([companySheetId, problemId])
 }

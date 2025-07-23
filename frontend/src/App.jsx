@@ -20,6 +20,7 @@ import { Analytics } from '@vercel/analytics/react';
 import EditProfileForm from "./components/EditProfileForm";
 import ServiceDownPopUp from "./components/ServiceDownPopUp";
 import SheetsPage from "./page/SheetsPage";
+import PricingPage from "./page/PricingPage";
 
 
 const App = () => {
@@ -45,9 +46,9 @@ const App = () => {
       
       <Analytics />
       <Toaster />
-         <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
+         {/* <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
           <ServiceDownPopUp />
-        </div>
+        </div> */}
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
           <Route
@@ -68,6 +69,12 @@ const App = () => {
               ) : (
                 <Navigate to={"/"} />
               )
+            }
+          />
+          <Route
+            path="/dashboard/pricing"
+            element={
+              authUser ? <PricingPage /> : <Navigate to={"/dashboard/pricing"} />
             }
           />
         </Route>

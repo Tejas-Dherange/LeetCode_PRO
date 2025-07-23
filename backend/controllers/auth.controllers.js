@@ -122,6 +122,8 @@ const logout = async (req, res) => {
 const me = async (req, res) => {
   try {
     const user = req?.user;
+    // console.log("user in me controller:", user);
+    
     return res.status(200).json({
       sucess: true,
       message: "User fetched successfully",
