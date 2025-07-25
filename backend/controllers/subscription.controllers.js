@@ -6,15 +6,15 @@ export const createSubscription = async (req, res) => {
   try {
     // Check if the user already has a subscription
     const existingSubscription = await db.subscription.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     // Prepare subscription data
     const subscriptionData = {
       planId,
-      status: 'active',
+      status: "active",
       startDate: new Date(),
-      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)) // 1 year from now
+      endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)), // 1 year from now
     };
 
     // Create or update subscription
@@ -22,21 +22,21 @@ export const createSubscription = async (req, res) => {
     if (existingSubscription) {
       subscription = await db.subscription.update({
         where: { userId },
-        data: subscriptionData
+        data: subscriptionData,
       });
     } else {
       subscription = await db.subscription.create({
         data: {
           userId,
-          ...subscriptionData
-        }
+          ...subscriptionData,
+        },
       });
     }
 
     res.status(201).json({ subscription });
   } catch (error) {
-    console.error('Error creating subscription:', error);
-    res.status(500).json({ error: 'Failed to create subscription' });
+    console.error("Error creating subscription:", error);
+    res.status(500).json({ error: "Failed to create subscription" });
   }
 };
 
@@ -53,16 +53,16 @@ export const getSubscriptionStatus = async (req, res) => {
 
   try {
     const subscription = await db.subscription.findUnique({
-      where: { userId }
+      where: { userId },
     });
 
     if (!subscription) {
-      return res.status(404).json({ error: 'Subscription not found' });
+      return res.status(404).json({ message: "Subscription not found" });
     }
 
     res.json({ subscription });
   } catch (error) {
-    console.error('Error fetching subscription status:', error);
-    res.status(500).json({ error: 'Failed to fetch subscription status' });
+    console.error("Error fetching subscription status:", error);
+    res.status(500).json({ error: "Failed to fetch subscription status" });
   }
 };

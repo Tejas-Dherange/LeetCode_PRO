@@ -23,7 +23,10 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 w-full py-5">
       <div className="flex w-full justify-between items-center mx-auto max-w-4xl bg-black/15 shadow-lg shadow-neutral-600/5 backdrop-blur-lg border border-gray-200/10 p-4 rounded-2xl">
         {/* Logo Section */}
-        <Link to="/dashboard" className="flex items-center gap-3 cursor-pointer">
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-3 cursor-pointer"
+        >
           <img
             src="/greenLogo.png"
             className="h-18 w-18 bg-primary/20 text-primary border-none px-2 py-2 rounded-full"
@@ -33,23 +36,28 @@ const Navbar = () => {
           </span>
         </Link>
         {/* Theme Toggle Button and Contests Button */}
-        
+
         {/* User Profile and Dropdown */}
         <div className="flex items-center gap-8">
           <div className="flex items-center  gap-2 ml-4">
-          <button
-            onClick={toggleTheme}
-            className="btn btn-sm btn-ghost text-xl"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ?  <Sun />: <Moon/>}
-          </button>
-          <Link to="/dashboard/contest">
-  <button className="btn btn-warning btn-sm font-bold  shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:brightness-110">
-    Contests
-  </button>
-</Link>
-        </div>
+            <button
+              onClick={toggleTheme}
+              className="btn btn-sm btn-ghost text-xl"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <Sun /> : <Moon />}
+            </button>
+            <Link to="/dashboard/contest">
+              <button className="btn btn-warning btn-sm font-bold  shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:brightness-110">
+                Contests
+              </button>
+            </Link>
+            <Link to="/dashboard/pricing">
+              <button className="btn btn-warning btn-sm font-bold  shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:brightness-110">
+                Pricing
+              </button>
+            </Link>
+          </div>
           <div className="dropdown dropdown-end">
             <label
               tabIndex={0}
@@ -113,7 +121,7 @@ const Navbar = () => {
                     className="hover:bg-primary hover:text-white text-base font-semibold"
                   >
                     <Trophy className="w-4 h-4 mr-1" />
-                   Create Contest
+                    Create Contest
                   </Link>
                 </li>
               )}

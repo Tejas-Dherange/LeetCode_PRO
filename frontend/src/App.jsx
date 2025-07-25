@@ -21,11 +21,11 @@ import EditProfileForm from "./components/EditProfileForm";
 import ServiceDownPopUp from "./components/ServiceDownPopUp";
 import SheetsPage from "./page/SheetsPage";
 import PricingPage from "./page/PricingPage";
+import useSubscriptionStore from "./store/useSubscriptionStore";
 
 
 const App = () => {
   const { authUser, isCheckingAuth, checkAuth } = useAuthStore();
-
   // console.log("AdminRoute - authUser:", authUser);
   // console.log("AdminRoute - isCheckingAuth:", isCheckingAuth);
 
@@ -46,9 +46,9 @@ const App = () => {
       
       <Analytics />
       <Toaster />
-         <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
+         {/* <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
           <ServiceDownPopUp />
-        </div>
+        </div> */}
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
           <Route
@@ -74,7 +74,7 @@ const App = () => {
           <Route
             path="/dashboard/pricing"
             element={
-              authUser ? <PricingPage /> : <Navigate to={"/dashboard/pricing"} />
+              authUser ? <PricingPage /> : <Navigate to={"/login"} />
             }
           />
         </Route>

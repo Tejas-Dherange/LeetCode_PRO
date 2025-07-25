@@ -12,5 +12,5 @@ router.get("/status/:userId", isLoggedIn, getSubscriptionStatus);
 router.post("/create", isLoggedIn, createSubscription);
 router.post("/cancel", isLoggedIn, cancelSubscription);
 router.post("/webhook", isLoggedIn, handleRazorpayWebhook);
-
+ 
 export default router;
