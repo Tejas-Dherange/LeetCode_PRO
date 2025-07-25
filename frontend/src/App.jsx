@@ -46,9 +46,9 @@ const App = () => {
       
       <Analytics />
       <Toaster />
-         {/* <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
+         <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
           <ServiceDownPopUp />
-        </div> */}
+        </div>
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
           <Route
