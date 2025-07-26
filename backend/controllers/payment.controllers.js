@@ -8,7 +8,6 @@ import {
 import crypto from 'crypto';
 
 // Create payment order for one-time payment
-// ...existing code...
 export const createPaymentOrder = async (req, res) => {
   try {
     const { planType, billingCycle = 'monthly' } = req.body;

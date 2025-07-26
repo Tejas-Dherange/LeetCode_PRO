@@ -22,6 +22,7 @@ import ServiceDownPopUp from "./components/ServiceDownPopUp";
 import SheetsPage from "./page/SheetsPage";
 import PricingPage from "./page/PricingPage";
 import useSubscriptionStore from "./store/useSubscriptionStore";
+import EditSheetPage from "./page/EditSheetPage";
 
 
 const App = () => {
@@ -46,9 +47,9 @@ const App = () => {
       
       <Analytics />
       <Toaster />
-         <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
+         {/* <div className="fixed top-4 w-full z-150 left-1/2 transform -translate-x-1/2">
           <ServiceDownPopUp />
-        </div>
+        </div> */}
       <Routes>
         <Route path="/dashboard" element={<Layout />}>
           <Route
@@ -110,13 +111,19 @@ const App = () => {
         <Route
           path="/dashboard/contest-execution/:cid/:id"
           element={
-            authUser ? <ContestProblemExecPage /> : <Navigate to={"/dashboard"} />
+            authUser ? <ContestProblemExecPage /> : <Navigate to={"/login"} />
           }
         />
         <Route
           path="/dashboard/contest/create-contest"
           element={
-            authUser ? <CreateContestPage /> : <Navigate to={"/dashboard"} />
+            authUser ? <CreateContestPage /> : <Navigate to={"/login"} />
+          }
+        />
+        <Route
+          path="/dashboard/edit-sheets"
+          element={
+            authUser ? <EditSheetPage /> : <Navigate to={"/login"} />
           }
         />
         <Route

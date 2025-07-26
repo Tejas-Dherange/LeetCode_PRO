@@ -8,9 +8,17 @@ const razorpay = new Razorpay({
 
 // Pricing plans mapping - Updated to match your schema
 export const RAZORPAY_PLANS = {
+  FREE:{
+    monthly: {
+      amount: 0, // Free plan
+      currency: 'INR',
+      interval: 1,
+      period: 'monthly'
+    }
+  },
   BASIC: {
     monthly: {
-      amount: 999, // ₹9.99 in paise
+      amount: 199, // ₹9.99 in paise
       currency: 'INR',
       interval: 1,
       period: 'monthly'
@@ -18,7 +26,7 @@ export const RAZORPAY_PLANS = {
   },
   PREMIUM: { // Changed from PRO to PREMIUM to match your schema
     monthly: {
-      amount: 1999, // ₹19.99 in paise
+      amount: 399, // ₹19.99 in paise
       currency: 'INR',
       interval: 1,
       period: 'monthly'

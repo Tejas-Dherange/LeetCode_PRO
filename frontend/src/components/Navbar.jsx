@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut, Trophy, Moon, Sun } from "lucide-react";
+import { User, Code, LogOut, Trophy, Moon, Sun, Sheet } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 import { useEffect, useState } from "react";
@@ -122,6 +122,17 @@ const Navbar = () => {
                   >
                     <Trophy className="w-4 h-4 mr-1" />
                     Create Contest
+                  </Link>
+                </li>
+              )}
+              {authUser?.role === "ADMIN" && (
+                <li>
+                  <Link
+                    to="/dashboard/edit-sheets"
+                    className="hover:bg-primary hover:text-white text-base font-semibold"
+                  >
+                    <Sheet className="w-4 h-4 mr-1" />
+                    Manage Sheets
                   </Link>
                 </li>
               )}

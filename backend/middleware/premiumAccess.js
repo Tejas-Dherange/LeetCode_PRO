@@ -1,11 +1,12 @@
+import db from "../libs/db.js";
+
 export const checkSubscriptionAccess = (requiredPlan) => {
   return async (req, res, next) => {
     try {
       const userId = req.user.id;
       
       const subscription = await db.subscription.findUnique({
-        where: { userId },
-        include: { usageTracker: true }
+        where: { userId }
       });
       
       if (!subscription || subscription.status !== 'ACTIVE') {
@@ -34,7 +35,8 @@ export const checkSubscriptionAccess = (requiredPlan) => {
     } catch (error) {
       res.status(500).json({
         success: false,
-        message: "Error checking subscription"
+        message: "Error checking subscription",
+        error
       });
     }
   };

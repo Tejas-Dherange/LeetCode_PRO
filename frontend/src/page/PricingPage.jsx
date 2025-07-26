@@ -4,6 +4,7 @@ import usePaymentStore from "../store/usePaymentStore";
 
 import useAuthStore from "../store/useAuthStore";
 import useSubscriptionStore from "../store/useSubscriptionStore";
+import { Loader2 } from "lucide-react";
 
 const plans = [
   {
@@ -63,7 +64,7 @@ const Pricing = () => {
   const { getSubscriptionStatus, subscription } = useSubscriptionStore();
   useEffect(() => {
     getSubscriptionStatus(authUser.id);
-  }, [getSubscriptionStatus]);
+  }, [getSubscriptionStatus, authUser.id]);
   console.log("Subscription status fetched successfully:", subscription);
 
   return (
@@ -87,7 +88,7 @@ const Pricing = () => {
             className={`card bg-base-100 border-2 shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 transition-all duration-300 ${
               plan.popular
                 ? "ring-2 border-none ring-secondary ring-opacity-50 scale-105 lg:scale-110"
-                : "border-base-300 hover:border-primary/50"
+                : "border-base-300 hover:border-success/50"
             }`}
           >
             {plan.popular && (
@@ -114,7 +115,7 @@ const Pricing = () => {
 
               {/* Pricing */}
               <div className="mb-6">
-                <p className="text-5xl font-extrabold text-primary">
+                <p className="text-5xl font-extrabold text-success">
                   {plan.price}
                 </p>
                 <p className="text-lg text-base-content/60 mt-1">
@@ -136,23 +137,27 @@ const Pricing = () => {
 
               {/* CTA Button */}
               <div className="card-actions w-full">
-                {/* <button 
-                  className={`btn rounded-xl btn-${plan.color} btn-lg w-full text-lg font-semibold hover:scale-105 transition-transform duration-200 ${
-                    plan.popular ? 'btn-secondary' : ''
-                  }`}
-                >
-                  {plan.buttonLabel}
-                  <span className="ml-2">→</span>
-                </button> */}
+                {plan.name === "Free" ? (
+                  <a
+                    href="/dashboard"
+                    className={`btn rounded-2xl btn-${plan.color} btn-lg w-full text-lg font-semibold hover:scale-105 transition-transform duration-200`}
+                    >
+
+                    {plan.buttonLabel}
+                  </a>
+                ) :(
+                    
+                 
 
                 <PaymentButton
                   plan={plan}
-                  className={`btn rounded-xl btn-${
+                  className={`btn rounded-2xl btn-${
                     plan.color
                   } btn-lg w-full text-lg font-semibold hover:scale-105 transition-transform duration-200 ${
                     plan.popular ? "btn-secondary" : ""
                   }`}
                 />
+                ) }
               </div>
 
               {plan.popular && (
@@ -235,13 +240,13 @@ const PaymentButton = ({ plan, className = "" }) => {
     <button
       onClick={handlePayment}
       disabled={isProcessing || subscription?.status === "ACTIVE"}
-      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+      className={`w-full py-2 px-4 rounded-3xl font-medium transition-colors ${
         isProcessing
           ? "bg-gray-400 cursor-not-allowed"
-          : "bg-blue-600 hover:bg-blue-700 text-white"
+          : "  text-white"
       } ${className}`}
     >
-      {isProcessing ? "Processing..." : `Subscribe to ${plan.name}`}
+      {isProcessing ? <Loader2 className="animate-spin" /> :  `Subscribe to ${plan.name}`}
     </button>
   );
 };
