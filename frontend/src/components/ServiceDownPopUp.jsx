@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 const ServiceDownPopUp = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -60,9 +61,22 @@ const ServiceDownPopUp = () => {
                 Under Maintenance
               </p>
             </div>
-            <p className="text-sm text-gray-600 mb-3">
-              Working on improvements! 
-            </p>
+            <div className="text-sm text-gray-600 mb-3">
+  <p className="mb-2">Working on improvements!</p>
+  <div className="flex items-center gap-2">
+    <span>Watch demo video:</span>
+    <Link
+      to="https://drive.google.com/file/d/1Cff5yUO8Jm6ac3IrI3DcKPzEwnUvHUIX/view"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block"
+    >
+      <button className="text-xs cursor-pointer font-medium px-3 py-1 bg-green-600 hover:bg-green-700 rounded-lg text-white transition-colors duration-200">
+         Demo
+      </button>
+    </Link>
+  </div>
+</div>
             
             {/* Action buttons */}
             <div className="flex space-x-2">
