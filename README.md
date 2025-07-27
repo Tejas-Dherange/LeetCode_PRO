@@ -1,3 +1,81 @@
+# Codeloom
+A platform for coding challenges and competitions.
+
+
+## Installation instructions
+1. Clone the repository
+```bash
+git clone https://github.com/Tejas-Dherange/LeetCode_PRO.git
+cd LeetCode_PRO
+```
+
+2. Install dependencies
+```bash
+cd backend
+npm install
+
+cd ../frontend
+npm install
+
+```
+3. Create a `.env` file in the root directory and add the following environment variables:
+```env
+PORT=3000
+JWT_SECRET=
+
+JUDGE0_BATCH_SUBMISSION_ENDPOINT=
+JUDGE0_BATCH_SUBMISSION_ENDPOINT=
+JUDGE0_SULU_API_KEY=
+GEMINI_API_KEY=
+
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+# Razorpay
+RAZORPAY_KEY_ID=
+RAZORPAY_KEY_SECRET=
+RAZORPAY_WEBHOOK_SECRET=
+
+# Frontend URL for redirects
+FRONTEND_URL=http://localhost:5173
+```
+
+# Usage examples
+4. Start the server
+```bash
+cd frontend
+npm run dev
+
+cd ../backend
+npm run dev
+
+```
+
+5. Open your browser and navigate to `http://localhost:3000` to access the application.
+
+# Screenshots or demos (if visual)
+![Landing Page](<Screenshot (268).png>)
+[Demo Video](https://drive.google.com/file/d/1Cff5yUO8Jm6ac3IrI3DcKPzEwnUvHUIX/view)
+ 
+# Technology stack
+- Node.js
+- Express.js
+- Prisma
+- PostgreSQL
+- React.js
+- Tailwind CSS
+- Judge0 API
+- Cloudinary
+- Razorpay
+- Gemini API
+- JWT Authentication
+- WebSockets
+- Redis
+- Docker
+- Zustand
+
+
 ## Steps to initialize prisma in project
 ```
 1] npm i prisma 
@@ -31,15 +109,3 @@ npx prisma generate
 
 
 6. Environment Variables
-
-# Stripe
-STRIPE_PUBLISHABLE_KEY=pk_test_...
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-
-# OpenAI for AI Analysis
-OPENAI_API_KEY=sk-...
-
-# Pricing Plan IDs
-STRIPE_PRICE_BASIC_MONTHLY=price_...
-STRIPE_PRICE_PREMIUM_MONTHLY=price_...
