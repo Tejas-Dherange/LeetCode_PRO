@@ -109,3 +109,33 @@ npx prisma generate
 
 
 6. Environment Variables
+
+# Next todo
+## Sheets and Problems
+ - add frontend for sheets creation and problem adding
+ - Display the saved sheets and problems in the frontend
+ - Add functionality to delete sheets and problems
+ - Add functionality to edit sheets and problems
+ - Add functionality to add problems to sheets
+
+
+# Next todo
+  ## Contest
+  - Make constest handling for 150-200 users
+  - Use redis bullMq for contest handling
+  - Web Sockets for live Leaderboard
+  - Add verification of users for contest
+  - Reduce copy paste of code in contest - dont allow copy paste and tab switching
+  - Add timer for contest
+  - Generate report fo contest
+
+# Next todo
+  ## Drag-race coding
+  - Two user can compete with each other on one problem
+  - Implement real-time collaboration features
+    - Add timer
+    - Add live coding features
+    - Add live chat features
+    - Add live code sharing features
+    - Add live code execution features
+    - Add live code submission features
