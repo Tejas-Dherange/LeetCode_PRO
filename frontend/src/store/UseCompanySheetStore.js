@@ -8,6 +8,7 @@ export const useCompanySheetStore = create((set) => ({
   companySheet: null,
   premiumSheets:[],
   isPremiumSheetsLoading: false,
+  sheetProblems: [],
 
   getCompanySheets: async () => {
     set({ isSheetsLoading: true });
@@ -24,6 +25,7 @@ export const useCompanySheetStore = create((set) => ({
       set({ isSheetsLoading: false });
     }
   },
+
   createCompanySheet: async (sheetData) => {
     set({ isSheetsLoading: true });
     try {
@@ -45,6 +47,7 @@ export const useCompanySheetStore = create((set) => ({
       set({ isSheetsLoading: false });
     }
   },
+
   getPremiumCompanySheets: async () => {
     set({ isPremiumSheetsLoading: true });
     try {
@@ -58,6 +61,22 @@ export const useCompanySheetStore = create((set) => ({
       toast.error("Failed to fetch premium company sheets.");
     } finally {
       set({ isPremiumSheetsLoading: false });
+    }
+  },
+
+  getSheetProblems: async (sheetId) => {
+    set({ isSheetsLoading: true });
+    try {
+      const response = await axiosInstance.get(`/company-sheets/${sheetId}/problems`);
+      console.log("Sheet Problems Response:", response);
+
+      set({ sheetProblems: response.data.sheet });
+      toast.success(response.data.message || "Sheet problems fetched successfully!");
+    } catch (error) {
+      console.error("Error fetching sheet problems:", error);
+      toast.error("Failed to fetch sheet problems.");
+    } finally {
+      set({ isSheetsLoading: false });
     }
   }
 }));

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   ChevronRight,
   Building2,
@@ -13,18 +13,29 @@ import {
   Filter,
   Home,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import useSubscriptionStore from "../store/useSubscriptionStore";
 import useAuthStore from "../store/useAuthStore";
+import { useCompanySheetStore } from "../store/UseCompanySheetStore";
 
 const SheetsPage = () => {
-  const [selectedSheet, setSelectedSheet] = useState("google");
+  const [selectedSheet, setSelectedSheet] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
 
   const { getSubscriptionStatus, subscription } = useSubscriptionStore();
   const { authUser } = useAuthStore();
+
+  const {
+    premiumSheets,
+    isPremiumSheetsLoading,
+    getSheetProblems,
+    sheetProblems,
+    isSheetsLoading,
+    getPremiumCompanySheets,
+  } = useCompanySheetStore();
   // Mock data for company sheets
   const companySheets = {
     google: {
@@ -188,7 +199,7 @@ const SheetsPage = () => {
   };
 
   const filteredProblems =
-    companySheets[selectedSheet]?.problems.filter((problem) => {
+    sheetProblems?.problems?.filter((problem) => {
       const matchesSearch =
         problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         problem.tags.some((tag) =>
@@ -204,28 +215,41 @@ const SheetsPage = () => {
     getSubscriptionStatus(authUser?.id);
   }, [getSubscriptionStatus]);
 
+  useEffect(() => {
+    // Fetch premium company sheets when the component mounts
+    getPremiumCompanySheets();
+  }, [getPremiumCompanySheets]);
+
+  useEffect(() => {
+    // Fetch sheet problems when a sheet is selected
+    if (selectedSheet) {
+      getSheetProblems(selectedSheet);
+    }
+  }, [selectedSheet, getSheetProblems]);
+
   return (
     <div className="min-h-screen w-full bg-base-100">
       {/* //if subscription is not active then shoe that access is denied */}
       {/* is subscription is undefined then add check */}
 
-      {!subscription?.status=="ACTIVE" || !subscription && (
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-error mb-4">
-              Access Denied
-            </h1>
-            <p className="text-lg text-base-content/70 mb-6">
-              Your subscription is not active. Please subscribe to access the
-              company sheets.
-            </p>
-            <Link to="/dashboard/pricing">
-              <button className="btn btn-primary">Subscribe Now</button>
-            </Link>
+      {!subscription?.status == "ACTIVE" ||
+        (!subscription && (
+          <div className="flex items-center justify-center h-screen">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-error mb-4">
+                Access Denied
+              </h1>
+              <p className="text-lg text-base-content/70 mb-6">
+                Your subscription is not active. Please subscribe to access the
+                company sheets.
+              </p>
+              <Link to="/dashboard/pricing">
+                <button className="btn btn-primary">Subscribe Now</button>
+              </Link>
+            </div>
           </div>
-        </div>
-      )}
-      {subscription?.status=="ACTIVE" && (
+        ))}
+      {subscription?.status == "ACTIVE" && (
         <div className="flex h-screen">
           {/* Sidebar */}
           <div className="w-80 bg-base-200 shadow-xl border-r border-base-300 overflow-y-auto">
@@ -256,27 +280,33 @@ const SheetsPage = () => {
               <h2 className="text-lg font-semibold text-base-content mb-4">
                 Companies
               </h2>
-              <div className="space-y-2">
-                {Object.entries(companySheets).map(([key, sheet]) => (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedSheet(key)}
+
+              {isPremiumSheetsLoading
+              ? <Loader2 className="h-6 w-6 animate-spin" />
+              : (
+                <div className="space-y-2">
+                  {premiumSheets.map((sheet) => (
+                    <button
+                      key={sheet.id}
+                      onClick={() => setSelectedSheet(sheet.id)}
                     className={`w-full cursor-pointer flex items-center justify-between p-4 rounded-xl transition-all duration-200 group hover:shadow-lg ${
-                      selectedSheet === key
+                      selectedSheet === sheet.id
                         ? "bg-success/50 text-primary-content shadow-lg scale-[1.02]"
                         : "bg-base-100 hover:bg-base-300 text-base-content"
                     }`}
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center  space-x-3">
                       <div
-                        className={`w-4 h-4 rounded-full ${sheet.color}`}
+                        className={`w-4 h-4 rounded-full bg-[${
+                          sheet.color != "" ? sheet.color : "bg-[#3c1cb0]"
+                        }]`}
                       ></div>
                       <span className="font-medium">{sheet.name}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <span
                         className={`text-sm px-2 py-1 rounded-full font-medium ${
-                          selectedSheet === key
+                          selectedSheet === sheet.id
                             ? "bg-primary-content/20 text-primary-content"
                             : "bg-base-200 text-base-content/70"
                         }`}
@@ -285,7 +315,7 @@ const SheetsPage = () => {
                       </span>
                       <ChevronRight
                         className={`w-4 h-4 transition-transform ${
-                          selectedSheet === key
+                          selectedSheet === sheet.id
                             ? "rotate-90"
                             : "group-hover:translate-x-1"
                         }`}
@@ -294,7 +324,10 @@ const SheetsPage = () => {
                   </button>
                 ))}
               </div>
+              )}
+
             </div>
+              
 
             <div className="p-4 border-t border-base-300 mt-auto">
               <div className="bg-gradient-to-br from-secondary/10 to-accent/10 p-4 rounded-xl border border-secondary/20">
@@ -318,26 +351,33 @@ const SheetsPage = () => {
 
             <div className="p-8">
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="text-3xl font-bold text-base-content flex items-center space-x-3">
-                      <div
-                        className={`w-6 h-6 rounded-full ${companySheets[selectedSheet]?.color}`}
-                      ></div>
-                      <span>{companySheets[selectedSheet]?.name} Problems</span>
-                    </h2>
-                    <p className="text-base-content/70 mt-2">
-                      Master the coding interview with{" "}
-                      {companySheets[selectedSheet]?.name}-specific problems
-                    </p>
-                  </div>
-                  <div className="flex items-center space-x-2 bg-secondary/10 px-4 py-2 rounded-full">
-                    <Star className="w-5 h-5 text-secondary fill-current" />
-                    <span className="text-sm text-secondary font-semibold">
-                      Curated Collection
-                    </span>
-                  </div>
-                </div>
+                {
+                  (isPremiumSheetsLoading  || isSheetsLoading) ? (
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  ) : (
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-3xl font-bold text-base-content flex items-center space-x-3">
+                          <div
+                            className={`w-6 h-6 rounded-full bg-[${sheetProblems?.color}]`}
+                          >
+                          </div>
+                          <span>{sheetProblems?.name} Problems</span>
+                        </h2>
+                        <p className="text-base-content/70 mt-2">
+                          Master the coding interview with {sheetProblems?.name } 
+                           - specific problems
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2 bg-secondary/10 px-4 py-2 rounded-full">
+                        <Star className="w-5 h-5 text-secondary fill-current" />
+                        <span className="text-sm text-secondary font-semibold">
+                          Curated Collection
+                        </span>
+                      </div>
+                    </div>
+                  )
+                }
 
                 {/* Search and Filter */}
                 <div className="flex space-x-4 mb-6">
@@ -368,7 +408,11 @@ const SheetsPage = () => {
               </div>
 
               {/* Problems Grid */}
-              <div className="flex flex-col space-y-4 min-h-[400px]">
+              {
+                isPremiumSheetsLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <div className="flex flex-col space-y-4 min-h-[400px]">
                 {filteredProblems.length > 0 ? (
                   filteredProblems.map((problem) => (
                     <div
@@ -463,6 +507,8 @@ const SheetsPage = () => {
                   </div>
                 )}
               </div>
+                )
+              }
             </div>
           </div>
         </div>

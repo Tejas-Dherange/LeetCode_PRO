@@ -1,7 +1,6 @@
 import db from "../libs/db.js";
 
 export const getCompanySheets = async (req, res) => {
-  
   // Get all company sheets
   try {
     const companySheets = await db.companySheet.findMany({
@@ -15,7 +14,9 @@ export const getCompanySheets = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching company sheets:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch company sheets" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch company sheets" });
   }
 };
 
@@ -23,22 +24,49 @@ export const getPremiumCompanySheets = async (req, res) => {
   // Get all premium company sheets
   try {
     const premiumCompanySheets = await db.companySheet.findMany({
-      where: { isPremium: true }, // Only fetch premium sheets
+      where: { isPremium: true },
       orderBy: { createdAt: "desc" },
+      include: {
+        problems: {
+          select: {
+            id: true,
+            difficulty: true,
+            tags: true,
+            frequency: true,
+          },
+        },
+      },
     });
+
+    const formattedSheets = premiumCompanySheets.map((sheet) => ({
+      id: sheet.id,
+      name: sheet.name,
+      color: sheet.color.startsWith("#") ? sheet.color : `bg-${sheet.color}`, // Optional: ensure Tailwind class format
+      problems: sheet.problems.map((problem) => ({
+        id: problem.id,
+        difficulty: problem.difficulty,
+        tags: problem.tags,
+        frequency: problem.frequency,
+      })),
+    }));
+
 
     res.json({
       success: true,
-      sheets: premiumCompanySheets,
+      sheets: formattedSheets,
     });
   } catch (error) {
     console.error("Error fetching premium company sheets:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch premium company sheets" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to fetch premium company sheets",
+      });
   }
 };
 
 export const getCompanySheetProblems = async (req, res) => {
-  // Get problems for specific company sheet
   try {
     const { id } = req.params;
 
@@ -47,32 +75,63 @@ export const getCompanySheetProblems = async (req, res) => {
       include: {
         problems: {
           orderBy: { createdAt: "asc" },
+          include: {
+            problem: {
+              select: {
+                id: true,
+                title: true,
+                description: true,
+                tags: true,
+              },
+            },
+          },
         },
       },
     });
 
     if (!companySheet) {
-      return res.status(404).json({ success: false, message: "Company sheet not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Company sheet not found",
+      });
     }
+
+    // Transform into your desired format
+    const formattedSheet = {
+      name: companySheet.name,
+      color: companySheet.color,
+      problems: companySheet.problems.map((p) => ({
+        id: p.problem.id,
+        title: p.problem.title,
+        difficulty: p.difficulty,
+        status: "unsolved", // or fetch from user progress
+        tags: p.problem.tags || [],
+        description: p.problem.description,
+      })),
+    };
 
     res.json({
       success: true,
-      sheet: companySheet,
+      sheet: formattedSheet,
     });
   } catch (error) {
     console.error("Error fetching company sheet problems:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch company sheet problems" });
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch company sheet problems",
+    });
   }
 };
+
 
 export const createCompanySheet = async (req, res) => {
   // Create a new company sheet
 
   try {
-    const { name, description,slug, color, isPremium, requiredPlan } =
+    const { name, description, slug, color, isPremium, requiredPlan } =
       req.body;
 
-    if(req.user.role !== "ADMIN") {
+    if (req.user.role !== "ADMIN") {
       return res.status(403).json({ success: false, message: "Access denied" });
     }
 
@@ -90,17 +149,15 @@ export const createCompanySheet = async (req, res) => {
         isPremium: isPremium || false,
         logoUrl: "",
         slug: slug ? slug : name.toLowerCase().replace(/\s+/g, "-"),
-        requiredPlan: requiredPlan || "FREE"
+        requiredPlan: requiredPlan || "FREE",
       },
     });
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Company sheet created successfully",
-        sheet: newSheet,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Company sheet created successfully",
+      sheet: newSheet,
+    });
   } catch (error) {
     console.error("Error creating company sheet:", error);
     res
@@ -115,7 +172,7 @@ export const updateCompanySheet = async (req, res) => {
     const { id } = req.params;
     const { name, description, color, isPremium, requiredPlan } = req.body;
 
-    if(req.user.role !== "ADMIN") {
+    if (req.user.role !== "ADMIN") {
       return res.status(403).json({ success: false, message: "Access denied" });
     }
 
@@ -126,7 +183,7 @@ export const updateCompanySheet = async (req, res) => {
         description,
         color,
         isPremium,
-        requiredPlan
+        requiredPlan,
       },
     });
 
@@ -137,7 +194,9 @@ export const updateCompanySheet = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating company sheet:", error);
-    res.status(500).json({ success: false, message: "Failed to update company sheet" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update company sheet" });
   }
 };
 
@@ -146,7 +205,7 @@ export const deleteCompanySheet = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if(req.user.role !== "ADMIN") {
+    if (req.user.role !== "ADMIN") {
       return res.status(403).json({ success: false, message: "Access denied" });
     }
 
@@ -160,7 +219,9 @@ export const deleteCompanySheet = async (req, res) => {
     });
   } catch (error) {
     console.error("Error deleting company sheet:", error);
-    res.status(500).json({ success: false, message: "Failed to delete company sheet" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete company sheet" });
   }
 };
 
@@ -169,7 +230,7 @@ export const addProblemToCompanySheet = async (req, res) => {
   try {
     const { sheetId, problemId, difficulty, frequency } = req.body;
 
-    if(req.user.role !== "ADMIN") {
+    if (req.user.role !== "ADMIN") {
       return res.status(403).json({ success: false, message: "Access denied" });
     }
 
@@ -188,9 +249,11 @@ export const addProblemToCompanySheet = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding problem to company sheet:", error);
-    res.status(500).json({ success: false, message: "Failed to add problem to company sheet" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to add problem to company sheet",
+      });
   }
 };
-
-
-
