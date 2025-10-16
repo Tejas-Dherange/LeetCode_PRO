@@ -4,3 +4,6 @@
 
 /client/node_modules
 /client/.env
+
+/id_ed25519_tejas0593
+/id_ed25519_tejas0593.pub

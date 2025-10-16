@@ -112,11 +112,11 @@ npx prisma generate
 
 # Next todo
 ## Sheets and Problems
- - add frontend for sheets creation and problem adding
- - Display the saved sheets and problems in the frontend
- - Add functionality to delete sheets and problems
- - Add functionality to edit sheets and problems
- - Add functionality to add problems to sheets
+ - add frontend for sheets creation and problem adding ✅
+ - Display the saved sheets and problems in the frontend ✅
+ - Add functionality to delete sheets and problems ✅
+ - Add functionality to edit sheets and problems ✅
+ - Add functionality to add problems to sheets 
 
 
 # Next todo
