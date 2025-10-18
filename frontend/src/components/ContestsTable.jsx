@@ -19,7 +19,7 @@ function ContestsTable() {
           <div className="loader">Loading...</div>
         </div>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto ">
           <table className="table w-full">
             <thead>
               <tr>

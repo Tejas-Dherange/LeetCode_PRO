@@ -252,7 +252,7 @@ function RegisterContestPage() {
       <div className="leaderboard w-full">
         <h2 className="text-2xl md:text-3xl font-bold mb-4">Leaderboard</h2>
         <div className="overflow-x-auto">
-          <table className="table w-full border rounded-xl shadow bg-gradient-to-r from-gray-900 to-gray-800">
+          <table className="table w-full  rounded-xl shadow bg-gradient-to-r from-gray-900 to-gray-800">
             <thead>
               <tr className="bg-gradient-to-r from-primary/30 to-success/30 text-primary-content text-lg">
                 <th className="px-6 py-3 rounded-tl-xl">Rank</th>

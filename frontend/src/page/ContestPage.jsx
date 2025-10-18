@@ -155,9 +155,9 @@ function ContestCard({ id, name, description, startTime, endTime, status }) {
   const navigate = useNavigate();
   
   return (
-    <div className="card bg-base-100 dark:bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 border border-base-300">
-      <div className="card-body p-6">
-        <div className="flex items-center justify-between gap-4">
+    <div className="card bg-base-100 dark:bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 ">
+      <div className="card-body p-4 w-76 border-2 border-gray-400 rounded-lg">
+        <div className="flex items-center p-4  justify-between gap-4">
           <div>
             <h2 className="card-title text-xl font-bold text-primary">
               {name}
