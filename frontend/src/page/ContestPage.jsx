@@ -34,13 +34,13 @@ function ContestPage() {
   );
 
   return (
-    <div className="min-h-screen w-full p-6 bg-gradient-to-b from-base-100/50 to-base-200/30 dark:from-base-100 dark:to-base-200">
-      <div className="w-full max-w-[1920px] mx-auto px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-green-500">
+    <div className="min-h-screen w-full bg-gradient-to-b from-base-100/50 to-base-200/30 dark:from-base-100 dark:to-base-200">
+      <div className="w-full px-4 md:px-6 lg:px-8 py-6">
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-green-500">
             Competitive Programming Contests
           </h1>
-          <p className="text-lg text-base-content/70 mt-4 max-w-3xl mx-auto">
+          <p className="text-base md:text-lg text-base-content/70 mt-4 max-w-4xl mx-auto">
             Participate in our coding contests to challenge yourself and compete with others.
             Solve algorithmic problems and improve your programming skills.
           </p>
@@ -61,24 +61,20 @@ function ContestPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-12 gap-8">
-          {/* Live Contests - Full Width */}
-          <div className="col-span-12">
-            <Section title="Live Contests" data={live} />
-          </div>
+        <div className="space-y-8">
+          {/* Live Contests */}
+          <Section title="Live Contests" data={live} />
 
-          {/* Upcoming and Past side by side on larger screens */}
-          <div className="col-span-12 lg:col-span-6">
-            <Section title="Upcoming Contests" data={upcoming} />
-          </div>
-          <div className="col-span-12 lg:col-span-6">
-            <Section title="Past Contests" data={past} />
-          </div>
+          {/* Upcoming Contests */}
+          <Section title="Upcoming Contests" data={upcoming} />
+          
+          {/* Uncomment for Past Contests */}
+          {/* <Section title="Past Contests" data={past} /> */}
         </div>
 
         {/* Contest Table */}
-        <div className="mt-16 bg-base-100 dark:bg-base-200/50 rounded-xl shadow-xl p-6 backdrop-blur-sm border border-base-300">
-          <h2 className="text-2xl font-bold mb-8 text-primary">
+        <div className="mt-16 bg-base-100 rounded-xl shadow-xl p-4 md:p-6 backdrop-blur-sm border border-base-300">
+          <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-primary">
             Contest History
           </h2>
           <ContestsTable />
@@ -90,7 +86,7 @@ function ContestPage() {
 
 function Section({ title, data }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 3;
+  const cardsPerPage = 5;
   const totalPages = Math.ceil(data.length / cardsPerPage);
 
   const getCurrentPageData = () => {
@@ -107,7 +103,7 @@ function Section({ title, data }) {
       </h2>
       {data.length ? (
         <>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
             {getCurrentPageData().map((c) => (
               <ContestCard
                 key={c.id}
@@ -155,9 +151,9 @@ function ContestCard({ id, name, description, startTime, endTime, status }) {
   const navigate = useNavigate();
   
   return (
-    <div className="card bg-base-100 dark:bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 ">
-      <div className="card-body p-4 w-76 border-2 border-gray-400 rounded-lg">
-        <div className="flex items-center p-4  justify-between gap-4">
+    <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+      <div className="card-body p-6 border-2 border-base-300 rounded-lg">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="card-title text-xl font-bold text-primary">
               {name}
