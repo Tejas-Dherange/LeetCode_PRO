@@ -383,7 +383,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "D:\\Advanced Projects\\LeetCode_PRO\\backend\\src\\generated\\prisma",
+      "value": "/home/ubuntu/LeetCode_PRO/backend/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -392,17 +392,16 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "D:\\Advanced Projects\\LeetCode_PRO\\backend\\prisma\\schema.prisma",
+    "sourceFilePath": "/home/ubuntu/LeetCode_PRO/backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.6.0",
@@ -411,7 +410,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {
