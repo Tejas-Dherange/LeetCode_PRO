@@ -8,6 +8,7 @@ import ProblemSolvedByUser from "../components/ProblemSolvedByUser";
 import ProfileSubmission from "../components/ProfileSubmission";
 import { useEffect, useState } from "react";
 import { useContestStore } from "../store/useContestStore";
+import ContributionHeatmap from "../components/ContributionHeatmap";
 
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
@@ -45,7 +46,7 @@ const ProfilePage = () => {
     navigate("/edit-profile");
   };
   return (
-    <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-10 px-4   w-full">
+    <div className="min-h-screen bg-base-200 flex flex-col items-center justify-center py-10 px-4   w-[98vw]">
       {/* Header with back button */}
       <div className="flex flex-row justify-between items-center w-full mb-6">
         <div className="flex items-center gap-3">
@@ -186,6 +187,10 @@ const ProfilePage = () => {
             <div>
               <Ratings contestRatings={contestRatings} />
             </div>
+          </div>
+          {/* Contribution Heatmap */}
+          <div>
+            <ContributionHeatmap userId={authUser?.id} />
           </div>
           <div>
             <ProblemSolvedByUser />

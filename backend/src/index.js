@@ -14,6 +14,7 @@ import uploadRoutes from "../routes/upload.routes.js";
 import subscriptionRouter from "../routes/subscription.routes.js";
 import paymentRouter from "../routes/payment.routes.js";
 import companySheetsRouter from "../routes/companySheets.routes.js";
+import contributionRouter from "../routes/contibution.routes.js";
 dotenv.config();
 
 const port = process.env.PORT || 4000;
@@ -22,7 +23,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173","*"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
@@ -44,6 +45,7 @@ app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/subscription", subscriptionRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/company-sheets", companySheetsRouter);
+app.use("/api/v1/contribution", contributionRouter);
 
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);

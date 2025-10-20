@@ -1,0 +1,63 @@
+/* Contribution Heatmap Styles */
+.contribution-heatmap .react-calendar-heatmap {
+  width: 100%;
+}
+
+.contribution-heatmap .react-calendar-heatmap .react-calendar-heatmap-month-label {
+  font-size: 12px;
+  fill: #6b7280;
+}
+
+[data-theme="dark"] .contribution-heatmap .react-calendar-heatmap .react-calendar-heatmap-month-label {
+  fill: #d1d5db;
+}
+
+.contribution-heatmap .react-calendar-heatmap .react-calendar-heatmap-weekday-label {
+  font-size: 10px;
+  fill: #6b7280;
+}
+
+[data-theme="dark"] .contribution-heatmap .react-calendar-heatmap .react-calendar-heatmap-weekday-label {
+  fill: #d1d5db;
+}
+
+/* Color scheme for different activity levels */
+.contribution-heatmap .color-empty {
+  fill: #e5e7eb;
+}
+
+[data-theme="dark"] .contribution-heatmap .color-empty {
+  fill: #374151;
+}
+
+.contribution-heatmap .color-github-1 {
+  fill: #9be9a8;
+}
+
+.contribution-heatmap .color-github-2 {
+  fill: #40c463;
+}
+
+.contribution-heatmap .color-github-3 {
+  fill: #30a14e;
+}
+
+/* Hover effects */
+.contribution-heatmap .react-calendar-heatmap-square:hover {
+  stroke: #6b7280;
+  stroke-width: 1px;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .contribution-heatmap .react-calendar-heatmap-square:hover {
+  stroke: #d1d5db;
+  stroke-width: 1px;
+  cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .contribution-heatmap .react-calendar-heatmap {
+    font-size: 8px;
+  }
+}
