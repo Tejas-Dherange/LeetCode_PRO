@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import passport from "../libs/passport.lib.js";
 import authRouter from "../routes/auth.routes.js";
 import problemsRouter from "../routes/problems.routes.js";
 import codeExecutionRouter from "../routes/execute-code.routes.js";
@@ -32,6 +33,9 @@ app.use(
 app.use(express.json());
 
 app.use(cookieParser());
+
+// Initialize Passport
+app.use(passport.initialize());
 
 app.use("/api/v1/user", authRouter);
 app.use("/api/v1/problems", problemsRouter);

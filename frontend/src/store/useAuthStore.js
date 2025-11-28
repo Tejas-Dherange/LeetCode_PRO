@@ -90,6 +90,10 @@ const useAuthStore = create((set) => ({
       set({ isEditingProfile: false });
     }
   },
+
+  googleSignIn: () => {
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/google`;
+  }
 }));
 
 export default useAuthStore;

@@ -49,7 +49,10 @@ model User {
   name                String?
   email               String                @unique
   image               String?
-  password            String
+  password            String? // Nullable for OAuth users
+  googleId            String?               @unique // Google OAuth ID
+  clerkId             String?               @unique // Clerk ID (for future use)
+  emailVerified       Boolean               @default(false) // Email verification status
   role                UserRole              @default(USER)
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt

@@ -9,6 +9,7 @@ import ProfileSubmission from "../components/ProfileSubmission";
 import { useEffect, useState } from "react";
 import { useContestStore } from "../store/useContestStore";
 import ContributionHeatmap from "../components/ContributionHeatmap";
+import { SetPasswordModal } from "../components/GoogleAuth.example";
 
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
@@ -211,6 +212,7 @@ const ProfilePage = () => {
       <div>{/* Contest Rating Section */}</div>
 
       {/* PLaylist created by the user and their actions */}
+      
     </div>
   );
 };
