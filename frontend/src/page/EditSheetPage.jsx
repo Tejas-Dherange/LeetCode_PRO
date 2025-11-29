@@ -2,19 +2,28 @@ import { useEffect, useState } from "react";
 import { useCompanySheetStore } from "../store/UseCompanySheetStore";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Building2, Search, Plus, Eye, Edit, Trash2, ArrowLeft, Save } from "lucide-react";
+import {
+  Building2,
+  Search,
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  ArrowLeft,
+  Save,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-
+import {Skeleton} from "../components/ui/skeleton";
 const EditSheetPage = () => {
-  const { 
-    isSheetsLoading, 
-    companySheets, 
-    createCompanySheet, 
-    getCompanySheets, 
-    premiumSheets, 
+  const {
+    isSheetsLoading,
+    companySheets,
+    createCompanySheet,
+    getCompanySheets,
+    premiumSheets,
     getPremiumCompanySheets,
     updateCompanySheet,
-    deleteCompanySheet
+    deleteCompanySheet,
   } = useCompanySheetStore();
 
   const [activeTab, setActiveTab] = useState("view");
@@ -102,9 +111,10 @@ const EditSheetPage = () => {
     setActiveTab("view");
   };
 
-  const filteredSheets = premiumSheets.filter(sheet =>
-    sheet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    sheet.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredSheets = premiumSheets.filter(
+    (sheet) =>
+      sheet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      sheet.description?.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -122,7 +132,9 @@ const EditSheetPage = () => {
                 <h1 className="text-3xl font-bold text-base-content">
                   Company Sheets Manager
                 </h1>
-                <p className="text-base-content/70">Manage and organize company-specific problem sheets</p>
+                <p className="text-base-content/70">
+                  Manage and organize company-specific problem sheets
+                </p>
               </div>
             </div>
           </div>
@@ -177,15 +189,21 @@ const EditSheetPage = () => {
 
               {/* Sheets Grid */}
               {isSheetsLoading ? (
-                <div className="flex justify-center items-center py-12">
-                  <span className="loading loading-spinner loading-lg text-primary"></span>
+                <div className="flex space-x-3 ">
+                  <Skeleton className="h-[225px] w-[450px] rounded-xl" />
+                  <Skeleton className="h-[225px] w-[450px] rounded-xl" />
+                  <Skeleton className="h-[225px] w-[450px] rounded-xl" />
                 </div>
               ) : filteredSheets.length === 0 ? (
                 <div className="text-center py-12">
                   <Building2 className="w-16 h-16 text-base-content/30 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-base-content mb-2">No sheets found</h3>
+                  <h3 className="text-lg font-medium text-base-content mb-2">
+                    No sheets found
+                  </h3>
                   <p className="text-base-content/70 mb-4">
-                    {searchTerm ? "Try adjusting your search terms" : "Get started by creating your first company sheet"}
+                    {searchTerm
+                      ? "Try adjusting your search terms"
+                      : "Get started by creating your first company sheet"}
                   </p>
                   <button
                     onClick={() => setActiveTab("create")}
@@ -206,24 +224,50 @@ const EditSheetPage = () => {
                       <div className="card-body p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-lg font-semibold text-base-content truncate">{sheet.name}</h3>
-                            <p className="text-sm text-base-content/50">/{sheet.slug}</p>
+                            <h3 className="text-lg font-semibold text-base-content truncate">
+                              {sheet.name}
+                            </h3>
+                            <p className="text-sm text-base-content/50">
+                              /{sheet.slug}
+                            </p>
                           </div>
                           <div className="dropdown dropdown-end">
-                            <label tabIndex={0} className="btn btn-ghost btn-sm">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z" />
+                            <label
+                              tabIndex={0}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zM12 13a1 1 0 110-2 1 1 0 010 2zM12 20a1 1 0 110-2 1 1 0 010 2z"
+                                />
                               </svg>
                             </label>
-                            <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32">
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32"
+                            >
                               <li>
-                                <button onClick={() => handleEdit(sheet)} className="gap-2">
+                                <button
+                                  onClick={() => handleEdit(sheet)}
+                                  className="gap-2"
+                                >
                                   <Edit className="w-4 h-4" />
                                   Edit
                                 </button>
                               </li>
                               <li>
-                                <button onClick={() => handleDelete(sheet.id)} className="gap-2 text-error">
+                                <button
+                                  onClick={() => handleDelete(sheet.id)}
+                                  className="gap-2 text-error"
+                                >
                                   <Trash2 className="w-4 h-4" />
                                   Delete
                                 </button>
@@ -231,18 +275,20 @@ const EditSheetPage = () => {
                             </ul>
                           </div>
                         </div>
-                        
+
                         <p className="text-base-content/70 text-sm mb-4 line-clamp-2">
                           {sheet.description || "No description provided"}
                         </p>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span
                               className="w-3 h-3 rounded-full"
                               style={{ backgroundColor: sheet.color }}
                             ></span>
-                            <span className="text-xs text-base-content/50">{sheet.color}</span>
+                            <span className="text-xs text-base-content/50">
+                              {sheet.color}
+                            </span>
                           </div>
                           <div className="flex gap-2">
                             {sheet.isPremium && (
@@ -272,13 +318,14 @@ const EditSheetPage = () => {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 pb-4 border-b border-base-300">
                 <div>
                   <h2 className="text-2xl font-bold text-base-content mb-2">
-                    {editingSheet ? "Edit Company Sheet" : "Create New Company Sheet"}
+                    {editingSheet
+                      ? "Edit Company Sheet"
+                      : "Create New Company Sheet"}
                   </h2>
                   <p className="text-base-content/70">
-                    {editingSheet 
-                      ? "Update the company sheet information below" 
-                      : "Fill out the form to create a new company problem sheet"
-                    }
+                    {editingSheet
+                      ? "Update the company sheet information below"
+                      : "Fill out the form to create a new company problem sheet"}
                   </p>
                 </div>
                 {editingSheet && (
@@ -296,38 +343,53 @@ const EditSheetPage = () => {
                 <div className="space-y-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Building2 className="w-5 h-5 text-primary" />
-                    <h3 className="text-lg font-semibold text-base-content">Basic Information</h3>
+                    <h3 className="text-lg font-semibold text-base-content">
+                      Basic Information
+                    </h3>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Company Name */}
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-medium text-base-content">Company Name</span>
+                        <span className="label-text font-medium text-base-content">
+                          Company Name
+                        </span>
                         <span className="label-text-alt text-error">*</span>
                       </label>
                       <input
                         className={`input input-bordered bg-base-200 focus:bg-base-100 transition-colors ${
-                          errors.name ? 'input-error focus:input-error' : 'focus:input-primary'
+                          errors.name
+                            ? "input-error focus:input-error"
+                            : "focus:input-primary"
                         }`}
-                        {...register("name", { 
+                        {...register("name", {
                           required: "Company name is required",
                           minLength: {
                             value: 2,
-                            message: "Company name must be at least 2 characters"
+                            message:
+                              "Company name must be at least 2 characters",
                           },
                           maxLength: {
                             value: 50,
-                            message: "Company name cannot exceed 50 characters"
-                          }
+                            message: "Company name cannot exceed 50 characters",
+                          },
                         })}
                         placeholder="e.g., Google, Microsoft, Amazon"
                       />
                       {errors.name && (
                         <label className="label">
                           <span className="label-text-alt text-error flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                             {errors.name.message}
                           </span>
@@ -338,20 +400,25 @@ const EditSheetPage = () => {
                     {/* URL Slug */}
                     <div className="form-control">
                       <label className="label">
-                        <span className="label-text font-medium text-base-content">URL Slug</span>
+                        <span className="label-text font-medium text-base-content">
+                          URL Slug
+                        </span>
                         <span className="label-text-alt text-error">*</span>
                       </label>
                       <div className="relative">
                         <input
                           className={`input input-bordered bg-base-200 focus:bg-base-100 transition-colors pr-12 ${
-                            errors.slug ? 'input-error focus:input-error' : 'focus:input-primary'
+                            errors.slug
+                              ? "input-error focus:input-error"
+                              : "focus:input-primary"
                           }`}
-                          {...register("slug", { 
+                          {...register("slug", {
                             required: "Slug is required",
                             pattern: {
                               value: /^[a-z0-9-]+$/,
-                              message: "Slug can only contain lowercase letters, numbers, and hyphens"
-                            }
+                              message:
+                                "Slug can only contain lowercase letters, numbers, and hyphens",
+                            },
                           })}
                           placeholder="auto-generated from name"
                         />
@@ -362,8 +429,16 @@ const EditSheetPage = () => {
                       {errors.slug && (
                         <label className="label">
                           <span className="label-text-alt text-error flex items-center gap-1">
-                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
                             </svg>
                             {errors.slug.message}
                           </span>
@@ -375,8 +450,12 @@ const EditSheetPage = () => {
                   {/* Description */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium text-base-content">Description</span>
-                      <span className="label-text-alt text-base-content/70">Optional</span>
+                      <span className="label-text font-medium text-base-content">
+                        Description
+                      </span>
+                      <span className="label-text-alt text-base-content/70">
+                        Optional
+                      </span>
                     </label>
                     <textarea
                       rows={4}
@@ -384,8 +463,8 @@ const EditSheetPage = () => {
                       {...register("description", {
                         maxLength: {
                           value: 200,
-                          message: "Description cannot exceed 200 characters"
-                        }
+                          message: "Description cannot exceed 200 characters",
+                        },
                       })}
                       placeholder="Brief description of the company and its problem set focus areas..."
                     />
@@ -396,7 +475,9 @@ const EditSheetPage = () => {
                     </label>
                     {errors.description && (
                       <label className="label">
-                        <span className="label-text-alt text-error">{errors.description.message}</span>
+                        <span className="label-text-alt text-error">
+                          {errors.description.message}
+                        </span>
                       </label>
                     )}
                   </div>
@@ -411,7 +492,9 @@ const EditSheetPage = () => {
                   {/* Theme Color */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium text-base-content">Theme Color</span>
+                      <span className="label-text font-medium text-base-content">
+                        Theme Color
+                      </span>
                       <span className="label-text-alt text-error">*</span>
                     </label>
                     <div className="space-y-3">
@@ -419,12 +502,18 @@ const EditSheetPage = () => {
                         <input
                           type="color"
                           className={`w-16 h-16 border-2 rounded-xl cursor-pointer transition-all hover:scale-105 ${
-                            errors.color ? 'border-error' : 'border-base-300 hover:border-primary'
+                            errors.color
+                              ? "border-error"
+                              : "border-base-300 hover:border-primary"
                           }`}
-                          {...register("color", { required: "Color is required" })}
+                          {...register("color", {
+                            required: "Color is required",
+                          })}
                         />
                         <div>
-                          <p className="text-sm font-medium text-base-content">Brand Color</p>
+                          <p className="text-sm font-medium text-base-content">
+                            Brand Color
+                          </p>
                           <p className="text-xs text-base-content/70">
                             Current: {watch("color")?.toUpperCase()}
                           </p>
@@ -432,8 +521,17 @@ const EditSheetPage = () => {
                       </div>
                       {/* Color Presets */}
                       <div className="flex gap-2">
-                        <span className="text-xs text-base-content/50">Presets:</span>
-                        {["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"].map((color) => (
+                        <span className="text-xs text-base-content/50">
+                          Presets:
+                        </span>
+                        {[
+                          "#3B82F6",
+                          "#10B981",
+                          "#F59E0B",
+                          "#EF4444",
+                          "#8B5CF6",
+                          "#06B6D4",
+                        ].map((color) => (
                           <button
                             key={color}
                             type="button"
@@ -446,7 +544,9 @@ const EditSheetPage = () => {
                     </div>
                     {errors.color && (
                       <label className="label">
-                        <span className="label-text-alt text-error">{errors.color.message}</span>
+                        <span className="label-text-alt text-error">
+                          {errors.color.message}
+                        </span>
                       </label>
                     )}
                   </div>
@@ -454,22 +554,32 @@ const EditSheetPage = () => {
                   {/* Required Plan */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium text-base-content">Required Plan</span>
+                      <span className="label-text font-medium text-base-content">
+                        Required Plan
+                      </span>
                       <span className="label-text-alt text-error">*</span>
                     </label>
                     <select
                       className={`select select-bordered bg-base-200 focus:bg-base-100 transition-colors ${
-                        errors.requiredPlan ? 'select-error focus:select-error' : 'focus:select-primary'
+                        errors.requiredPlan
+                          ? "select-error focus:select-error"
+                          : "focus:select-primary"
                       }`}
-                      {...register("requiredPlan", { required: "Plan selection is required" })}
+                      {...register("requiredPlan", {
+                        required: "Plan selection is required",
+                      })}
                     >
                       <option value="">Select a plan</option>
                       <option value="BASIC">Basic Plan - $9.99/month</option>
-                      <option value="PREMIUM">Premium Plan - $19.99/month</option>
+                      <option value="PREMIUM">
+                        Premium Plan - $19.99/month
+                      </option>
                     </select>
                     {errors.requiredPlan && (
                       <label className="label">
-                        <span className="label-text-alt text-error">{errors.requiredPlan.message}</span>
+                        <span className="label-text-alt text-error">
+                          {errors.requiredPlan.message}
+                        </span>
                       </label>
                     )}
                   </div>
@@ -477,7 +587,9 @@ const EditSheetPage = () => {
                   {/* Premium Features */}
                   <div className="form-control">
                     <label className="label">
-                      <span className="label-text font-medium text-base-content">Premium Features</span>
+                      <span className="label-text font-medium text-base-content">
+                        Premium Features
+                      </span>
                     </label>
                     <div className="card bg-base-200 p-4">
                       <label className="label cursor-pointer justify-start gap-3">
@@ -487,7 +599,9 @@ const EditSheetPage = () => {
                           {...register("isPremium")}
                         />
                         <div>
-                          <span className="label-text font-medium">Mark as Premium</span>
+                          <span className="label-text font-medium">
+                            Mark as Premium
+                          </span>
                           <p className="text-xs text-base-content/70 mt-1">
                             Enable advanced features and analytics
                           </p>
@@ -504,15 +618,33 @@ const EditSheetPage = () => {
                       <span className="text-base-content/50">Preview</span>
                     </div>
                     <div className="alert alert-info">
-                      <svg className="w-6 h-6 stroke-current shrink-0" fill="none" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      <svg
+                        className="w-6 h-6 stroke-current shrink-0"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        ></path>
                       </svg>
                       <div>
                         <h3 className="font-bold">Sheet Preview</h3>
                         <div className="text-xs">
-                          <p><strong>Name:</strong> {watch("name") || "Company Name"}</p>
-                          <p><strong>Slug:</strong> /sheets/{watch("slug") || "company-slug"}</p>
-                          <p><strong>Description:</strong> {watch("description") || "No description"}</p>
+                          <p>
+                            <strong>Name:</strong>{" "}
+                            {watch("name") || "Company Name"}
+                          </p>
+                          <p>
+                            <strong>Slug:</strong> /sheets/
+                            {watch("slug") || "company-slug"}
+                          </p>
+                          <p>
+                            <strong>Description:</strong>{" "}
+                            {watch("description") || "No description"}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -522,7 +654,9 @@ const EditSheetPage = () => {
                 {/* Submit Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-center pt-6 border-t border-base-300 gap-4">
                   <div className="text-sm text-base-content/70">
-                    {editingSheet ? "Update the sheet information" : "Create a new company sheet"}
+                    {editingSheet
+                      ? "Update the sheet information"
+                      : "Create a new company sheet"}
                   </div>
                   <div className="flex gap-3">
                     <button
@@ -536,7 +670,9 @@ const EditSheetPage = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting || isSheetsLoading}
-                      className={`btn gap-2 ${editingSheet ? 'btn-warning' : 'btn-primary'}`}
+                      className={`btn gap-2 ${
+                        editingSheet ? "btn-warning" : "btn-primary"
+                      }`}
                     >
                       {isSubmitting ? (
                         <>

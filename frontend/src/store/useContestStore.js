@@ -308,6 +308,25 @@ export const useContestStore = create((set) => ({
     }
   },
 
+  getContestSubmissionForProblemByUser: async (problemId, userId,startTime,endTime) => {
+    set({ isContestLoading: true });
+    try {
+      const res = await axiosInstance.get(
+        `/contest-submission/get-submission-for-problem-by-user/${problemId}/${userId}`,
+      );
+      set({ contestSubmissions: res.data.submissions || [] });
+      toast.success(res.data.message || "User submissions fetched successfully");
+    } catch (error) {
+      console.error(
+        "Error occurred in fetching contest submissions by user",
+        error,
+      );
+      toast.error("Error in fetching contest submissions by user");
+    } finally {
+      set({ isContestLoading: false });
+    }
+  },
+
   contestSubmitCode: async (
     source_code,
     language_id,

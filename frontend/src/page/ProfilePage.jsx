@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PlaylistProfile from "../components/PlaylistProfile";
 import useAuthStore from "../store/useAuthStore";
 import Ratings from "../components/Ratings";
-
+import { Skeleton } from "../components/ui/skeleton";
 import { ArrowLeft, Mail, User, Shield, Image } from "lucide-react";
 import ProblemSolvedByUser from "../components/ProblemSolvedByUser";
 import ProfileSubmission from "../components/ProfileSubmission";
@@ -12,8 +12,8 @@ import ContributionHeatmap from "../components/ContributionHeatmap";
 import { SetPasswordModal } from "../components/GoogleAuth.example";
 
 const ProfilePage = () => {
-  const { authUser } = useAuthStore();
-  const navigate=useNavigate();
+  const { authUser, isCheckingAuth } = useAuthStore();
+  const navigate = useNavigate();
   const [contestRatings, setContestRatings] = useState([]);
   const [currentRating, setCurrentRating] = useState(null);
   const [currentRank, setCurrentRank] = useState(null);
@@ -60,131 +60,144 @@ const ProfilePage = () => {
 
       <div className="w-full  gap-10 justify-center-safe flex flex-row mx-auto">
         {/* Profile Card */}
-        <div className="card left bg-base-100 h-full shadow-xl">
-          <div className="card-body">
-            {/* Profile Header */}
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              {/* Avatar */}
-              <div className="avatar placeholder">
-                <div className="bg-neutral text-neutral-content rounded-full w-24 h-24 ring ring-primary ring-offset-base-100 ring-offset-2">
-                  {authUser.image ? (
-                    <img
-                      src={
-                        authUser?.image ||
-                        "https://avatar.iran.liara.run/public/boy"
-                      }
-                      alt={authUser.name}
-                    />
-                  ) : (
-                    <span className="text-3xl">
-                      {authUser.name ? authUser.name.charAt(0) : "U"}
-                    </span>
-                  )}
-                </div>
-              </div>
 
-              {/* Name and Role Badge */}
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold">{authUser.name}</h2>
-                <div className="badge badge-success mt-2">{authUser.role}</div>
-              </div>
-            </div>
-
-            <div className="divider"></div>
-
-            {/* User Information */}
-            <div className="flex flex-col gap-4">
-              {/* Email */}
-              <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-success">
-                  <Mail className="w-8 h-8" />
-                </div>
-                <div className="stat-title">Email</div>
-                <div className="stat-value text-lg break-all">
-                  {authUser.email}
-                </div>
-              </div>
-
-              {/* User ID */}
-              <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-success">
-                  <User className="w-8 h-8" />
-                </div>
-                <div className="stat-title">User ID</div>
-                <div className="stat-value text-sm break-all">
-                  {authUser.id}
-                </div>
-              </div>
-
-              {/* Role Status */}
-              <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-success">
-                  <Shield className="w-8 h-8" />
-                </div>
-                <div className="stat-title">Role</div>
-                <div className="stat-value text-lg">{authUser.role}</div>
-                <div className="stat-desc">
-                  {authUser.role === "ADMIN"
-                    ? "Full system access"
-                    : "Limited access"}
-                </div>
-              </div>
-
-              {/* Profile Image Status */}
-              <div className="stat bg-base-200 rounded-box">
-                <div className="stat-figure text-success">
-                  <Image className="w-8 h-8" />
-                </div>
-                <div className="stat-title">Profile Image</div>
-                <div className="stat-value text-lg">
-                  {authUser.image ? "Uploaded" : "Not Set"}
-                </div>
-                <div className="stat-desc">
-                  {authUser.image
-                    ? "Image available"
-                    : "Upload a profile picture"}
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="card-actions justify-end mt-6 text-white">
-              <button className="btn btn-outline text-shadow-base-100 btn-success" 
-               onClick={handleClickEditProfile}
-              >
-                Edit Profile
-              </button>
-              <button className="btn btn-outline text-shadow-base-100 btn-error">Change Password</button>
+        {isCheckingAuth ? (
+          <div className="flex flex-col space-y-3">
+            <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-[250px]" />
+              <Skeleton className="h-4 w-[200px]" />
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="card left bg-base-100 h-full shadow-xl">
+            <div className="card-body">
+              {/* Profile Header */}
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                {/* Avatar */}
+                <div className="avatar placeholder">
+                  <div className="bg-neutral text-neutral-content rounded-full w-24 h-24 ring ring-primary ring-offset-base-100 ring-offset-2">
+                    {authUser.image ? (
+                      <img
+                        src={
+                          authUser?.image ||
+                          "https://avatar.iran.liara.run/public/boy"
+                        }
+                        alt={authUser.name}
+                      />
+                    ) : (
+                      <span className="text-3xl">
+                        {authUser.name ? authUser.name.charAt(0) : "U"}
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-        
+                {/* Name and Role Badge */}
+                <div className="text-center md:text-left">
+                  <h2 className="text-2xl font-bold">{authUser.name}</h2>
+                  <div className="badge badge-success mt-2">
+                    {authUser.role}
+                  </div>
+                </div>
+              </div>
+
+              <div className="divider"></div>
+
+              {/* User Information */}
+              <div className="flex flex-col gap-4">
+                {/* Email */}
+                <div className="stat bg-base-200 rounded-box">
+                  <div className="stat-figure text-success">
+                    <Mail className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">Email</div>
+                  <div className="stat-value text-lg break-all">
+                    {authUser.email}
+                  </div>
+                </div>
+
+                {/* User ID */}
+                <div className="stat bg-base-200 rounded-box">
+                  <div className="stat-figure text-success">
+                    <User className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">User ID</div>
+                  <div className="stat-value text-sm break-all">
+                    {authUser.id}
+                  </div>
+                </div>
+
+                {/* Role Status */}
+                <div className="stat bg-base-200 rounded-box">
+                  <div className="stat-figure text-success">
+                    <Shield className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">Role</div>
+                  <div className="stat-value text-lg">{authUser.role}</div>
+                  <div className="stat-desc">
+                    {authUser.role === "ADMIN"
+                      ? "Full system access"
+                      : "Limited access"}
+                  </div>
+                </div>
+
+                {/* Profile Image Status */}
+                <div className="stat bg-base-200 rounded-box">
+                  <div className="stat-figure text-success">
+                    <Image className="w-8 h-8" />
+                  </div>
+                  <div className="stat-title">Profile Image</div>
+                  <div className="stat-value text-lg">
+                    {authUser.image ? "Uploaded" : "Not Set"}
+                  </div>
+                  <div className="stat-desc">
+                    {authUser.image
+                      ? "Image available"
+                      : "Upload a profile picture"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="card-actions justify-end mt-6 text-white">
+                <button
+                  className="btn btn-outline text-shadow-base-100 btn-success"
+                  onClick={handleClickEditProfile}
+                >
+                  Edit Profile
+                </button>
+                <button className="btn btn-outline text-shadow-base-100 btn-error">
+                  Change Password
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* {proble solved by users} */}
         <div className="right flex flex-col gap-8 w-[60%]">
-
           <div>
-             {/* Contest Ratings Section */}
-          <div className="mt-8 flex gap-10">
-            <h3 className="text-xl font-bold mb-2 text-secondary">
-              Contest Rating
-            </h3>
-            <div className="flex items-center gap-8 mb-4">
-              <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-secondary">
-                  {currentRating !== null ? currentRating : "-"}
-                </span>
-                <span className="text-base-content/70">Current Rating</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-3xl font-bold text-secondary">
-                  {currentRank !== null ? `#${currentRank}` : "-"}
-                </span>
-                <span className="text-base-content/70">Current Rank</span>
+            {/* Contest Ratings Section */}
+            <div className="mt-8 flex gap-10">
+              <h3 className="text-xl font-bold mb-2 text-secondary">
+                Contest Rating
+              </h3>
+              <div className="flex items-center gap-8 mb-4">
+                <div className="flex flex-col items-center">
+                  <span className="text-3xl font-bold text-secondary">
+                    {currentRating !== null ? currentRating : "-"}
+                  </span>
+                  <span className="text-base-content/70">Current Rating</span>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-3xl font-bold text-secondary">
+                    {currentRank !== null ? `#${currentRank}` : "-"}
+                  </span>
+                  <span className="text-base-content/70">Current Rank</span>
+                </div>
               </div>
             </div>
-
-          </div>
             <div>
               <Ratings contestRatings={contestRatings} />
             </div>
@@ -196,8 +209,6 @@ const ProfilePage = () => {
           <div>
             <ProblemSolvedByUser />
           </div>
-
-         
 
           {/* Submissions */}
           <div className="Submissions">
@@ -212,7 +223,6 @@ const ProfilePage = () => {
       <div>{/* Contest Rating Section */}</div>
 
       {/* PLaylist created by the user and their actions */}
-      
     </div>
   );
 };

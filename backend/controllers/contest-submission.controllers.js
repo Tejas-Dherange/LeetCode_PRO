@@ -36,4 +36,20 @@ const getCountOfSubmissions = async (req, res) => {
   }
 };
 
-export { getSubmissionForProblem, getCountOfSubmissions };
+const getSubmissionForProblemByUser = async (req, res) => {
+  const { problemId, userId } = req.params;
+  if (!problemId || !userId) {
+    return res.status(400).json({ message: "problemId and userId are required" });
+  }
+  try {
+    const submissions = await db.contestSubmission.findMany({
+      where: { problemId, userId },
+    });
+    return res.json({ submissions });
+  } catch (error) {
+    console.error("Error in getSubmissionForProblemByUser", error);
+    return res.status(500).json({ message: "Error fetching submissions" });
+  }
+};
+
+export { getSubmissionForProblem, getCountOfSubmissions, getSubmissionForProblemByUser };
