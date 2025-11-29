@@ -1,34 +1,34 @@
 import db from "../libs/db.js";
-// const getSubmissionById = (req, res) => {
-//   try {
-//     const { id } = req.params;
+const getSubmissionByUserAndProblem = async (req, res) => {
+  try {
+    const { problemId, userId } = req.params;
+    if (!problemId || !userId) {
+      return res.status(400).json({ message: "some error occured" });
+    }
+    const submission = await db.submission.findMany({
+      where: {
+        problemId,
+        userId,
+      },
+    });
 
-//     if (!id) {
-//       return res.status(400).json({ message: "some error occured" });
-//     }
-
-//     const submission = db.submission.findUnique({
-//       where: {
-//         problemId:id,
-//       },
-//     });
-
-//     if (!submission) {
-//       return res.status(404).json({ message: "submission not found" });
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "submission found successfully",
-//       submission,
-//     });
-//   } catch (error) {
-//     return res.status(400).json({
-//       success: false,
-//       message: "error in fetching submission by id",
-//     });
-//   }
-// };
+    if (!submission) {
+      return res
+        .status(404)
+        .json({ message: "submission not found for user and problem" });
+    }
+    return res.status(200).json({
+      message: "Submission fetched succesfully for user and problem",
+      submission,
+    });
+  } catch (error) {
+    console.error("error in getting submission by user and problem", error);
+    return res.status(400).json({
+      success: false,
+      message: "error in getting submission by user and problem",
+    });
+  }
+};
 
 const getAllSubmissions = async (req, res) => {
   try {
@@ -129,4 +129,5 @@ export {
   getAllSubmissions,
   countSubmissions,
   getAllSubmissionsForProblem,
+  getSubmissionByUserAndProblem,
 };

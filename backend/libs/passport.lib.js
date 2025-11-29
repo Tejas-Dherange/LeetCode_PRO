@@ -41,7 +41,7 @@ passport.use(
               data: {
                 googleId: googleId,
                 emailVerified: emailVerified,
-                image: image || user.image, // Keep existing image if no Google image
+                image: user.image  ||  image  , // Keep existing image if no Google image
               },
             });
           }
@@ -51,7 +51,7 @@ passport.use(
             where: { id: user.id },
             data: {
               emailVerified: emailVerified,
-              image: image || user.image,
+              image: user.image  ||  image  ,
             },
           });
         }

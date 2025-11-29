@@ -48,15 +48,96 @@ function LoginPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Code className="w-6 h-6 text-primary" />
+              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                <Code className="w-6 h-6 text-success" />
               </div>
               <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
               <p className="text-base-content/60">LogIn to your account</p>
             </div>
           </div>
-          <button onClick={handleGoogleLogin}
-           className=" cursor-pointer rounded-xl bg-blue-600 p-1 w-full  flex gap-20 items-center"
+        
+          
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Email */}
+            {/* <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Email</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-base-content/40" />
+                </div>
+                <input
+                  type="email"
+                  {...register("email")}
+                  className={`input input-bordered w-full pl-10 ${
+                    errors.email ? "input-error" : ""
+                  }`}
+                  placeholder="you@example.com"
+                />
+              </div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div> */}
+            {/* Password */}
+            {/* <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-base-content/40" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  {...register("password")}
+                  className={`input input-bordered w-full pl-10 ${
+                    errors.password ? "input-error" : ""
+                  }`}
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-base-content/40" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-base-content/40" />
+                  )}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div> */}
+            {/* Google Login Button */}
+
+            {/* Submit Button */}
+            {/* <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={isLogingIn}
+            >
+              {isLogingIn ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                "Log In"
+              )}
+            </button> */}
+          </form>
+          
+    <button onClick={handleGoogleLogin}
+           className=" cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-900 p-1 w-full  flex gap-20 items-center"
           >
             <div className="bg-white rounded-lg ">
             <svg
@@ -90,110 +171,15 @@ function LoginPage() {
             Continue with Google
             </div>
           </button>
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Email */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Email</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-base-content/40" />
-                </div>
-                <input
-                  type="email"
-                  {...register("email")}
-                  className={`input input-bordered w-full pl-10 ${
-                    errors.email ? "input-error" : ""
-                  }`}
-                  placeholder="you@example.com"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div>
-            {/* Password */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Password</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-base-content/40" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
-                  className={`input input-bordered w-full pl-10 ${
-                    errors.password ? "input-error" : ""
-                  }`}
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-base-content/40" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-base-content/40" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
-            {/* Google Login Button */}
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="btn btn-primary w-full"
-              disabled={isLogingIn}
-            >
-              {isLogingIn ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                "Log In"
-              )}
-            </button>
-          </form>
-          {/* <div className="flex justify-center w-full  p-2 rounded-lg ">
-            <GoogleLogin
-              width={"420px"}
-              logo_alignment="left"
-              theme="filled_blue"
-              shape="rectangular"
-              onSuccess={(credentialResponse) => {
-                const decoded = jwtDecode(credentialResponse.credential);
-                console.log("Decoded Google User Data:", decoded);
-              }}
-              onError={() => {
-                console.log("Login Failed");
-              }}
-            />
-          </div> */}
-
           {/* Footer */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <p className="text-base-content/60">
               Don't have an account?{" "}
               <Link to="/signup" className="link link-primary">
                 Sign Up
               </Link>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 

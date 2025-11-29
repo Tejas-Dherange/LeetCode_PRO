@@ -30,6 +30,7 @@ import Submission from "../components/Submission";
 import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
+import useAuthStore from "../store/useAuthStore";
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -40,6 +41,8 @@ const ProblemPage = () => {
     getSubmissionForProblem,
     getSubmissionCountForProblem,
     submissionCount,
+    submissionbyuser,
+    getSubmissionByUserAndProblem,
   } = useSubmissionStore();
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
@@ -106,7 +109,8 @@ useEffect(() => {
 
   useEffect(() => {
     if (activeTab === "submissions" && id) {
-      getSubmissionForProblem(id);
+      // getSubmissionForProblem(id);
+      getSubmissionByUserAndProblem(id, useAuthStore.getState().authUser.id);
     }
   }, [activeTab, id]);
 
@@ -276,7 +280,7 @@ useEffect(() => {
       case "submissions":
         return (
           <SubmissionsList
-            submissions={submissions}
+            submissions={submissionbyuser}
             isLoading={isSubmissionsLoading}
           />
         );
