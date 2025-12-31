@@ -331,6 +331,41 @@ exports.Prisma.CompanySheetProblemScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PatternScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  link: 'link',
+  icon: 'icon',
+  order: 'order',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProblemInPatternScalarFieldEnum = {
+  id: 'id',
+  patternId: 'patternId',
+  problemId: 'problemId',
+  order: 'order',
+  link: 'link',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PatternProgressScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  patternId: 'patternId',
+  completedProblems: 'completedProblems',
+  totalProblems: 'totalProblems',
+  lastSolvedAt: 'lastSolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -401,7 +436,10 @@ exports.Prisma.ModelName = {
   Payment: 'Payment',
   UsageTracker: 'UsageTracker',
   CompanySheet: 'CompanySheet',
-  CompanySheetProblem: 'CompanySheetProblem'
+  CompanySheetProblem: 'CompanySheetProblem',
+  Pattern: 'Pattern',
+  ProblemInPattern: 'ProblemInPattern',
+  PatternProgress: 'PatternProgress'
 };
 
 /**

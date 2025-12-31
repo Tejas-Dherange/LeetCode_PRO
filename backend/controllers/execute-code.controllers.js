@@ -4,6 +4,7 @@ import {
   submitBatch,
 } from "../libs/judge0.lib.js";
 import db from "../libs/db.js";
+import { updatePatternProgress } from "./pattern.controllers.js";
 
 // Controller: Run code (no DB save, just return results)
 const runCode = async (req, res) => {
@@ -150,6 +151,15 @@ const submitCode = async (req, res) => {
     });
 
     if (allPassed) {
+      const isNewSolve = await db.problemSolved.findUnique({
+        where: {
+          userId_problemId: {
+            userId,
+            problemId,
+          },
+        },
+      });
+
       await db.problemSolved.upsert({
         where: {
           userId_problemId: {
@@ -163,6 +173,9 @@ const submitCode = async (req, res) => {
           problemId,
         },
       });
+
+      // Always update pattern progress (recalculates based on actual solved problems)
+      await updatePatternProgress(userId, problemId);
     }
 
     const testCaseResults = detailedResults.map((result) => ({

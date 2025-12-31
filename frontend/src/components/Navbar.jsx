@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut, Trophy, Moon, Sun, Sheet } from "lucide-react";
+import { User, Code, LogOut, Trophy, Moon, Sun, Sheet, BookOpen } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 import { useEffect, useState } from "react";
@@ -57,6 +57,11 @@ const Navbar = () => {
                 Pricing
               </button>
             </Link>
+            <Link to="/patterns">
+              <button className="btn btn-accent btn-sm font-bold  shadow-md transition-transform duration-300 hover:scale-105 hover:shadow-xl hover:brightness-110">
+                Patterns
+              </button>
+            </Link>
           </div>
           <div className="dropdown dropdown-end">
             <label
@@ -99,10 +104,30 @@ const Navbar = () => {
                   to="/sheets"
                   className="hover:bg-primary hover:text-white text-base font-semibold"
                 >
-                  <User className="w-4 h-4 mr-2" />
+                  <Sheet className="w-4 h-4 mr-2" />
                   Sheets
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/patterns"
+                  className="hover:bg-primary hover:text-white text-base font-semibold"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Patterns
+                </Link>
+              </li>
+              {authUser?.role === "ADMIN" && (
+                <li>
+                  <Link
+                    to="/admin/patterns"
+                    className="hover:bg-primary hover:text-white text-base font-semibold"
+                  >
+                    <BookOpen className="w-4 h-4 mr-1" />
+                    Manage Patterns
+                  </Link>
+                </li>
+              )}
               {authUser?.role === "ADMIN" && (
                 <li>
                   <Link

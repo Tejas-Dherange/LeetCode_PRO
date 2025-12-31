@@ -64,6 +64,7 @@ model User {
   Subscription        Subscription?
   Payment             Payment[]
   UsageTracker        UsageTracker?
+  PatternProgress     PatternProgress[]
 }
 
 model Problem {
@@ -93,6 +94,7 @@ model Problem {
   problemInPlayLists  ProblemInPlayList[]
   ContestProblem      ContestProblem[]
   CompanySheetProblem CompanySheetProblem[]
+  ProblemInPattern    ProblemInPattern[]
 }
 
 model Submission {
@@ -352,4 +354,58 @@ model CompanySheetProblem {
   problem      Problem      @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([companySheetId, problemId])
+}
+
+model Pattern {
+  id          String  @id @default(uuid())
+  name        String  @unique // "Two Pointers", "Sliding Window"
+  slug        String  @unique // "two-pointers", "sliding-window"
+  description String
+  link        String? // Reference link/article about pattern
+  icon        String  @default("📚") // Icon/emoji for UI
+  order       Int     @default(0) // Display order
+  isActive    Boolean @default(true) // Show/hide patterns
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  problems        ProblemInPattern[]
+  patternProgress PatternProgress[]
+}
+
+model ProblemInPattern {
+  id        String  @id @default(uuid())
+  patternId String
+  problemId String
+  order     Int     @default(0) // Problem sequence within pattern
+  link      String? // Specific link for this problem in pattern context
+  notes     String? // Pattern-specific notes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  pattern Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([patternId, problemId])
+}
+
+model PatternProgress {
+  id                String    @id @default(uuid())
+  userId            String
+  patternId         String
+  completedProblems Int       @default(0)
+  totalProblems     Int       @default(0)
+  lastSolvedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pattern Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, patternId])
 }

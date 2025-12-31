@@ -16,6 +16,7 @@ import subscriptionRouter from "../routes/subscription.routes.js";
 import paymentRouter from "../routes/payment.routes.js";
 import companySheetsRouter from "../routes/companySheets.routes.js";
 import contributionRouter from "../routes/contibution.routes.js";
+import patternRouter from "../routes/pattern.routes.js";
 dotenv.config();
 
 const port = process.env.PORT || 4000;
@@ -50,6 +51,7 @@ app.use("/api/v1/subscription", subscriptionRouter);
 app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/company-sheets", companySheetsRouter);
 app.use("/api/v1/contribution", contributionRouter);
+app.use("/api/v1/patterns", patternRouter);
 
 app.listen(port, () => {
   console.log(`app is running on port ${port}`);

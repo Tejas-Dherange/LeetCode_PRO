@@ -23,6 +23,9 @@ import SheetsPage from "./page/SheetsPage";
 import PricingPage from "./page/PricingPage";
 import useSubscriptionStore from "./store/useSubscriptionStore";
 import EditSheetPage from "./page/EditSheetPage";
+import PatternsPage from "./page/PatternsPage";
+import PatternDetailPage from "./page/PatternDetailPage";
+import ManagePatternsPage from "./page/ManagePatternsPage";
 
 
 const App = () => {
@@ -51,47 +54,7 @@ const App = () => {
           <ServiceDownPopUp />
         </div> */}
       <Routes>
-        <Route path="/dashboard" element={<Layout />}>
-          <Route
-            index
-            element={authUser ? <Dashboard /> : <Navigate to={"/login"} />}
-          />
-          <Route
-            path="/dashboard/contest"
-            element={
-              authUser ? <ContestPage /> : <Navigate to={"/dashboard"} />
-            }
-          />
-           <Route
-          path="/dashboard/profile"
-          element={authUser ? <ProfilePage /> : <Navigate to={"/dashboard"} />}
-        />
-          <Route
-            path="/dashboard/contest/register/:id"
-            element={
-              authUser ? (
-                <RegisterContestPage />
-              ) : (
-                <Navigate to={"/"} />
-              )
-            }
-          />
-          <Route
-            path="/dashboard/pricing"
-            element={
-              authUser ? <PricingPage /> : <Navigate to={"/login"} />
-            }
-          />
-        </Route>
-       
-        <Route
-          path="sheets"
-          element={authUser ? <SheetsPage /> : <Navigate to={"/dashboard"} />}
-        />
-        <Route
-          path="edit-profile"
-          element={authUser ? <EditProfileForm /> : <Navigate to={"/edit-profile"} />}
-        />
+        {/* Public routes */}
         <Route
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to={"/dashboard"} />}
@@ -100,37 +63,50 @@ const App = () => {
           path="/signup"
           element={!authUser ? <SignUpPage /> : <Navigate to={"/dashboard"} />}
         />
-
-        <Route element={<AdminRoute />}>
-          <Route path="/add-problem" element={<AddProblemPage />} />
-        </Route>
-
-        <Route
-          path="/problem/:id"
-          element={authUser ? <ProblemPage /> : <Navigate to={"/dashboard"} />}
-        />
-        <Route
-          path="/dashboard/contest-execution/:cid/:id"
-          element={
-            authUser ? <ContestProblemExecPage /> : <Navigate to={"/login"} />
-          }
-        />
-        <Route
-          path="/dashboard/contest/create-contest"
-          element={
-            authUser ? <CreateContestPage /> : <Navigate to={"/login"} />
-          }
-        />
-        <Route
-          path="/dashboard/edit-sheets"
-          element={
-            authUser ? <EditSheetPage /> : <Navigate to={"/login"} />
-          }
-        />
         <Route
           path="/"
-          element={ <HomePage />}
+          element={<HomePage />}
         />
+
+        {/* Protected routes with Layout */}
+        <Route path="/dashboard" element={authUser ? <Layout /> : <Navigate to={"/login"} />}>
+          <Route index element={<Dashboard />} />
+          <Route path="contest" element={<ContestPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="contest/register/:id" element={<RegisterContestPage />} />
+          <Route path="pricing" element={<PricingPage />} />
+          <Route path="contest-execution/:cid/:id" element={<ContestProblemExecPage />} />
+          <Route path="contest/create-contest" element={<CreateContestPage />} />
+          <Route path="edit-sheets" element={<EditSheetPage />} />
+        </Route>
+
+        {/* Protected routes without Layout */}
+        <Route
+          path="/sheets"
+          element={authUser ? <SheetsPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/edit-profile"
+          element={authUser ? <EditProfileForm /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/problem/:id"
+          element={authUser ? <ProblemPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/patterns"
+          element={authUser ? <PatternsPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/patterns/:slug"
+          element={authUser ? <PatternDetailPage /> : <Navigate to={"/login"} />}
+        />
+
+        {/* Admin routes */}
+        <Route element={<AdminRoute />}>
+          <Route path="/add-problem" element={<AddProblemPage />} />
+          <Route path="/admin/patterns" element={<ManagePatternsPage />} />
+        </Route>
       </Routes>
     </div>
   );
