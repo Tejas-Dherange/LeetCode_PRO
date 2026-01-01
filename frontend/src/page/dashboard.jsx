@@ -7,10 +7,12 @@ function Dashboard() {
   const { isProblemsLoading, problems, getAllProblems } = useProblemStore();
 
   useEffect(() => {
-    getAllProblems();
-  }, []);
+    // Fetch initial problems with pagination
+    getAllProblems(true); // true to reset filters
+  }, [getAllProblems]);
 
-  if (isProblemsLoading) {
+  if (isProblemsLoading && problems.length === 0) {
+    // Only show loader on initial load, not when loading more
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader className="size-10 animate-spin" />
@@ -31,16 +33,12 @@ function Dashboard() {
           interviews and helps you to improve your coding skills by solving
           coding problems
         </p>
-        {problems.length > 0 ? (
-          <ProblemTable problems={problems} />
-        ) : (
-          <p className="mt-10 text-center text-lg font-semibold text-gray-500 dark:text-gray-400 z-10 border border-primary px-4 py-2 rounded-md border-dashed">
-            No problems found
-          </p>
-        )}
+        {/* Always render ProblemTable to keep filters visible */}
+        <ProblemTable problems={problems} />
       </div>
     </>
   );
 }
 
 export default Dashboard;
+

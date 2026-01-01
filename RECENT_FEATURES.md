@@ -1,8 +1,35 @@
 # Recent Features & Improvements
 
-## Last 4 Git Commits Summary
+## Last 5 Git Commits Summary
 
-### 🎯 Commit 1: Pattern Management System (Latest)
+### � Commit 1: UI/UX Modernization & Contest System Polish (Latest)
+**Author**: Tejas Dherange | **Date**: Jan 01, 2026
+
+#### Major Features Added:
+- **Pricing Page Redesign**: Implemented dark theme with emerald accents, animated backgrounds, and "Glassmorphism" pricing cards.
+- **Contest Page Overhaul**:
+  - Completely redesigned with focus on "Code. Compete. Conquer." branding.
+  - Added new "Stats HUD" for live/upcoming insights.
+  - Implemented "Explore Contests" section with integrated search.
+  - Fixed infinite loading bug in `ContestsTable` by optimizing fetch logic.
+- **Create Contest Page Update**:
+  - Matched aesthetic with glassmorphic forms and animated backdrops.
+  - Improved form UX with step-like sections and better input states.
+
+#### Improvements:
+- **Unified Design Language**: Consistent use of Emerald Green accents and framer-motion animations across key pages.
+- **Performance**: Resolved re-rendering loops in contest data fetching.
+- **Responsive Layouts**: Full-width header designs and responsive grid layouts for stats and cards.
+
+#### Files Changed:
+- `PricingPage.jsx`
+- `ContestPage.jsx`
+- `CreateContestPage.jsx`
+- `ContestsTable.jsx`
+
+---
+
+### 🎯 Commit 2: Pattern Management System
 **Author**: Tejas Dherange | **Date**: Dec 31, 2025
 
 #### Major Features Added:
@@ -38,7 +65,7 @@
 
 ---
 
-### 🎨 Commit 2: Shadcn/UI Integration & Skeleton Loading
+### 🎨 Commit 3: Shadcn/UI Integration & Skeleton Loading
 **Author**: Tejas Dherange | **Date**: Nov 29, 2025 (5 weeks ago)
 
 #### Features:
@@ -64,7 +91,7 @@
 
 ---
 
-### 🔍 Commit 3: Submission Fetching Issue Resolution
+### 🔍 Commit 4: Submission Fetching Issue Resolution
 **Author**: Tejas Dherange | **Date**: Nov 29, 2025 (5 weeks ago)
 
 #### Bug Fixes:
@@ -83,7 +110,7 @@
 
 ---
 
-### 🔐 Commit 4: Google OAuth Login Implementation
+### 🔐 Commit 5: Google OAuth Login Implementation
 **Author**: Tejas Dherange | **Date**: Nov 29, 2025 (5 weeks ago)
 
 #### Major Features:
@@ -119,17 +146,18 @@
 
 ## Summary Statistics
 
-### Total Changes Across Last 4 Commits:
-- **71 files changed**
-- **+11,614 additions**
-- **-671 deletions**
+### Total Changes Across Last 5 Commits:
+- **75+ files changed**
+- **+13,000+ additions**
+- **-900+ deletions**
 
 ### Key Features:
-1. ✅ Complete Pattern Management System
-2. ✅ Google OAuth Social Login
-3. ✅ Shadcn/UI Component Library
-4. ✅ Skeleton Loading States
-5. ✅ Submission System Improvements
+1. ✅ UI/UX Modernization (Pricing, Contests)
+2. ✅ Complete Pattern Management System
+3. ✅ Google OAuth Social Login
+4. ✅ Shadcn/UI Component Library
+5. ✅ Skeleton Loading States
+6. ✅ Submission System Improvements
 
 ### Technologies Used:
 - React 19
@@ -143,5 +171,4 @@
 
 ---
 
-**Last Updated**: December 31, 2025
-
+**Last Updated**: Jan 01, 2026

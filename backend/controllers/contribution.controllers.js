@@ -7,15 +7,16 @@ export const getContributionActivity = async (req, res) => {
   }
 
   try {
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    // Fetch submissions from the past 3 years to support year selector
+    const threeYearsAgo = new Date();
+    threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
 
-    // STEP 1: Fetch all submissions (not solved problems)
+    // STEP 1: Fetch all submissions
     const submissions = await db.submission.findMany({
       where: {
         userId,
         createdAt: {
-          gte: oneYearAgo,
+          gte: threeYearsAgo,
         },
       },
       select: {

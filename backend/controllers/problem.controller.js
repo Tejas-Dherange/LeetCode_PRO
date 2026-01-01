@@ -153,8 +153,49 @@ const getAllProblems = async (req, res) => {
   if (!id) {
     return res.status(400).json({ message: "Unauthorized" });
   }
+
   try {
+    // Extract pagination and filter parameters from query
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const search = req.query.search || "";
+    const difficulty = req.query.difficulty || "";
+    const tag = req.query.tag || "";
+
+    // Calculate skip for offset-based pagination
+    const skip = (page - 1) * limit;
+
+    // Build where clause for filtering
+    const whereClause = {};
+
+    // Search filter (title contains search term)
+    if (search) {
+      whereClause.title = {
+        contains: search,
+        mode: "insensitive", // case-insensitive search
+      };
+    }
+
+    // Difficulty filter
+    if (difficulty && difficulty !== "ALL") {
+      whereClause.difficulty = difficulty;
+    }
+
+    // Tag filter
+    if (tag && tag !== "ALL") {
+      whereClause.tags = {
+        has: tag,
+      };
+    }
+
+    // Get total count for pagination metadata
+    const total = await db.problem.count({
+      where: whereClause,
+    });
+
+    // Fetch problems with pagination and filters
     const allProblems = await db.problem.findMany({
+      where: whereClause,
       include: {
         solvedBy: {
           where: {
@@ -162,17 +203,30 @@ const getAllProblems = async (req, res) => {
           },
         },
       },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc", // newest first
+      },
     });
 
-    if (!allProblems) {
-      return res.status(404).json({ message: "problems not found" });
-    }
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(total / limit);
+    const hasMore = page < totalPages;
 
     return res.status(200).json({
-      message: "Problems fetched succesfully",
+      message: "Problems fetched successfully",
       allProblems,
+      pagination: {
+        total,
+        currentPage: page,
+        totalPages,
+        hasMore,
+        limit,
+      },
     });
   } catch (error) {
+    console.error("Error in fetching all problems:", error);
     return res.status(400).json({
       success: false,
       message: "error in fetching all problems",

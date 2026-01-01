@@ -1,9 +1,8 @@
 import { create } from "zustand";
 import { axiosInstance } from "../libs/axios";
 
-
 const useActivityStore = create((set) => ({
-activity: [],
+  activity: [],
   fetchActivity: async (userId) => {
     try {
       const res = await axiosInstance.get(`/contribution/activity/${userId}`);

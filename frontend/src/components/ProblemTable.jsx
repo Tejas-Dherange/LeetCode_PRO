@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import useAuthStore from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 
@@ -14,66 +14,104 @@ import {
 import { useProblemStore } from "../store/useProblemStore";
 import { usePlaylistStore } from "../store/usePlaylistStore";
 import AddToPlaylistModal from "./AddToPlaylistModal";
-const ProblemTable = ({ problems: initialProblems }) => {
-  const [problems, setProblems] = useState(initialProblems);
-  console.log("Problems in table", problems);
-  const { authUser } = useAuthStore();
-  const { deleteProblem } = useProblemStore();
 
+const ProblemTable = ({ problems: initialProblems }) => {
+  const { authUser } = useAuthStore();
+  const { 
+    problems, 
+    pagination, 
+    isLoadingMore, 
+    loadMoreProblems, 
+    updateFilters,
+    filters,
+    deleteProblem 
+  } = useProblemStore();
+  
+  const [localProblems, setLocalProblems] = useState(problems);
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("ALL");
   const [selectedTag, setSelectedTag] = useState("ALL");
-  const [currentPage, setCurrentPage] = useState(1);
 
   const [showPopup, setShowPopup] = useState(false);
-  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] =
-    useState(false);
+  const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] = useState(false);
   const [selectedProblemId, setSelectedProblemId] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const { isLoading, createPlayList, addProblemToPlayList } =
-    usePlaylistStore();
+  const { isLoading, createPlayList } = usePlaylistStore();
+  
   const difficulties = ["EASY", "MEDIUM", "HARD"];
-
   const [showTagsPopup, setShowTagsPopup] = useState(null);
   const [showCompanyTagsPopup, setShowCompanyTagsPopup] = useState(null);
 
+  // Ref for infinite scroll sentinel
+  const sentinelRef = useRef(null);
+
+  // Update local problems when store problems change
+  useEffect(() => {
+    setLocalProblems(problems);
+  }, [problems]);
+
+  // Get all unique tags from problems
   const allTags = useMemo(() => {
     if (!Array.isArray(problems)) return [];
-
     const tagSet = new Set();
-
     problems.forEach((p) => p.tags?.forEach((t) => tagSet.add(t)));
-
     return Array.from(tagSet);
   }, [problems]);
 
-  const filteredProblems = useMemo(() => {
-    return (problems || [])
-      .filter((problem) =>
-        problem.title.toLowerCase().includes(search.toLowerCase()),
-      )
-      .filter((problem) =>
-        difficulty === "ALL" ? true : problem.difficulty === difficulty,
-      )
-      .filter((problem) =>
-        selectedTag === "ALL" ? true : problem.tags?.includes(selectedTag),
-      );
-  }, [problems, search, difficulty, selectedTag]);
-
-  const itemsPerPage = 5;
-  const totalPages = Math.ceil(filteredProblems.length / itemsPerPage);
-  const paginatedProblems = useMemo(() => {
-    return filteredProblems.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage,
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // When sentinel is visible and there's more data to load
+        if (entries[0].isIntersecting && pagination.hasMore && !isLoadingMore) {
+          loadMoreProblems();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "100px", // Start loading 100px before reaching the bottom
+        threshold: 0.1,
+      }
     );
-  }, [filteredProblems, currentPage]);
+
+    if (sentinelRef.current) {
+      observer.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (sentinelRef.current) {
+        observer.unobserve(sentinelRef.current);
+      }
+    };
+  }, [pagination.hasMore, isLoadingMore, loadMoreProblems]);
+
+  // Handle filter changes - debounced search
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (search !== filters.search) {
+        updateFilters({ search });
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [search]);
+
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
+    updateFilters({ difficulty: newDifficulty === "ALL" ? "" : newDifficulty });
+  };
+
+  const handleTagChange = (newTag) => {
+    setSelectedTag(newTag);
+    updateFilters({ tag: newTag === "ALL" ? "" : newTag });
+  };
 
   const handleDelete = (id) => {
     deleteProblem(id);
-    setProblems((prev) => prev.filter((p) => p.id !== id));
+    setLocalProblems((prev) => prev.filter((p) => p.id !== id));
   };
+
   const handleAddToPlaylist = (id) => {
     setSelectedProblemId(id);
     setIsAddToPlaylistModalOpen(true);
@@ -81,26 +119,28 @@ const ProblemTable = ({ problems: initialProblems }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Name:", name);
-    console.log("Description:", description);
-    const playListData = {
-      name,
-      description,
-    };
+    const playListData = { name, description };
     if (name.length > 0) {
       await createPlayList(playListData);
       setShowPopup(false);
+      setName("");
+      setDescription("");
     }
   };
+
+  const handleCloseModal = () => {
+    setShowPopup(false);
+    setName("");
+    setDescription("");
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto mt-10">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Problems</h2>
         <button
           className="btn btn-success text-white font-bold gap-2"
-          onClick={() => {
-            setShowPopup(true);
-          }}
+          onClick={() => setShowPopup(true)}
         >
           <Plus className="w-4 h-4 " />
           Create Playlist
@@ -108,44 +148,92 @@ const ProblemTable = ({ problems: initialProblems }) => {
       </div>
 
       {showPopup && (
-        <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center z-50">
-          <div className=" p-6 rounded-lg w-80 bg-base-200 ">
-            <h2 className="text-xl mb-4 font-semibold">Enter Details</h2>
-            <form onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full mb-3 p-2 border rounded"
-                required
-              />
-              <textarea
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full mb-3 p-2 border rounded"
-                required
-              ></textarea>
-              <div className="flex justify-end gap-2">
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 animate-in fade-in duration-200"
+          onClick={handleCloseModal}
+        >
+          <div 
+            className="bg-base-200 p-8 rounded-2xl w-full max-w-md shadow-2xl border border-base-300 animate-in zoom-in duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-base-content">Create New Playlist</h2>
+              <button
+                onClick={handleCloseModal}
+                className="btn btn-ghost btn-sm btn-circle"
+                aria-label="Close"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text font-semibold">Playlist Name</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Array Problems"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="input input-bordered w-full focus:input-primary"
+                  required
+                  autoFocus
+                />
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text font-semibold">Description</span>
+                </label>
+                <textarea
+                  placeholder="Describe your playlist..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="textarea textarea-bordered w-full h-24 focus:textarea-primary resize-none"
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="flex justify-end gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setShowPopup(false)}
-                  className="px-4 py-2 cursor-pointer bg-gray-900 rounded"
+                  onClick={handleCloseModal}
+                  className="btn btn-ghost"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded"
+                  className="btn btn-success text-white min-w-[100px]"
+                  disabled={isLoading}
                 >
-                  {isLoading ? <Loader2 /> : <h3>Submit</h3>}
+                  {isLoading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    "Create"
+                  )}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
       <div className="flex flex-wrap justify-between items-center mb-6 gap-4">
         <input
           type="text"
@@ -157,7 +245,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
         <select
           className="select select-bordered bg-base-200"
           value={difficulty}
-          onChange={(e) => setDifficulty(e.target.value)}
+          onChange={(e) => handleDifficultyChange(e.target.value)}
         >
           <option value="ALL">All Difficulties</option>
           {difficulties.map((diff) => (
@@ -169,7 +257,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
         <select
           className="select select-bordered bg-base-200"
           value={selectedTag}
-          onChange={(e) => setSelectedTag(e.target.value)}
+          onChange={(e) => handleTagChange(e.target.value)}
         >
           <option value="ALL">All Tags</option>
           {allTags.map((tag) => (
@@ -179,7 +267,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
               style={
                 tag === "demo"
                   ? {
-                      backgroundColor: '#6366f1', // indigo-500
+                      backgroundColor: '#6366f1',
                       color: 'white',
                       fontWeight: 'bold',
                       textTransform: 'uppercase',
@@ -191,6 +279,11 @@ const ProblemTable = ({ problems: initialProblems }) => {
             </option>
           ))}
         </select>
+      </div>
+
+      {/* Pagination info */}
+      <div className="mb-4 text-sm text-base-content/70">
+        Showing {localProblems.length} of {pagination.total} problems
       </div>
 
       <div className="overflow-x-auto rounded-xl shadow-md">
@@ -206,8 +299,8 @@ const ProblemTable = ({ problems: initialProblems }) => {
             </tr>
           </thead>
           <tbody>
-            {paginatedProblems.length > 0 ? (
-              paginatedProblems.map((problem) => {
+            {localProblems.length > 0 ? (
+              localProblems.map((problem) => {
                 const isSolved = (problem.solvedBy || []).some(
                   (user) => user.userId === authUser?.id,
                 );
@@ -277,7 +370,6 @@ const ProblemTable = ({ problems: initialProblems }) => {
                             </>
                           );
                         })()}
-                        {/* Popup for all tags */}
                         {showTagsPopup === problem.id && (
                           <div
                             className="absolute left-0 z-50 bg-base-100 border rounded shadow-lg p-2 mt-2"
@@ -345,7 +437,6 @@ const ProblemTable = ({ problems: initialProblems }) => {
                             </>
                           );
                         })()}
-                        {/* Popup for all company tags */}
                         {showCompanyTagsPopup === problem.id && (
                           <div
                             className="absolute left-0 z-50 bg-base-100 border rounded shadow-lg p-2 mt-2"
@@ -407,7 +498,6 @@ const ProblemTable = ({ problems: initialProblems }) => {
                           onClick={() => handleAddToPlaylist(problem.id)}
                         >
                           <Bookmark className="w-4 h-4" />
-                          
                         </button>
                       </div>
                     </td>
@@ -416,7 +506,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
               })
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-6 text-gray-500">
+                <td colSpan={6} className="text-center py-6 text-gray-500">
                   No problems found.
                 </td>
               </tr>
@@ -425,26 +515,25 @@ const ProblemTable = ({ problems: initialProblems }) => {
         </table>
       </div>
 
-      {/*  */}
-      <div className="flex justify-center mt-6 gap-2">
-        <button
-          className="btn btn-sm"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => prev - 1)}
-        >
-          Prev
-        </button>
-        <span className="btn btn-ghost btn-sm">
-          {currentPage} / {totalPages}
-        </span>
-        <button
-          className="btn btn-sm"
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
+      {/* Infinite scroll sentinel */}
+      {pagination.hasMore && (
+        <div ref={sentinelRef} className="flex justify-center py-8">
+          {isLoadingMore && (
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Loading more problems...</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* End message when no more problems */}
+      {!pagination.hasMore && localProblems.length > 0 && (
+        <div className="text-center py-6 text-base-content/70">
+          You've reached the end of the list
+        </div>
+      )}
+
       <AddToPlaylistModal
         isOpen={isAddToPlaylistModalOpen}
         onClose={() => setIsAddToPlaylistModalOpen(false)}

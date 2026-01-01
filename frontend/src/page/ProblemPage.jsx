@@ -31,6 +31,7 @@ import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
 import useAuthStore from "../store/useAuthStore";
+import { extractVisibleCode, mergeCodeWithBoilerplate } from "../utils/codeTemplates";
 
 const ProblemPage = () => {
   const { id } = useParams();
@@ -44,7 +45,9 @@ const ProblemPage = () => {
     submissionbyuser,
     getSubmissionByUserAndProblem,
   } = useSubmissionStore();
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState("");  // User's editable code (visible part only)
+  const [hiddenPrefix, setHiddenPrefix] = useState("");  // Hidden boilerplate before function
+  const [hiddenSuffix, setHiddenSuffix] = useState("");  // Hidden boilerplate after function
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("JAVA");
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -97,7 +100,13 @@ useEffect(() => {
 
   useEffect(() => {
     if (problem) {
-      setCode(problem.codeSnippet?.[selectedLanguage] || "");
+      const fullCode = problem.codeSnippet?.[selectedLanguage] || "";
+      const { visibleCode, hiddenPrefix: prefix, hiddenSuffix: suffix } = extractVisibleCode(fullCode, selectedLanguage);
+      
+      setCode(visibleCode);
+      setHiddenPrefix(prefix);
+      setHiddenSuffix(suffix);
+      
       setTestCases(
         problem.testcase.map((tc) => ({
           input: tc.input,
@@ -117,7 +126,13 @@ useEffect(() => {
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
-    setCode(problem.codeSnippet?.[lang] || "");
+    
+    const fullCode = problem.codeSnippet?.[lang] || "";
+    const { visibleCode, hiddenPrefix: prefix, hiddenSuffix: suffix } = extractVisibleCode(fullCode, lang);
+    
+    setCode(visibleCode);
+    setHiddenPrefix(prefix);
+    setHiddenSuffix(suffix);
   };
 
   // Horizontal resizable split pane handlers
@@ -218,45 +233,52 @@ useEffect(() => {
     switch (activeTab) {
       case "description":
         return (
-          <div className="prose max-w-none">
-            <h1 className="text-2xl mb-2 text-green-500 font-bold">
+          <div className="prose prose-lg max-w-none">
+            {/* Problem Title */}
+            <h1 className="text-3xl mb-4 text-success font-bold">
               {problem?.title}
             </h1>
-            <p className="text-lg mb-6">{problem?.description}</p>
+            
+            {/* Problem Description */}
+            <div className="mb-8">
+              <div className="text-base-content/90 leading-relaxed whitespace-pre-wrap">
+                {problem?.description}
+              </div>
+            </div>
 
             {problem?.examples && (
               <>
-                <h3 className="text-xl font-bold mb-4">Examples:</h3>
+                <h3 className="text-2xl font-bold mb-4 text-primary">Examples:</h3>
                 {Object.entries(problem?.examples).map(
                   ([lang, example], idx) => (
                     <div
                       key={lang}
-                      className="bg-base-200 p-6 rounded-xl mb-6 font-mono"
+                      className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300"
                     >
                       <div className="mb-4">
-                        <div className="text-indigo-300 mb-2 text-base font-semibold">
+                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
                           Input:
                         </div>
-                        <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                          {example.input}
-                        </span>
+                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                          <pre className="whitespace-pre-wrap break-words">{example.input}</pre>
+                        </div>
                       </div>
                       <div className="mb-4">
-                        <div className="text-indigo-300 mb-2 text-base font-semibold">
+                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
                           Output:
                         </div>
-                        <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                          {example.output}
-                        </span>
+                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                          <pre className="whitespace-pre-wrap break-words">{example.output}</pre>
+                        </div>
                       </div>
                       {example.explanation && (
                         <div>
-                          <div className="text-emerald-300 mb-2 text-base font-semibold">
+                          <div className="text-success mb-2 text-base font-bold uppercase tracking-wide">
                             Explanation:
                           </div>
-                          <p className="text-base-content/70 text-lg font-sem">
+                          <div className="text-base-content/80 text-base leading-relaxed whitespace-pre-wrap">
                             {example.explanation}
-                          </p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -267,11 +289,11 @@ useEffect(() => {
 
             {problem?.constraints && (
               <>
-                <h3 className="text-xl font-bold mb-4">Constraints:</h3>
-                <div className="bg-base-200 p-6 rounded-xl mb-6">
-                  <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                    {problem.constraints}
-                  </span>
+                <h3 className="text-2xl font-bold mb-4 text-warning">Constraints:</h3>
+                <div className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300">
+                  <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                    <pre className="whitespace-pre-wrap break-words">{problem.constraints}</pre>
+                  </div>
                 </div>
               </>
             )}
@@ -323,11 +345,14 @@ useEffect(() => {
   const handleRunCode = (e) => {
     e.preventDefault();
     try {
+      // Merge user code with boilerplate before execution
+      const fullCode = mergeCodeWithBoilerplate(code, hiddenPrefix, hiddenSuffix);
+      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       console.log(expected_outputs);
-      runCode(code, language_id, stdin, expected_outputs, id);
+      runCode(fullCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in executing code", error);
     }
@@ -336,10 +361,13 @@ useEffect(() => {
   const handleSubmitCode = (e) => {
     e.preventDefault();
     try {
+      // Merge user code with boilerplate before submission
+      const fullCode = mergeCodeWithBoilerplate(code, hiddenPrefix, hiddenSuffix);
+      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
-      submitCode(code, language_id, stdin, expected_outputs, id);
+      submitCode(fullCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in submitting code", error);
     }
