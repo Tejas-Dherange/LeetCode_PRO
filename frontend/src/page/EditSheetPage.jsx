@@ -11,9 +11,12 @@ import {
   Trash2,
   ArrowLeft,
   Save,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import {Skeleton} from "../components/ui/skeleton";
+import { PRICING, getPlanDisplay } from "../constants/pricing";
 const EditSheetPage = () => {
   const {
     isSheetsLoading,
@@ -118,35 +121,34 @@ const EditSheetPage = () => {
   );
 
   return (
-    <div className="min-h-screen w-full bg-base-100">
-      <div className="w-full p-5 mx-auto p-6">
+    <div className="min-h-screen md:w-[79vw] w-full bg-base-100">
+      <div className="w-full mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Link to="/dashboard" className="btn btn-ghost btn-circle">
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-3">
-              <Building2 className="w-8 h-8 text-primary" />
-              <div>
-                <h1 className="text-3xl font-bold text-base-content">
-                  Company Sheets Manager
-                </h1>
-                <p className="text-base-content/70">
-                  Manage and organize company-specific problem sheets
-                </p>
-              </div>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-3 bg-emerald-500/20 rounded-xl">
+              <Building2 className="w-8 h-8 text-emerald-500" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-base-content">
+                Company Sheets Manager
+              </h1>
+              <p className="text-base-content/70">
+                Manage and organize company-specific problem sheets
+              </p>
             </div>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-base-200 rounded-lg shadow-sm border border-base-300 mb-6">
-          <div className="tabs tabs-boxed w-full justify-start p-2">
+        <div className="bg-base-100/40 backdrop-blur-md rounded-xl shadow-lg border border-base-200 mb-6">
+          <div className="tabs tabs-boxed w-full justify-start p-3 bg-transparent">
             <button
               onClick={() => setActiveTab("view")}
-              className={`tab gap-2 ${
-                activeTab === "view" ? "tab-active" : ""
+              className={`tab gap-2 transition-all $\{
+                activeTab === "view" 
+                  ? "tab-active bg-emerald-500/20 text-emerald-600 border border-emerald-500/30" 
+                  : "hover:bg-base-200"
               }`}
             >
               <Eye className="w-4 h-4" />
@@ -157,8 +159,10 @@ const EditSheetPage = () => {
                 setActiveTab("create");
                 if (editingSheet) cancelEdit();
               }}
-              className={`tab gap-2 ${
-                activeTab === "create" ? "tab-active" : ""
+              className={`tab gap-2 transition-all $\{
+                activeTab === "create" 
+                  ? "tab-active bg-emerald-500/20 text-emerald-600 border border-emerald-500/30" 
+                  : "hover:bg-base-200"
               }`}
             >
               <Plus className="w-4 h-4" />
@@ -169,7 +173,7 @@ const EditSheetPage = () => {
 
         {/* View Sheets Tab */}
         {activeTab === "view" && (
-          <div className="card bg-base-100 shadow-xl border border-base-300">
+          <div className="card bg-base-100/40 backdrop-blur-md shadow-xl border border-base-200">
             <div className="card-body">
               {/* Search Bar */}
               <div className="mb-6">
@@ -207,7 +211,7 @@ const EditSheetPage = () => {
                   </p>
                   <button
                     onClick={() => setActiveTab("create")}
-                    className="btn btn-primary gap-2"
+                    className="btn bg-emerald-600 hover:bg-emerald-500 text-white gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     Create First Sheet
@@ -218,7 +222,7 @@ const EditSheetPage = () => {
                   {filteredSheets.map((sheet) => (
                     <div
                       key={sheet.id}
-                      className="card bg-base-200 border border-base-300 hover:shadow-xl transition-all duration-200 hover:scale-[1.02]"
+                      className="card bg-base-200 border border-base-300 hover:shadow-xl hover:border-emerald-500/50 transition-all duration-200 hover:scale-[1.02]"
                       style={{ borderLeft: `4px solid ${sheet.color}` }}
                     >
                       <div className="card-body p-6">
@@ -312,7 +316,7 @@ const EditSheetPage = () => {
 
         {/* Create/Edit Sheet Tab */}
         {activeTab === "create" && (
-          <div className="card bg-base-100 shadow-xl border border-base-300">
+          <div className="card bg-base-100/40 backdrop-blur-md shadow-xl border border-base-200">
             <div className="card-body p-8">
               {/* Header with better styling */}
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 pb-4 border-b border-base-300">
@@ -341,9 +345,11 @@ const EditSheetPage = () => {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 {/* Basic Information Section */}
                 <div className="space-y-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Building2 className="w-5 h-5 text-primary" />
-                    <h3 className="text-lg font-semibold text-base-content">
+                  <div className="flex items-center gap-3 mb-6 pb-3 border-b border-emerald-500/20">
+                    <div className="p-2 bg-emerald-500/10 rounded-lg">
+                      <Building2 className="w-5 h-5 text-emerald-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-base-content">
                       Basic Information
                     </h3>
                   </div>
@@ -358,10 +364,10 @@ const EditSheetPage = () => {
                         <span className="label-text-alt text-error">*</span>
                       </label>
                       <input
-                        className={`input input-bordered bg-base-200 focus:bg-base-100 transition-colors ${
+                        className={`input input-bordered ml-2 input-lg bg-base-200/50 focus:bg-base-100 transition-all ${
                           errors.name
-                            ? "input-error focus:input-error"
-                            : "focus:input-primary"
+                            ? "input-error border-error focus:ring-2 focus:ring-error/20"
+                            : "focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                         }`}
                         {...register("name", {
                           required: "Company name is required",
@@ -380,17 +386,7 @@ const EditSheetPage = () => {
                       {errors.name && (
                         <label className="label">
                           <span className="label-text-alt text-error flex items-center gap-1">
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <AlertCircle className="w-4 h-4" />
                             {errors.name.message}
                           </span>
                         </label>
@@ -399,7 +395,7 @@ const EditSheetPage = () => {
 
                     {/* URL Slug */}
                     <div className="form-control">
-                      <label className="label">
+                      <label className="label ">
                         <span className="label-text font-medium text-base-content">
                           URL Slug
                         </span>
@@ -407,10 +403,10 @@ const EditSheetPage = () => {
                       </label>
                       <div className="relative">
                         <input
-                          className={`input input-bordered bg-base-200 focus:bg-base-100 transition-colors pr-12 ${
+                          className={`input input-bordered input-lg bg-base-200/50 focus:bg-base-100 transition-all pr-24 ${
                             errors.slug
-                              ? "input-error focus:input-error"
-                              : "focus:input-primary"
+                              ? "input-error border-error focus:ring-2 focus:ring-error/20"
+                              : "focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                           }`}
                           {...register("slug", {
                             required: "Slug is required",
@@ -429,17 +425,7 @@ const EditSheetPage = () => {
                       {errors.slug && (
                         <label className="label">
                           <span className="label-text-alt text-error flex items-center gap-1">
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <AlertCircle className="w-4 h-4" />
                             {errors.slug.message}
                           </span>
                         </label>
@@ -458,8 +444,8 @@ const EditSheetPage = () => {
                       </span>
                     </label>
                     <textarea
-                      rows={4}
-                      className="textarea textarea-bordered bg-base-200 focus:bg-base-100 focus:textarea-primary transition-colors resize-none"
+                      rows={2}
+                      className="textarea ml-2 textarea-bordered  bg-base-200/50 focus:bg-base-100 transition-all resize-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
                       {...register("description", {
                         maxLength: {
                           value: 200,
@@ -469,7 +455,7 @@ const EditSheetPage = () => {
                       placeholder="Brief description of the company and its problem set focus areas..."
                     />
                     <label className="label">
-                      <span className="label-text-alt text-base-content/70">
+                      <span className="label-text-alt text-base-content/70 ml-2">
                         {watch("description")?.length || 0}/200 characters
                       </span>
                     </label>
@@ -484,8 +470,8 @@ const EditSheetPage = () => {
                 </div>
 
                 {/* Configuration Section */}
-                <div className="divider">
-                  <span className="text-base-content/50">Configuration</span>
+                <div className="divider my-8">
+                  <span className="text-base-content/60 font-semibold px-4 py-2 bg-base-200/50 rounded-full">Configuration</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -501,21 +487,21 @@ const EditSheetPage = () => {
                       <div className="flex items-center gap-4">
                         <input
                           type="color"
-                          className={`w-16 h-16 border-2 rounded-xl cursor-pointer transition-all hover:scale-105 ${
+                          className={`w-20 h-20 border-4 rounded-2xl cursor-pointer transition-all hover:scale-110 shadow-lg ${
                             errors.color
                               ? "border-error"
-                              : "border-base-300 hover:border-primary"
+                              : "border-emerald-500/30 hover:border-emerald-500"
                           }`}
                           {...register("color", {
                             required: "Color is required",
                           })}
                         />
                         <div>
-                          <p className="text-sm font-medium text-base-content">
+                          <p className="text-base font-semibold text-base-content">
                             Brand Color
                           </p>
-                          <p className="text-xs text-base-content/70">
-                            Current: {watch("color")?.toUpperCase()}
+                          <p className="text-sm text-base-content/70 font-mono">
+                            {watch("color")?.toUpperCase()}
                           </p>
                         </div>
                       </div>
@@ -535,7 +521,7 @@ const EditSheetPage = () => {
                           <button
                             key={color}
                             type="button"
-                            className="w-6 h-6 rounded-full border-2 border-base-300 hover:border-primary transition-colors"
+                            className="w-8 h-8 rounded-full border-2 border-base-300 hover:border-emerald-500 transition-all hover:scale-110 shadow-md"
                             style={{ backgroundColor: color }}
                             onClick={() => setValue("color", color)}
                           />
@@ -560,20 +546,18 @@ const EditSheetPage = () => {
                       <span className="label-text-alt text-error">*</span>
                     </label>
                     <select
-                      className={`select select-bordered bg-base-200 focus:bg-base-100 transition-colors ${
+                      className={`select select-bordered select-lg bg-base-200/50 focus:bg-base-100 transition-all ${
                         errors.requiredPlan
-                          ? "select-error focus:select-error"
-                          : "focus:select-primary"
+                          ? "select-error border-error focus:ring-2 focus:ring-error/20"
+                          : "focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
                       }`}
                       {...register("requiredPlan", {
                         required: "Plan selection is required",
                       })}
                     >
                       <option value="">Select a plan</option>
-                      <option value="BASIC">Basic Plan - $9.99/month</option>
-                      <option value="PREMIUM">
-                        Premium Plan - $19.99/month
-                      </option>
+                      <option value="BASIC">{getPlanDisplay("BASIC")}</option>
+                      <option value="PREMIUM">{getPlanDisplay("PREMIUM")}</option>
                     </select>
                     {errors.requiredPlan && (
                       <label className="label">
@@ -591,18 +575,18 @@ const EditSheetPage = () => {
                         Premium Features
                       </span>
                     </label>
-                    <div className="card bg-base-200 p-4">
-                      <label className="label cursor-pointer justify-start gap-3">
+                    <div className="card bg-emerald-500/5 border-2 border-emerald-500/20 p-5 hover:bg-emerald-500/10 transition-all">
+                      <label className="label cursor-pointer justify-start gap-4">
                         <input
                           type="checkbox"
-                          className="checkbox checkbox-primary"
+                          className="checkbox checkbox-lg checkbox-success"
                           {...register("isPremium")}
                         />
                         <div>
-                          <span className="label-text font-medium">
+                          <span className="label-text font-semibold text-base">
                             Mark as Premium
                           </span>
-                          <p className="text-xs text-base-content/70 mt-1">
+                          <p className="text-sm text-base-content/70 mt-1">
                             Enable advanced features and analytics
                           </p>
                         </div>
@@ -670,13 +654,15 @@ const EditSheetPage = () => {
                     <button
                       type="submit"
                       disabled={isSubmitting || isSheetsLoading}
-                      className={`btn gap-2 ${
-                        editingSheet ? "btn-warning" : "btn-primary"
+                      className={`btn gap-2 text-white ${
+                        editingSheet 
+                          ? "bg-orange-600 hover:bg-orange-500" 
+                          : "bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400"
                       }`}
                     >
                       {isSubmitting ? (
                         <>
-                          <span className="loading loading-spinner loading-sm"></span>
+                          <Loader2 className="w-4 h-4 animate-spin" />
                           {editingSheet ? "Updating..." : "Creating..."}
                         </>
                       ) : (

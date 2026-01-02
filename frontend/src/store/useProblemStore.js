@@ -132,7 +132,7 @@ export const useProblemStore = create((set, get) => ({
       const res = await axiosInstance.get(
         "/problems/getAllProblemsSolvedByUser",
       );
-      console.log(res);
+      // console.log(res);
       set({ solvedProblems: res.data.problemSolvedByUser });
     } catch (error) {
       console.error("error occurred in fetching  problem", error);

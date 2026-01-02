@@ -63,10 +63,10 @@ const useSubscriptionStore = create((set) => ({
       );
 
       set({ subscription: response.data.subscription });
-      console.log(
-        "Subscription status fetched successfully:",
-        response.data.subscription,
-      );
+      // console.log(
+      //   "Subscription status fetched successfully:",
+      //   response.data.subscription,
+      // );
 
       toast.success(
         response.data.message || "Subscription status fetched successfully",

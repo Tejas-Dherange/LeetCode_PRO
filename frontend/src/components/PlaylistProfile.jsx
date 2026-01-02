@@ -86,42 +86,71 @@ const PlaylistProfile = () => {
             Create Playlist
           </button>
         {showPopup && (
-          <div className="fixed inset-0  bg-opacity-50 flex justify-center items-center z-50">
-            <div className=" p-6 rounded-lg w-80 bg-base-200 ">
-              <h2 className="text-xl mb-4 font-semibold">Enter Details</h2>
-              <form onSubmit={handleSubmit}>
-                <input
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full mb-3 p-2 border rounded"
-                  required
-                />
-                <textarea
-                  placeholder="Description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full mb-3 p-2 border rounded"
-                  required
-                ></textarea>
-                <div className="flex justify-end gap-2">
+          <div className="modal modal-open">
+            <div className="modal-box bg-base-100/95 backdrop-blur-md border-2 border-emerald-500/30 shadow-2xl max-w-md">
+              <h2 className="text-2xl mb-6 font-bold text-emerald-500 flex items-center gap-2">
+                <BookOpen className="w-6 h-6" />
+                Create New Playlist
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Name</span>
+                    <span className="label-text-alt text-error">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Dynamic Programming"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="input input-bordered input-lg bg-base-200/50 focus:bg-base-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    required
+                  />
+                </div>
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Description</span>
+                    <span className="label-text-alt text-error">*</span>
+                  </label>
+                  <textarea
+                    placeholder="Brief description of the playlist..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="textarea textarea-bordered textarea-lg bg-base-200/50 focus:bg-base-100 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none leading-relaxed"
+                    rows={4}
+                    required
+                  />
+                </div>
+                <div className="modal-action">
                   <button
                     type="button"
                     onClick={() => setShowPopup(false)}
-                    className="px-4 py-2 cursor-pointer bg-gray-900 rounded"
+                    className="btn btn-ghost"
+                    disabled={isLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 cursor-pointer bg-blue-600 text-white rounded"
+                    className="btn bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white border-none gap-2"
+                    disabled={isLoading}
                   >
-                    {isLoading ? <Loader2 /> : <h3>Submit</h3>}
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <BookOpen className="w-5 h-5" />
+                        Create Playlist
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
             </div>
+            <div className="modal-backdrop" onClick={() => setShowPopup(false)}></div>
           </div>
         )}
         </div>

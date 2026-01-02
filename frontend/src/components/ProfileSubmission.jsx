@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useSubmissionStore } from '../store/useSubmissionStore';
-import { Code, Terminal, Clock, HardDrive, Check, X, ChevronDown, ChevronUp, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Code, Terminal, Clock, HardDrive, Check, X, ChevronDown, ChevronUp, Filter, ChevronLeft, ChevronRight, Copy } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 const ProfileSubmission = () => {
   const { submissions, getAllSubmissions } = useSubmissionStore();
   const [expandedSubmission, setExpandedSubmission] = useState(null);
   const [filter, setFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [copiedId, setCopiedId] = useState(null);
   const submissionsPerPage = 5;
 
   useEffect(() => {
@@ -42,6 +44,17 @@ const ProfileSubmission = () => {
       setExpandedSubmission(null);
     } else {
       setExpandedSubmission(id);
+    }
+  };
+
+  const copyToClipboard = async (code, id) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(id);
+      toast.success('Code copied to clipboard!');
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      toast.error('Failed to copy code');
     }
   };
 
@@ -150,10 +163,31 @@ const ProfileSubmission = () => {
                       <div className="border-t border-base-300">
                         {/* Code Section */}
                         <div className="p-4">
-                          <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
-                            <Code size={18} />
-                            Solution Code
-                          </h3>
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-bold text-lg flex items-center gap-2">
+                              <Code size={18} />
+                              Solution Code
+                            </h3>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyToClipboard(submission.sourceCode, submission.id);
+                              }}
+                              className="btn btn-sm btn-ghost gap-2 hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors"
+                            >
+                              {copiedId === submission.id ? (
+                                <>
+                                  <Check size={16} className="text-emerald-500" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={16} />
+                                  Copy Code
+                                </>
+                              )}
+                            </button>
+                          </div>
                           <div className="mockup-code bg-neutral text-neutral-content overflow-x-auto">
                             <pre className="p-4"><code>{submission.sourceCode}</code></pre>
                           </div>

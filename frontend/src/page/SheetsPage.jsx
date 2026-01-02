@@ -36,143 +36,7 @@ const SheetsPage = () => {
     isSheetsLoading,
     getPremiumCompanySheets,
   } = useCompanySheetStore();
-  // Mock data for company sheets
-  const companySheets = {
-    google: {
-      name: "Google",
-      color: "bg-blue-500",
-      problems: [
-        {
-          id: 1,
-          title: "Two Sum",
-          difficulty: "Easy",
-          status: "solved",
-          tags: ["Array", "Hash Table"],
-          description:
-            "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(n)",
-        },
-        {
-          id: 2,
-          title: "Longest Substring Without Repeating Characters",
-          difficulty: "Medium",
-          status: "attempted",
-          tags: ["String", "Sliding Window"],
-          description:
-            "Given a string s, find the length of the longest substring without repeating characters.",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(min(m,n))",
-        },
-        {
-          id: 3,
-          title: "Median of Two Sorted Arrays",
-          difficulty: "Hard",
-          status: "unsolved",
-          tags: ["Array", "Binary Search"],
-          description:
-            "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.",
-          timeComplexity: "O(log(min(m,n)))",
-          spaceComplexity: "O(1)",
-        },
-        {
-          id: 4,
-          title: "Container With Most Water",
-          difficulty: "Medium",
-          status: "attempted",
-          tags: ["Array", "Two Pointers"],
-          description:
-            "You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(1)",
-        },
-        {
-          id: 5,
-          title: "Regular Expression Matching",
-          difficulty: "Hard",
-          status: "unsolved",
-          tags: ["String", "Dynamic Programming"],
-          description:
-            "Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*'.",
-          timeComplexity: "O(m*n)",
-          spaceComplexity: "O(m*n)",
-        },
-      ],
-    },
-    microsoft: {
-      name: "Microsoft",
-      color: "bg-green-500",
-      problems: [
-        {
-          id: 4,
-          title: "Reverse Linked List",
-          difficulty: "Easy",
-          status: "solved",
-          tags: ["Linked List", "Recursion"],
-          description:
-            "Given the head of a singly linked list, reverse the list, and return the reversed list.",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(1)",
-        },
-        {
-          id: 5,
-          title: "Design LRU Cache",
-          difficulty: "Medium",
-          status: "unsolved",
-          tags: ["Hash Table", "Linked List", "Design"],
-          description:
-            "Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.",
-          timeComplexity: "O(1)",
-          spaceComplexity: "O(capacity)",
-        },
-      ],
-    },
-    amazon: {
-      name: "Amazon",
-      color: "bg-orange-500",
-      problems: [
-        {
-          id: 6,
-          title: "Merge k Sorted Lists",
-          difficulty: "Hard",
-          status: "attempted",
-          tags: ["Linked List", "Divide and Conquer", "Heap"],
-          description:
-            "You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.",
-          timeComplexity: "O(n log k)",
-          spaceComplexity: "O(1)",
-        },
-        {
-          id: 7,
-          title: "Product of Array Except Self",
-          difficulty: "Medium",
-          status: "solved",
-          tags: ["Array", "Prefix Sum"],
-          description:
-            "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(1)",
-        },
-      ],
-    },
-    meta: {
-      name: "Meta",
-      color: "bg-blue-600",
-      problems: [
-        {
-          id: 8,
-          title: "Valid Parentheses",
-          difficulty: "Easy",
-          status: "solved",
-          tags: ["String", "Stack"],
-          description:
-            "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.",
-          timeComplexity: "O(n)",
-          spaceComplexity: "O(n)",
-        },
-      ],
-    },
-  };
+ 
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
@@ -291,8 +155,8 @@ const SheetsPage = () => {
                       onClick={() => setSelectedSheet(sheet.id)}
                     className={`w-full cursor-pointer flex items-center justify-between p-4 rounded-xl transition-all duration-200 group hover:shadow-lg ${
                       selectedSheet === sheet.id
-                        ? "bg-success/50 text-primary-content shadow-lg scale-[1.02]"
-                        : "bg-base-100 hover:bg-base-300 text-base-content"
+                        ? "bg-emerald-500/20 border-2 border-emerald-500/50 shadow-lg scale-[1.02]"
+                        : "bg-base-100 hover:bg-base-300 text-base-content border-2 border-transparent"
                     }`}
                   >
                     <div className="flex items-center  space-x-3">
@@ -381,8 +245,8 @@ const SheetsPage = () => {
 
                 {/* Search and Filter */}
                 <div className="flex space-x-4 mb-6">
-                  <div className="relative flex-1 text-green-500">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 bg-amber-600 text-green-500 w-5 h-5 " />
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-base-content/40 w-5 h-5" />
                     <input
                       type="text"
                       placeholder="Search problems or tags..."
@@ -415,9 +279,10 @@ const SheetsPage = () => {
                   <div className="flex flex-col space-y-4 min-h-[400px]">
                 {filteredProblems.length > 0 ? (
                   filteredProblems.map((problem) => (
-                    <div
+                    <Link
                       key={problem.id}
-                      className="card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 border border-base-100 hover:border-success/50 group hover:scale-[1.02] cursor-pointer"
+                      to={`/problem/${problem.id}`}
+                      className="card bg-base-100 shadow-md hover:shadow-xl transition-all duration-300 border border-base-200 hover:border-emerald-500/50 group hover:scale-[1.02] cursor-pointer"
                     >
                       <div className="card-body p-6">
                         <div className="flex items-start justify-between">
@@ -431,7 +296,7 @@ const SheetsPage = () => {
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-col space-y-3">
                                 {/* Title */}
-                                <h3 className="text-lg font-semibold text-base-content group-hover:text-success transition-colors leading-tight">
+                                <h3 className="text-lg font-semibold text-base-content group-hover:text-emerald-500 transition-colors leading-tight">
                                   {problem.title}
                                 </h3>
 
@@ -440,7 +305,7 @@ const SheetsPage = () => {
                                   {problem.tags.map((tag, index) => (
                                     <span
                                       key={index}
-                                      className="badge badge-outline badge-sm hover:badge-primary transition-colors cursor-pointer"
+                                      className="badge badge-outline badge-sm hover:badge-primary transition-colors"
                                     >
                                       {tag}
                                     </span>
@@ -450,7 +315,7 @@ const SheetsPage = () => {
                             </div>
                           </div>
 
-                          {/* Right Side Actions */}
+                          {/* Right Side - Difficulty Badge */}
                           <div className="flex items-center space-x-3 flex-shrink-0 ml-4">
                             <span
                               className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getDifficultyColor(
@@ -459,13 +324,11 @@ const SheetsPage = () => {
                             >
                               {problem.difficulty}
                             </span>
-                            <button className="btn btn-ghost btn-sm btn-square hover:btn-success hover:text-primary-content transition-all duration-200">
-                              <ExternalLink className="w-4 h-4" />
-                            </button>
+                            <ExternalLink className="w-5 h-5 text-base-content/40 group-hover:text-emerald-500 transition-colors" />
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))
                 ) : (
                   <div className="flex flex-col items-center justify-center py-20 px-6 min-h-[400px]">

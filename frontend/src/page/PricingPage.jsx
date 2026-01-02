@@ -5,6 +5,7 @@ import useAuthStore from "../store/useAuthStore";
 import useSubscriptionStore from "../store/useSubscriptionStore";
 import { Loader2, Check, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getAllPlans } from "../constants/pricing";
 
 const Pricing = () => {
   const { authUser } = useAuthStore();
@@ -14,54 +15,7 @@ const Pricing = () => {
     getSubscriptionStatus(authUser.id);
   }, [getSubscriptionStatus, authUser.id]);
 
-  const plans = [
-    {
-      id: "free",
-      name: "Free",
-      price: "₹0",
-      period: "forever",
-      features: [
-        "Access to 250 basic problems",
-        "Daily coding challenge",
-        "Basic discussion board",
-        "Email support",
-      ],
-      cta: "Get Started",
-      highlighted: false,
-    },
-    {
-      id: "BASIC",
-      name: "Pro",
-      price: "₹199",
-      period: "per month",
-      features: [
-        "Access to 1000+ problems",
-        "Unlock all contest problems",
-        "Detailed editorial access",
-        "Premium Discord support",
-        "Company-wise problem filters",
-        "Advanced analytics dashboard",
-      ],
-      cta: "Go Pro",
-      highlighted: true,
-    },
-    {
-      id: "PREMIUM",
-      name: "Elite",
-      price: "₹399",
-      period: "per month",
-      features: [
-        "Everything in Pro",
-        "1:1 mentor session monthly",
-        "Mock interview access",
-        "Resume and profile reviews",
-        "Career guidance sessions",
-        "Priority support",
-      ],
-      cta: "Go Elite",
-      highlighted: false,
-    },
-  ];
+  const plans = getAllPlans();
 
   return (
     <div className="min-h-screen w-[99vw] mt-[-150px] pt-15 flex flex-col items-center justify-center relative overflow-x-hidden bg-base-100">
@@ -144,7 +98,7 @@ const Pricing = () => {
               <div className="mb-6">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl md:text-5xl font-extrabold text-base-content">
-                    {plan.price}
+                    {plan.displayPrice}
                   </span>
                   <span className="text-base-content/60 text-sm md:text-base">
                     /{plan.period}
