@@ -20,6 +20,8 @@ import {
   GripHorizontal,
   Fullscreen,
   Maximize,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import myCustomTheme from "../themes/customTheme";
@@ -62,7 +64,14 @@ const ProblemPage = () => {
   const rightPanelRef = useRef(null);
 
 
-  const { theme } = useThemeStore();
+  const { theme, setTheme } = useThemeStore();
+
+  // Toggle theme function matching navbar implementation
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
 
   // Set Monaco theme based on app theme
   const handleEditorMount = (editor, monaco) => {
@@ -442,6 +451,17 @@ useEffect(() => {
             <button className="btn btn-ghost btn-circle" title="Share">
               <Share2 className="w-5 h-5" />
             </button>
+            <button 
+              className="btn btn-ghost btn-circle hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors" 
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
             <select
               className="select select-bordered select-primary w-32 md:w-40"
               value={selectedLanguage}
@@ -614,7 +634,14 @@ useEffect(() => {
                   readOnly: false,
                   automaticLayout: true,
                   smoothScrolling: true,
-                }}
+                  glyphMargin: true,
+                  folding: true,
+                  foldingStrategy: "indentation",
+                  showFoldingControls: "always",
+                  lineNumbersMinChars: 3,
+                  mouseWheelZoom: true,
+                  roundedSelection: true,
+                  }}
               />
             </div>
           </div>

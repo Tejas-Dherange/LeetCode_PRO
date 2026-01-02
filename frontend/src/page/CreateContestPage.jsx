@@ -1,7 +1,7 @@
 import { useForm, useFieldArray } from "react-hook-form";
 import { useContestStore } from "../store/useContestStore.js";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProblemStore } from "../store/useProblemStore";
 import { motion } from "framer-motion";
 import { 
@@ -14,13 +14,17 @@ import {
   Save, 
   ArrowLeft,
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Search,
+  Filter
 } from "lucide-react";
 
 function CreateContestPage() {
   const { createContest } = useContestStore();
   const navigate = useNavigate();
   const { problems, getAllProblems } = useProblemStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
 
   useEffect(() => {
     getAllProblems();
@@ -69,8 +73,26 @@ function CreateContestPage() {
     }
   };
 
+  // Filter and sort problems
+  const filteredAndSortedProblems = problems
+    .filter((problem) => {
+      // Search filter
+      const matchesSearch = problem.title?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Difficulty filter
+      const matchesDifficulty = difficultyFilter === "all" || problem.difficulty === difficultyFilter;
+      
+      return matchesSearch && matchesDifficulty;
+    })
+    .sort((a, b) => {
+      // Sort by creation date (newest first)
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB - dateA;
+    });
+
   return (
-    <div className="min-h-screen bg-base-100 w-full relative overflow-hidden">
+    <div className="min-h-screen mt-[-150px] pt-[150px] bg-base-100 w-full md:w-[99vw] relative overflow-hidden">
       {/* Animated Background Grid */}
       <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none"></div>
@@ -78,15 +100,7 @@ function CreateContestPage() {
 
       <div className="relative z-10 w-full px-6 md:px-12 lg:px-20 py-12">
         {/* Navigation */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => navigate("/dashboard/contest")}
-          className="btn btn-ghost btn-sm gap-2 mb-8 hover:bg-base-200/50 text-base-content/60"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Contests
-        </motion.button>
+       
 
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -151,7 +165,7 @@ function CreateContestPage() {
                     </label>
                     <textarea
                       placeholder="Briefly describe what this contest is about..."
-                      className="textarea textarea-bordered h-32 bg-base-100/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all text-base"
+                      className="textarea ml-2 textarea-bordered h-12 w-full bg-base-100/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all text-base"
                       {...register("description", { required: "Description is required" })}
                     ></textarea>
                     {errors.description && (
@@ -238,6 +252,37 @@ function CreateContestPage() {
                   </button>
                 </div>
 
+                {/* Search and Filter */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-base-200/50 p-4 rounded-xl">
+                  <div className="form-control">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40" />
+                      <input
+                        type="text"
+                        placeholder="Search problems by title..."
+                        className="input input-bordered w-full pl-10 bg-base-100/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="form-control">
+                    <div className="relative">
+                      <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40 pointer-events-none" />
+                      <select
+                        className="select select-bordered w-full pl-10 bg-base-100/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        value={difficultyFilter}
+                        onChange={(e) => setDifficultyFilter(e.target.value)}
+                      >
+                        <option value="all">All Difficulties</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-4">
                   {fields.map((field, idx) => (
                     <motion.div
@@ -260,9 +305,9 @@ function CreateContestPage() {
                           defaultValue={field.problemId}
                         >
                           <option value="" disabled>Choose a problem from the library</option>
-                          {problems.map((problem) => (
+                          {filteredAndSortedProblems.map((problem) => (
                             <option key={problem.id} value={problem.id}>
-                              {problem.title || problem.name || `Problem ${problem.id}`}
+                              {problem.title || problem.name || `Problem ${problem.id}`} ({problem.difficulty})
                             </option>
                           ))}
                         </select>

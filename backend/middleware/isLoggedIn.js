@@ -20,6 +20,7 @@ export const isLoggedIn = async (req, res, next) => {
         email: true,
         image: true,
         role: true,
+        createdAt: true,
       },
     });
 

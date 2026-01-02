@@ -174,7 +174,7 @@ const ProfilePage = () => {
                     <div className="flex-1">
                       <p className="text-xs text-base-content/60 font-semibold uppercase tracking-wider">Member Since</p>
                       <p className="text-sm font-bold">
-                        {new Date().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                        {authUser.createdAt && new Date(authUser.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                       </p>
                     </div>
                   </div>

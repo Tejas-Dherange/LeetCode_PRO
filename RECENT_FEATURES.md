@@ -2,7 +2,63 @@
 
 ## Last 5 Git Commits Summary
 
-### � Commit 1: UI/UX Modernization & Contest System Polish (Latest)
+### 🎨 Commit 1: Profile Page Redesign & Contribution Heatmap (Latest)
+**Author**: Tejas Dherange | **Date**: Jan 02, 2026
+
+#### Major Features Added:
+- **Profile Page Complete Redesign**:
+  - Full-width layout (99vw) with premium glassmorphism effects
+  - Gradient backgrounds and card-based design
+  - Animated avatar with hover effects and image upload button
+  - Quick stats cards with gradient backgrounds
+  - Smooth scale and rotation animations on all interactive elements
+  - Improved info cards with icon transitions
+  - Sticky sidebar for better UX
+
+- **Contribution Heatmap Year Selector**:
+  - Added year selector to view contributions for current year and past 2 years
+  - Refresh button with spinning animation
+  - Auto-updates when code is submitted
+  - Fixed date filtering to show correct year's data
+  - Backend updated to fetch 3 years of submission data
+
+- **Code Editor Boilerplate Hiding**:
+  - Created `codeTemplates.js` utility to extract user-editable code
+  - Hides imports, input reading, and main method wrappers
+  - Shows only the core function (like LeetCode)
+  - Supports JavaScript, Python, and Java
+  - Automatically merges hidden code during execution
+  - Works with existing database structure (no migration needed)
+
+- **Unit Conversions**:
+  - Memory displayed in MB (converted from KB)
+  - Time displayed in milliseconds (converted from seconds)
+  - Applied to both `RunResultsTable` and `Submission` components
+
+#### Improvements:
+- **Text Colors**: Made text colors more natural and professional (removed AI-generated gradient look)
+- **Monaco Editor**: Enhanced with font ligatures, smooth cursor animation, bracket colorization
+- **Submission Component**: Added modern complexity graph with dual-chart visualization (Bar + Doughnut)
+- **Better Typography**: Improved font weights and sizes across profile page
+
+#### Files Changed:
+- `ProfilePage.jsx` - Complete UI/UX redesign
+- `ContributionHeatmap.jsx` - Year selector and auto-refresh
+- `contribution.controllers.js` - Extended date range to 3 years
+- `useActivityStore.js` - State management for contributions
+- `codeTemplates.js` - NEW utility for code parsing
+- `ProblemPage.jsx` - Code hiding implementation
+- `Submission.jsx` - Complexity visualization
+- `RunResultsTable.jsx` - Unit conversions
+
+#### Bug Fixes:
+- Fixed heatmap date filtering for correct year display
+- Resolved timezone issues with contribution dates
+- Fixed activity auto-refresh on new submissions
+
+---
+
+### 🎯 Commit 2: UI/UX Modernization & Contest System Polish
 **Author**: Tejas Dherange | **Date**: Jan 01, 2026
 
 #### Major Features Added:

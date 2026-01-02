@@ -293,7 +293,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
               <th>Solved</th>
               <th>Title</th>
               <th>Tags</th>
-              <th>Company</th>
+              {/* <th>Company</th> */}
               <th>Difficulty</th>
               <th>Actions</th>
             </tr>
@@ -402,7 +402,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                         )}
                       </div>
                     </td>
-                    <td>
+                    {/* <td>
                       <div className="flex flex-wrap gap-1 items-center relative">
                         {(() => {
                           const validCompanyTags = (problem.companyTags || []).filter((tag) => tag && tag.trim());
@@ -464,7 +464,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                           </div>
                         )}
                       </div>
-                    </td>
+                    </td> */}
                     <td>
                       <span
                         className={`badge font-semibold text-xs text-white ${

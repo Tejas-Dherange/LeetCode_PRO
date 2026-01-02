@@ -10,6 +10,8 @@ import {
   BookOpen,
   CheckCircle2,
   Download,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
@@ -17,6 +19,7 @@ import { axiosInstance } from "../libs/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useProblemStore } from "../store/useProblemStore";
+import ProblemReferencePanel from "./ProblemReferencePanel";
 
 const problemSchema = z.object({
   title: z.string().min(3, "title must be atleast 3 character"),
@@ -599,31 +602,52 @@ const CreateProblemForm = () => {
     // Reset the form with sample data
     reset(sampleData);
   };
+  const [showReference, setShowReference] = useState(true);
+
   return (
-    <div className="container mx-auto py-8 px-4 max-w-7xl">
-      <div className="card bg-base-100 shadow-xl">
+    <div className="w-full flex gap-6">
+      {/* Left Column - Editable Form */}
+      <div className={`${showReference ? 'w-full lg:w-[60%]' : 'w-full'} transition-all duration-300`}>
+      <div className="card bg-base-100/40 backdrop-blur-md shadow-2xl border border-base-200 hover:border-emerald-500/30 transition-all duration-300">
         <div className="card-body p-6 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-4 border-b">
-            <h2 className="card-title text-2xl md:text-3xl flex items-center gap-3">
-              <FileText className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-              Create Problem
-            </h2>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 pb-6 border-b border-base-300">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-emerald-500/20 rounded-xl">
+                <FileText className="w-6 h-6 md:w-8 md:h-8 text-emerald-500" />
+              </div>
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-base-content">
+                  Problem Details
+                </h2>
+                <p className="text-sm text-base-content/60 mt-1">Fill in all required fields to create a problem</p>
+              </div>
+            </div>
 
             <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
-              <div className="join">
+              {/* Toggle Reference Button */}
+              <button
+                type="button"
+                className="btn btn-sm btn-outline gap-2"
+                onClick={() => setShowReference(!showReference)}
+              >
+                <BookOpen className="w-4 h-4" />
+                {showReference ? 'Hide' : 'Show'} Reference
+              </button>
+              
+              <div className="join shadow-lg">
                 <button
                   type="button"
-                  className={`btn join-item ${
-                    sampleType === "DP" ? "btn-active" : ""
+                  className={`btn join-item btn-sm ${
+                    sampleType === "DP" ? "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" : "btn-outline"
                   }`}
-                  onClick={() => setSampleType("array")}
+                  onClick={() => setSampleType("DP")}
                 >
                   DP Problem
                 </button>
                 <button
                   type="button"
-                  className={`btn join-item ${
-                    sampleType === "string" ? "btn-active" : ""
+                  className={`btn join-item btn-sm ${
+                    sampleType === "string" ? "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-600" : "btn-outline"
                   }`}
                   onClick={() => setSampleType("string")}
                 >
@@ -632,7 +656,7 @@ const CreateProblemForm = () => {
               </div>
               <button
                 type="button"
-                className="btn btn-secondary gap-2"
+                className="btn btn-sm bg-blue-600 hover:bg-blue-500 text-white border-none gap-2 shadow-lg hover:shadow-xl transition-all"
                 onClick={loadSampleData}
               >
                 <Download className="w-4 h-4" />
@@ -658,7 +682,8 @@ const CreateProblemForm = () => {
                 />
                 {errors.title && (
                   <label className="label">
-                    <span className="label-text-alt text-error">
+                    <span className="label-text-alt text-error flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
                       {errors.title.message}
                     </span>
                   </label>
@@ -678,7 +703,8 @@ const CreateProblemForm = () => {
                 />
                 {errors.description && (
                   <label className="label">
-                    <span className="label-text-alt text-error">
+                    <span className="label-text-alt text-error flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
                       {errors.description.message}
                     </span>
                   </label>
@@ -713,15 +739,15 @@ const CreateProblemForm = () => {
             <div className="card bg-base-200 p-4 md:p-6 shadow-md">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
+                  <BookOpen className="w-5 h-5 text-emerald-500" />
                   Tags
                 </h3>
                 <button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  className="btn bg-emerald-600 hover:bg-emerald-500 text-white border-none btn-sm gap-1 shadow-md"
                   onClick={() => appendTags("")}
                 >
-                  <Plus className="w-4 h-4 mr-1" /> Add Tag
+                  <Plus className="w-4 h-4" /> Add Tag
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -746,7 +772,8 @@ const CreateProblemForm = () => {
               </div>
               {errors.tags && (
                 <div className="mt-2">
-                  <span className="text-error text-sm">
+                  <span className="text-error text-sm flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
                     {errors.tags.message}
                   </span>
                 </div>
@@ -757,15 +784,15 @@ const CreateProblemForm = () => {
             <div className="card bg-base-200 p-4 md:p-6 shadow-md">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
+                  <BookOpen className="w-5 h-5 text-emerald-500" />
                   Company Tags
                 </h3>
                 <button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  className="btn bg-emerald-600 hover:bg-emerald-500 text-white border-none btn-sm gap-1 shadow-md"
                   onClick={() => appendCompanyTag("")}
                 >
-                  <Plus className="w-4 h-4 mr-1" /> Add Company Tag
+                  <Plus className="w-4 h-4" /> Add Company Tag
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -801,15 +828,15 @@ const CreateProblemForm = () => {
             <div className="card bg-base-200 p-4 md:p-6 shadow-md">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg md:text-xl font-semibold flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
+                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                   Test Cases
                 </h3>
                 <button
                   type="button"
-                  className="btn btn-primary btn-sm"
+                  className="btn bg-emerald-600 hover:bg-emerald-500 text-white border-none btn-sm gap-1 shadow-md"
                   onClick={() => appendtestcases({ input: "", output: "" })}
                 >
-                  <Plus className="w-4 h-4 mr-1" /> Add Test Case
+                  <Plus className="w-4 h-4" /> Add Test Case
                 </button>
               </div>
               <div className="space-y-6">
@@ -843,7 +870,8 @@ const CreateProblemForm = () => {
                           />
                           {errors.testcases?.[index]?.input && (
                             <label className="label">
-                              <span className="label-text-alt text-error">
+                              <span className="label-text-alt text-error flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
                                 {errors.testcases[index].input.message}
                               </span>
                             </label>
@@ -862,7 +890,8 @@ const CreateProblemForm = () => {
                           />
                           {errors.testcases?.[index]?.output && (
                             <label className="label">
-                              <span className="label-text-alt text-error">
+                              <span className="label-text-alt text-error flex items-center gap-1">
+                                <AlertCircle className="w-3 h-3" />
                                 {errors.testcases[index].output.message}
                               </span>
                             </label>
@@ -890,7 +919,7 @@ const CreateProblemForm = () => {
                   className="card bg-base-200 p-4 md:p-6 shadow-md"
                 >
                   <h3 className="text-lg md:text-xl font-semibold mb-6 flex items-center gap-2">
-                    <Code2 className="w-5 h-5" />
+                    <Code2 className="w-5 h-5 text-emerald-500" />
                     {language}
                   </h3>
 
@@ -1042,7 +1071,7 @@ const CreateProblemForm = () => {
             {/* Additional Information */}
             <div className="card bg-base-200 p-4 md:p-6 shadow-md">
               <h3 className="text-lg md:text-xl font-semibold mb-6 flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-warning" />
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
                 Additional Information
               </h3>
               <div className="space-y-6">
@@ -1090,10 +1119,17 @@ const CreateProblemForm = () => {
               </div>
             </div>
 
-            <div className="card-actions justify-end pt-4 border-t">
-              <button type="submit" className="btn btn-primary btn-lg gap-2">
+            <div className="card-actions justify-end pt-6 border-t border-base-300">
+              <button 
+                type="submit" 
+                className="btn btn-lg bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white border-none gap-2 shadow-xl hover:shadow-2xl px-8 transition-all disabled:opacity-50"
+                disabled={isLoading}
+              >
                 {isLoading ? (
-                  <span className="loading loading-spinner text-white"></span>
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Creating Problem...
+                  </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-5 h-5" />
@@ -1105,6 +1141,14 @@ const CreateProblemForm = () => {
           </form>
         </div>
       </div>
+      </div>
+
+      {/* Right Column - Reference Example */}
+      {showReference && (
+        <div className="hidden lg:block w-[40%]">
+          <ProblemReferencePanel sampleData={sampleType === "DP" ? sampledpData : sampleStringProblem} />
+        </div>
+      )}
     </div>
   );
 };
