@@ -69,25 +69,28 @@ const App = () => {
         />
 
         {/* Protected routes with Layout */}
-        <Route path="/dashboard" element={authUser ? <Layout /> : <Navigate to={"/login"} />}>
+        <Route path="/dashboard" element={authUser ? <Layout /> : <Navigate to="/login" />}>
           <Route index element={<Dashboard />} />
           <Route path="contest" element={<ContestPage />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="contest/register/:id" element={<RegisterContestPage />} />
-          <Route path="pricing" element={<PricingPage />} />
-          <Route path="contest-execution/:cid/:id" element={<ContestProblemExecPage />} />
           <Route path="contest/create-contest" element={<CreateContestPage />} />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="pricing" element={<PricingPage />} />
           <Route path="edit-sheets" element={<EditSheetPage />} />
         </Route>
 
         {/* Protected routes without Layout */}
         <Route
+          path="/contest-execution/:cid/:id"
+          element={authUser ? <ContestProblemExecPage /> : <Navigate to="/login" />}
+        />
+        <Route
           path="/sheets"
-          element={authUser ? <SheetsPage /> : <Navigate to={"/login"} />}
+          element={authUser ? <SheetsPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/edit-profile"
-          element={authUser ? <EditProfileForm /> : <Navigate to={"/login"} />}
+          element={authUser ? <EditProfileForm /> : <Navigate to="/login" />}
         />
         <Route
           path="/problem/:id"

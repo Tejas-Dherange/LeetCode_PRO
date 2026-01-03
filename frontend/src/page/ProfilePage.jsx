@@ -203,7 +203,7 @@ const ProfilePage = () => {
             <div className="card bg-gradient-to-br from-base-100 via-base-100 to-primary/5 shadow-2xl border-2 border-primary/20 backdrop-blur-xl hover:shadow-[0_0_30px_rgba(0,0,0,0.3)] hover:scale-[1.01] transition-all duration-500">
               <div className="card-body p-8">
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="p-4 bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-xl">
+                  <div className="p-4 bg-gradient-to-br from-success/80 to-success/50 rounded-2xl shadow-xl">
                     <Award className="w-8 h-8 text-white" />
                   </div>
                   <div>

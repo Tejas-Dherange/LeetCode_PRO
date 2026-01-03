@@ -124,7 +124,7 @@ function ContestProblem({ contestId }) {
                       </td>
                       <td className="px-6 py-3 text-center font-semibold">
                         <Link
-                          to={`/dashboard/contest-execution/${contestId}/${problem.problem.id}`}
+                          to={`/contest-execution/${contestId}/${problem.problem.id}`}
                           className="hover:underline text-primary-content block w-full h-full"
                         >
                           {problem.problem.title}

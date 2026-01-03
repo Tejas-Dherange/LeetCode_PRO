@@ -20,6 +20,8 @@ import {
   GripHorizontal,
   Fullscreen,
   Maximize,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import myCustomTheme from "../themes/customTheme";
@@ -57,7 +59,14 @@ const ContestProblemPage = () => {
   const containerRef = useRef(null);
   const rightPanelRef = useRef(null);
 
-  const { theme } = useThemeStore();
+  const { theme, setTheme } = useThemeStore();
+
+  // Toggle theme function matching navbar implementation
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };
 
   // Set Monaco theme based on app theme
   const handleEditorMount = (editor, monaco) => {
@@ -216,45 +225,52 @@ const ContestProblemPage = () => {
     switch (activeTab) {
       case "description":
         return (
-          <div className="prose max-w-none">
-            <h1 className="text-2xl mb-2 text-green-500 font-bold">
+          <div className="prose prose-lg max-w-none">
+            {/* Problem Title */}
+            <h1 className="text-3xl mb-4 text-success font-bold">
               {problem?.title}
             </h1>
-            <p className="text-lg mb-6">{problem?.description}</p>
+            
+            {/* Problem Description */}
+            <div className="mb-8">
+              <div className="text-base-content/90 leading-relaxed whitespace-pre-wrap">
+                {problem?.description}
+              </div>
+            </div>
 
             {problem?.examples && (
               <>
-                <h3 className="text-xl font-bold mb-4">Examples:</h3>
+                <h3 className="text-2xl font-bold mb-4 text-primary">Examples:</h3>
                 {Object.entries(problem?.examples).map(
                   ([lang, example], idx) => (
                     <div
                       key={lang}
-                      className="bg-base-200 p-6 rounded-xl mb-6 font-mono"
+                      className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300"
                     >
                       <div className="mb-4">
-                        <div className="text-indigo-300 mb-2 text-base font-semibold">
+                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
                           Input:
                         </div>
-                        <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                          {example.input}
-                        </span>
+                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                          <pre className="whitespace-pre-wrap break-words">{example.input}</pre>
+                        </div>
                       </div>
                       <div className="mb-4">
-                        <div className="text-indigo-300 mb-2 text-base font-semibold">
+                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
                           Output:
                         </div>
-                        <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white">
-                          {example.output}
-                        </span>
+                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                          <pre className="whitespace-pre-wrap break-words">{example.output}</pre>
+                        </div>
                       </div>
                       {example.explanation && (
                         <div>
-                          <div className="text-emerald-300 mb-2 text-base font-semibold">
+                          <div className="text-success mb-2 text-base font-bold uppercase tracking-wide">
                             Explanation:
                           </div>
-                          <p className="text-base-content/70 text-lg font-sem">
+                          <div className="text-base-content/80 text-base leading-relaxed whitespace-pre-wrap">
                             {example.explanation}
-                          </p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -265,11 +281,11 @@ const ContestProblemPage = () => {
 
             {problem?.constraints && (
               <>
-                <h3 className="text-xl font-bold mb-4">Constraints:</h3>
-                <div className="bg-base-200 p-6 rounded-xl mb-6">
-                  <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                    {problem.constraints}
-                  </span>
+                <h3 className="text-2xl font-bold mb-4 text-warning">Constraints:</h3>
+                <div className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300">
+                  <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                    <pre className="whitespace-pre-wrap break-words">{problem.constraints}</pre>
+                  </div>
                 </div>
               </>
             )}
@@ -281,28 +297,6 @@ const ContestProblemPage = () => {
             submissions={contestSubmissions}
             isLoading={isContestLoading}
           />
-        );
-      case "discussion":
-        return (
-          <div className="p-4 text-center text-base-content/70">
-            No discussions yet
-          </div>
-        );
-      case "hints":
-        return (
-          <div className="p-4">
-            {problem?.hints ? (
-              <div className="bg-base-200 p-6 rounded-xl">
-                <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
-                  {problem.hints}
-                </span>
-              </div>
-            ) : (
-              <div className="text-center text-base-content/70">
-                No hints available
-              </div>
-            )}
-          </div>
         );
       default:
         return null;
@@ -424,6 +418,17 @@ const ContestProblemPage = () => {
             <button className="btn btn-ghost btn-circle" title="Share">
               <Share2 className="w-5 h-5" />
             </button>
+            <button 
+              className="btn btn-ghost btn-circle hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors" 
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </button>
             <select
               className="select select-bordered select-primary w-32 md:w-40"
               value={selectedLanguage}
@@ -468,26 +473,6 @@ const ContestProblemPage = () => {
             </button>
           </div>
         </div>
-
-        {/* // if want to show data of submission succes rate uncomment this */}
-        {/* <div className="flex flex-wrap w-[40%] items-center gap-4 text-sm text-base-content/70 bg-base-200 rounded-lg px-4 py-2 shadow-sm">
-            <div className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
-              <span>
-                Updated {problem?.createdAt ? new Date(problem.createdAt).toLocaleString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "-"}
-              </span>
-            </div>
-            <span className="text-base-content/30 hidden md:inline">•</span>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{submissionCount} Submissions</span>
-            </div>
-            <span className="text-base-content/30 hidden md:inline">•</span>
-            <div className="flex items-center gap-1">
-              <ThumbsUp className="w-4 h-4" />
-              <span>95% Success Rate</span>
-            </div>
-          </div> */}
       </nav>
 
       {/* Main Content - Resizable Split Layout */}
@@ -552,7 +537,7 @@ const ContestProblemPage = () => {
               </button>
               <div className="flex-1"></div>
               <button
-                className="cursor-pointer p-2 rounded-xl hover:bg-gray-800 btn-sm mr-2"
+                className="cursor-pointer p-2 rounded-xl hover:bg-base-100 btn-sm mr-2"
                 onClick={() =>
                   setRightPanelEditorHeight(
                     rightPanelEditorHeight === 100 ? 70 : 100,
@@ -578,7 +563,14 @@ const ContestProblemPage = () => {
                   readOnly: false,
                   automaticLayout: true,
                   smoothScrolling: true,
-                }}
+                  glyphMargin: true,
+                  folding: true,
+                  foldingStrategy: "indentation",
+                  showFoldingControls: "always",
+                  lineNumbersMinChars: 3,
+                  mouseWheelZoom: true,
+                  roundedSelection: true,
+                  }}
               />
             </div>
           </div>
