@@ -4,6 +4,7 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
+import { processCodeSnippet } from "../libs/codeTemplateEngine.js";
 
 const createProblem = async (req, res) => {
   //taking data from body
@@ -20,6 +21,7 @@ const createProblem = async (req, res) => {
     examples,
     constraints,
     testcases,
+    hints,
     codeSnippets,
     referenceSolutions,
   } = req.body;
@@ -87,6 +89,7 @@ const createProblem = async (req, res) => {
         tags,
         companyTags, // <-- add this
         examples,
+        hints,
         constraints,
         testcase: testcases,
         codeSnippet: codeSnippets,
@@ -133,10 +136,25 @@ const getProblemById = async (req, res) => {
       });
     }
 
+    console.log("problem", problem);
+
+    // Process code snippets to extract student-visible code
+    const studentCodeSnippet = {};
+    
+    if (problem.codeSnippet && typeof problem.codeSnippet === 'object') {
+      for (const [language, code] of Object.entries(problem.codeSnippet)) {
+        const processed = processCodeSnippet(code);
+        studentCodeSnippet[language] = processed.studentView;
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: "problem found successfully",
-      problem,
+      problem: {
+        ...problem,
+        studentCodeSnippet, // Add processed student-visible code
+      },
     });
   } catch (error) {
     console.error("Error in fetching problem by id:", error);

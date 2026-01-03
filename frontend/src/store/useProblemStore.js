@@ -117,7 +117,9 @@ export const useProblemStore = create((set, get) => ({
     try {
       set({ isProblemLoading: true });
       const res = await axiosInstance.get(`/problems/get-problem-byId/${id}`);
+      // console.log("ProblemStore Debug in getProblemById:", res.data.problem);
       set({ problem: res.data.problem });
+
       toast.success(res.data.message || "problem fetched successfully");
     } catch (error) {
       console.error("error occurred in fetching  problem", error);

@@ -33,6 +33,7 @@ import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
 import { useContestStore } from "../store/useContestStore";
+import { mergeStudentCodeWithTemplate } from "../utils/codeTemplateMerger";
 
 const ContestProblemPage = () => {
   const { id, cid } = useParams();
@@ -105,7 +106,22 @@ const ContestProblemPage = () => {
 
   useEffect(() => {
     if (problem) {
-      setCode(problem.codeSnippet?.[selectedLanguage] || "");
+      // Use studentCodeSnippet for display (without boilerplate)
+      // Fall back to codeSnippet for backward compatibility
+      const snippetToUse = problem.studentCodeSnippet?.[selectedLanguage] 
+        || problem.codeSnippet?.[selectedLanguage] 
+        || "";
+      
+      // console.log('🔍 Frontend Debug:', {
+      //   language: selectedLanguage,
+      //   hasStudentSnippet: !!problem.studentCodeSnippet?.[selectedLanguage],
+      //   hasCodeSnippet: !!problem.codeSnippet?.[selectedLanguage],
+      //   usingField: problem.studentCodeSnippet?.[selectedLanguage] ? 'studentCodeSnippet' : 'codeSnippet',
+      //   snippetLength: snippetToUse.length,
+      //   containsMarkers: snippetToUse.includes('USER_CODE') || snippetToUse.includes('BOILERPLATE')
+      // });
+      
+      setCode(snippetToUse);
       setTestCases(
         problem.testcase.map((tc) => ({
           input: tc.input,
@@ -124,7 +140,13 @@ const ContestProblemPage = () => {
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
-    setCode(problem.codeSnippet?.[lang] || "");
+    
+    // Use studentCodeSnippet for display, fallback to codeSnippet
+    const snippetToUse = problem.studentCodeSnippet?.[lang] 
+      || problem.codeSnippet?.[lang] 
+      || "";
+    
+    setCode(snippetToUse);
   };
 
   // Horizontal resizable split pane handlers
@@ -323,12 +345,16 @@ const ContestProblemPage = () => {
   const handleRunCode = (e) => {
     e.preventDefault();
     try {
+      // Get full template and merge student code
+      const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
+      const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
+      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
 
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       console.log(expected_outputs);
-      runCode(code, language_id, stdin, expected_outputs, id);
+      runCode(executableCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in executing code", error);
     }
@@ -337,12 +363,16 @@ const ContestProblemPage = () => {
   const handleSubmitCode = (e) => {
     e.preventDefault();
     try {
+      // Get full template and merge student code
+      const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
+      const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
+      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       // Clear previous contest submission output before submitting new code
       useContestStore.setState({ contestSubmission: null });
-      contestSubmitCode(code, language_id, stdin, expected_outputs, id, cid);
+      contestSubmitCode(executableCode, language_id, stdin, expected_outputs, id, cid);
       // getContestSubmissionForProblem(id);
     } catch (error) {
       console.error("error in submitting code", error);
@@ -558,7 +588,6 @@ const ContestProblemPage = () => {
                   minimap: { enabled: false },
                   fontSize: 18,
                   lineNumbers: "on",
-                  roundedSelection: false,
                   scrollBeyondLastLine: false,
                   readOnly: false,
                   automaticLayout: true,

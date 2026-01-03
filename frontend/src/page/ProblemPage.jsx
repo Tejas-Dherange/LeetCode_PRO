@@ -33,11 +33,13 @@ import SubmissionsList from "../components/SubmissionList";
 import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
 import useAuthStore from "../store/useAuthStore";
-import { extractVisibleCode, mergeCodeWithBoilerplate } from "../utils/codeTemplates";
+import { mergeStudentCodeWithTemplate } from "../utils/codeTemplateMerger";
 
 const ProblemPage = () => {
   const { id } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
+  console.log("ProblemPage Debug:", { problem });
+  
   const {
     submission: submissions,
     isLoading: isSubmissionsLoading,
@@ -109,12 +111,24 @@ useEffect(() => {
 
   useEffect(() => {
     if (problem) {
-      const fullCode = problem.codeSnippet?.[selectedLanguage] || "";
-      const { visibleCode, hiddenPrefix: prefix, hiddenSuffix: suffix } = extractVisibleCode(fullCode, selectedLanguage);
+      // Use studentCodeSnippet from backend (already processed, no markers)
+      // Fall back to codeSnippet for backward compatibility
+      const snippetToUse = problem.studentCodeSnippet?.[selectedLanguage] 
+        || problem.codeSnippet?.[selectedLanguage] 
+        || "";
       
-      setCode(visibleCode);
-      setHiddenPrefix(prefix);
-      setHiddenSuffix(suffix);
+      // console.log(' ProblemPage Debug:', {
+      //   language: selectedLanguage,
+      //   hasStudentSnippet: !!problem.studentCodeSnippet?.[selectedLanguage],
+      //   hasCodeSnippet: !!problem.codeSnippet?.[selectedLanguage],
+      //   usingField: problem.studentCodeSnippet?.[selectedLanguage] ? 'studentCodeSnippet' : 'codeSnippet',
+      //   snippetLength: snippetToUse.length,
+      //   containsMarkers: snippetToUse.includes('USER_CODE') || snippetToUse.includes('BOILERPLATE')
+      // });
+      
+      setCode(snippetToUse);
+      setHiddenPrefix('');
+      setHiddenSuffix('');
       
       setTestCases(
         problem.testcase.map((tc) => ({
@@ -136,12 +150,14 @@ useEffect(() => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
     
-    const fullCode = problem.codeSnippet?.[lang] || "";
-    const { visibleCode, hiddenPrefix: prefix, hiddenSuffix: suffix } = extractVisibleCode(fullCode, lang);
+    // Use studentCodeSnippet for display, fallback to codeSnippet
+    const snippetToUse = problem.studentCodeSnippet?.[lang] 
+      || problem.codeSnippet?.[lang] 
+      || "";
     
-    setCode(visibleCode);
-    setHiddenPrefix(prefix);
-    setHiddenSuffix(suffix);
+    setCode(snippetToUse);
+    setHiddenPrefix('');
+    setHiddenSuffix('');
   };
 
   // Horizontal resizable split pane handlers
@@ -325,10 +341,10 @@ useEffect(() => {
         return (
           <div className="p-4">
             {problem?.hints ? (
-              <div className="bg-base-200 p-6 rounded-xl">
-                <span className="bg-black/90 px-4 py-1 rounded-lg font-semibold text-white text-lg">
+              <div className="bg-base-200 p-6 rounded-xl border border-base-300">
+                <div className="text-base-content leading-relaxed whitespace-pre-wrap">
                   {problem.hints}
-                </span>
+                </div>
               </div>
             ) : (
               <div className="text-center text-base-content/70">
@@ -354,14 +370,15 @@ useEffect(() => {
   const handleRunCode = (e) => {
     e.preventDefault();
     try {
-      // Merge user code with boilerplate before execution
-      const fullCode = mergeCodeWithBoilerplate(code, hiddenPrefix, hiddenSuffix);
+      // Get full template and merge student code
+      const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
+      const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
       
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       console.log(expected_outputs);
-      runCode(fullCode, language_id, stdin, expected_outputs, id);
+      runCode(executableCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in executing code", error);
     }
@@ -370,13 +387,14 @@ useEffect(() => {
   const handleSubmitCode = (e) => {
     e.preventDefault();
     try {
-      // Merge user code with boilerplate before submission
-      const fullCode = mergeCodeWithBoilerplate(code, hiddenPrefix, hiddenSuffix);
+      // Get full template and merge student code
+      const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
+      const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
       
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
-      submitCode(fullCode, language_id, stdin, expected_outputs, id);
+      submitCode(executableCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in submitting code", error);
     }
