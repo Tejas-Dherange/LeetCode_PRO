@@ -29,7 +29,24 @@ export const useExecutionStore = create((set) => ({
       toast.success(res.data.message || "code executed succesfully");
     } catch (error) {
       console.error("error in execution", error);
-      toast.error("error in execution");
+      
+      // Handle rate limiting errors (429)
+      if (error.response?.status === 429) {
+        const rateLimitData = error.response.data;
+        const retryAfter = rateLimitData.retryAfter || 60;
+        const limitType = rateLimitData.limit || "Rate limit";
+        
+        toast.error(
+          `${limitType} exceeded! Wait ${retryAfter}s before trying again.`,
+          { duration: 5000 }
+        );
+      } else if (error.response?.status === 503) {
+        toast.error("Service temporarily unavailable. Please try again later.", {
+          duration: 4000
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Error in execution");
+      }
     } finally {
       set({ isRunExecuting: false });
     }
@@ -56,7 +73,24 @@ export const useExecutionStore = create((set) => ({
       toast.success(res.data.message || "code executed succesfully");
     } catch (error) {
       console.error("error in execution", error);
-      toast.error("error in execution");
+      
+      // Handle rate limiting errors (429)
+      if (error.response?.status === 429) {
+        const rateLimitData = error.response.data;
+        const retryAfter = rateLimitData.retryAfter || 60;
+        const limitType = rateLimitData.limit || "Rate limit";
+        
+        toast.error(
+          `${limitType} exceeded! Wait ${retryAfter}s before trying again.`,
+          { duration: 5000 }
+        );
+      } else if (error.response?.status === 503) {
+        toast.error("Service temporarily unavailable. Please try again later.", {
+          duration: 4000
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Error in execution");
+      }
     } finally {
       set({ isSubmitExecuting: false });
     }

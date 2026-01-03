@@ -4,6 +4,7 @@ import {
   pollBatchResults,
   submitBatch,
 } from "../libs/judge0.lib.js";
+import { addCodeExecutionJob } from "../libs/queue.lib.js";
 
 const createContest = async (req, res) => {
   const userId = req.user.id;
@@ -541,154 +542,22 @@ const contestSubmitCode = async (req, res) => {
       return res.status(400).json({ error: "Invalid or missing testcase" });
     }
 
-    // Run code using Judge0
-    const submissions = stdin.map((input) => ({
+    // Add job to queue instead of direct execution
+    const job = await addCodeExecutionJob({
+      jobType: 'contest',
+      userId,
+      problemId,
+      contestId,
       source_code,
       language_id,
-      stdin: input,
-    }));
-    const submissionResults = await submitBatch(submissions);
-    const tokens = submissionResults.map((res) => res.token);
-    const results = await pollBatchResults(tokens);
-
-    let allPassed = true;
-    const detailedResults = results.map((result, i) => {
-      const stdout =
-        result.stdout !== null ? result.stdout.trim() : result.stdout;
-      const expected_output = expected_outputs[i].trim();
-      const passed = stdout == expected_output;
-      if (!passed) allPassed = false;
-      return {
-        testcase: i + 1,
-        passed,
-        stdout,
-        expected: expected_output,
-        stderr: result.stderr || null,
-        compileOutput: result.compile_output || null,
-        status: result.status.description,
-        memory: result.memory ? `${result.memory} KB` : undefined,
-        time: result.time ? `${result.time} s` : undefined,
-        stdin: stdin[i] || null,
-      };
+      stdin,
+      expected_outputs,
     });
 
-    // Fetch contest and problem marks
-    const contest = await db.contest.findUnique({ where: { id: contestId } });
-    if (!contest) return res.status(404).json({ message: "Contest not found" });
-    const problem = await db.contestProblem.findFirst({
-      where: { contestId, problemId },
-    });
-    if (!problem)
-      return res
-        .status(404)
-        .json({ message: "Problem not found in this contest" });
+    // Wait for job to complete
+    const result = await job.waitUntilFinished();
 
-    // Determine obtained marks
-    let obtainedMarks = 0;
-    if (allPassed) obtainedMarks = problem.marks || 0;
-
-    // Save to ContestSubmission
-    const contestSubmission = await db.contestSubmission.create({
-      data: {
-        userId,
-        contestId,
-        problemId,
-        sourceCode: source_code,
-        language: getLanguageNameById(language_id),
-        stdin: stdin.join("/n"),
-        stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
-        time: detailedResults.some((r) => r.time)
-          ? JSON.stringify(detailedResults.map((r) => r.time))
-          : null,
-        memory: detailedResults.some((r) => r.memory)
-          ? JSON.stringify(detailedResults.map((r) => r.memory))
-          : null,
-        stderr: detailedResults.some((r) => r.stderr)
-          ? JSON.stringify(detailedResults.map((r) => r.stderr))
-          : null,
-        compile_output: detailedResults.some((r) => r.compileOutput)
-          ? JSON.stringify(detailedResults.map((r) => r.compileOutput))
-          : null,
-        status: allPassed ? "Accepted" : "Wrong Answer",
-        obtainedMarks,
-      },
-    });
-
-  
-    // Also save to regular Submission model
-    const submission = await db.submission.create({
-      data: {
-        userId,
-        problemId,
-        sourceCode: source_code,
-        language: getLanguageNameById(language_id),
-        stdin: stdin.join("/n"),
-        stdout: JSON.stringify(detailedResults.map((r) => r.stdout)),
-        time: detailedResults.some((r) => r.time)
-          ? JSON.stringify(detailedResults.map((r) => r.time))
-          : null,
-        memory: detailedResults.some((r) => r.memory)
-          ? JSON.stringify(detailedResults.map((r) => r.memory))
-          : null,
-        stderr: detailedResults.some((r) => r.stderr)
-          ? JSON.stringify(detailedResults.map((r) => r.stderr))
-          : null,
-        compile_output: detailedResults.some((r) => r.compileOutput)
-          ? JSON.stringify(detailedResults.map((r) => r.compileOutput))
-          : null,
-        status: allPassed ? "Accepted" : "Wrong Answer",
-      },
-    });
-
-    if (allPassed) {
-      await db.problemSolved.upsert({
-        where: {
-          userId_problemId: {
-            userId,
-            problemId,
-          },
-        },
-        update: {},
-        create: {
-          userId,
-          problemId,
-        },
-      });
-    }
-
-      // Save testcase results ONLY for the regular submission
-    const testCaseResults = detailedResults.map((result) => ({
-      submissionId: submission.id, // Use the regular submission's id
-      testcase: result.testcase,
-      passed: result.passed,
-      stdout: result.stdout,
-      expected: result.expected,
-      stderr: result.stderr,
-      compileOutput: result.compileOutput,
-      status: result.status,
-      memory: result.memory,
-      time: result.time,
-    }));
-    await db.teastCaseResult.createMany({ data: testCaseResults });
-
-    const submissionWithTestcase = await db.submission.findUnique({
-      where: {
-        id: submission.id,
-      },
-      include: {
-        testCases: true,
-      },
-    });
-    return res.status(201).json({
-      success: true,
-      message: "Contest code submitted and saved successfully",
-      contestSubmission,
-      submission: submissionWithTestcase,
-      allPassed,
-      obtainedMarks,
-      results: detailedResults,
-
-    });
+    return res.status(201).json(result);
   } catch (error) {
     console.error("Error in contest code submission", error);
     return res.status(500).json({

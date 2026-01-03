@@ -354,7 +354,24 @@ export const useContestStore = create((set) => ({
       set({ contestSubmission: res.data.submission ,runResults: null }); // Assuming the response contains the submission data
     } catch (error) {
       console.error("Error occurred in contest code submission", error);
-      toast.error("Error in contest code submission");
+      
+      // Handle rate limiting errors (429)
+      if (error.response?.status === 429) {
+        const rateLimitData = error.response.data;
+        const retryAfter = rateLimitData.retryAfter || 60;
+        const limitType = rateLimitData.limit || "Rate limit";
+        
+        toast.error(
+          `${limitType} exceeded! Wait ${retryAfter}s before trying again.`,
+          { duration: 5000 }
+        );
+      } else if (error.response?.status === 503) {
+        toast.error("Service temporarily unavailable. Please try again later.", {
+          duration: 4000
+        });
+      } else {
+        toast.error(error.response?.data?.message || "Error in contest code submission");
+      }
     } finally {
       set({ isContestLoading: false });
     }

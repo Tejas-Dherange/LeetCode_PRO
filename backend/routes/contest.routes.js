@@ -1,5 +1,6 @@
 import express from "express";
 import { isLoggedIn } from "../middleware/isLoggedIn.js";
+import { rateLimiter } from "../middleware/rateLimiter.middleware.js";
 import {
   addProblemToContest,
   // contestInterface,
@@ -33,6 +34,7 @@ router.post("/add-problem-to-contest/:cid", isLoggedIn, addProblemToContest); //
 router.post(
   "/contest-submission/submit-code",
   isLoggedIn,
+  rateLimiter,
   contestSubmitCode,
 ); //remaining to check
 router.get(

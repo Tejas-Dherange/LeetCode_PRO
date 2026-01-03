@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # Redis - for rate limiting and queue storage
+  redis:
+    image: redis:7-alpine
+    container_name: leetcode_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --maxmemory 256mb --maxmemory-policy noeviction
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - leetcode_network
+
+  # Queue Worker - processes code execution jobs
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: leetcode_queue_worker
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JUDGE0_BATCH_SUBMISSION_ENDPOINT=${JUDGE0_BATCH_SUBMISSION_ENDPOINT}
+      - JUDGE0_SULU_API_KEY=${JUDGE0_SULU_API_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - QUEUE_CONCURRENCY=5
+      - QUEUE_JOB_TIMEOUT=60000
+    restart: unless-stopped
+    networks:
+      - leetcode_network
+  # Backend API (optional - if you want to run it in Docker)
+  # Commented out by default - can be enabled if needed
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: leetcode_backend
+  #   ports:
+  #     - "4000:4000"
+  #   depends_on:
+  #     redis:
+  #       condition: service_healthy
+  #   environment:
+  #     - NODE_ENV=production
+  #     - PORT=4000
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - JUDGE0_BATCH_SUBMISSION_ENDPOINT=${JUDGE0_BATCH_SUBMISSION_ENDPOINT}
+  #     - JUDGE0_SULU_API_KEY=${JUDGE0_SULU_API_KEY}
+  #     - DATABASE_URL=${DATABASE_URL}
+  #   restart: unless-stopped
+  #   networks:
+  #     - leetcode_network
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  leetcode_network:
+    driver: bridge
