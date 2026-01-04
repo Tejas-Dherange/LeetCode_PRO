@@ -1,0 +1,206 @@
+# Dual-Pane UI Component Code
+
+Replace the Problems Section (lines 271-382 approximately) with this:
+
+```javascript
+              {/* Problems Section - Dual Pane */}
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 pb-2 border-b border-base-200">
+                  <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-lg font-bold text-base-content">Problems Selection</h3>
+                  <div className="ml-auto text-sm text-base-content/60">
+                    {selectedProblems.length} problem{selectedProblems.length !== 1 && 's'} selected
+                  </div>
+                </div>
+
+                {/* Dual Pane Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                  
+                  {/* LEFT PANE: Selected Problems */}
+                  <div className="lg:col-span-2">
+                    <div className="bg-base-200/50 rounded-xl p-4 border border-base-300 min-h-[400px]">
+                      <h4 className="font-semibold text-base-content mb-4 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-success" />
+                        Selected Problems ({selectedProblems.length})
+                      </h4>
+                      
+                      {selectedProblems.length === 0 ? (
+                        <div className="text-center py-12 text-base-content/50">
+                          <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                          <p className="text-sm">No problems selected yet</p>
+                          <p className="text-xs mt-1">Add from the table →</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                          {selectedProblems.map((problem, idx) => (
+                            <motion.div
+                              key={problem.id}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="bg-base-100 p-4 rounded-lg border border-base-300 hover:border-emerald-500/50 transition-all group"
+                            >
+                              <div className="flex items-start justify-between mb-2">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="text-xs font-bold text-base-content/50">#{idx + 1}</span>
+                                    <h5 className="font-semibold text-sm text-base-content line-clamp-1">
+                                      {problem.title}
+                                    </h5>
+                                  </div>
+                                  <span className={`text-xs px-2 py-0.5 rounded-full border ${getDifficultyColor(problem.difficulty)}`}>
+                                    {problem.difficulty}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveProblem(problem.id)}
+                                  className="btn btn-ghost btn-xs btn-square text-base-content/40 hover:text-error hover:bg-error/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                                  title="Remove"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                              
+                              <div className="mt-3">
+                                <label className="label py-0 mb-1">
+                                  <span className="label-text text-xs font-medium">Points</span>
+                                </label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  value={problem.marks || ''}
+                                  onChange={(e) => updateProblemMarks(problem.id, e.target.value)}
+                                  className="input input-xs input-bordered w-full bg-base-100"
+                                  placeholder="100"
+                                />
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* RIGHT PANE: Available Problems Table */}
+                  <div className="lg:col-span-3">
+                    <div className="bg-base-200/50 rounded-xl p-4 border border-base-300">
+                      <h4 className="font-semibold text-base-content mb-4">Available Problems</h4>
+                      
+                      {/* Search and Filter */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                        <div className="form-control">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40" />
+                            <input
+                              type="text"
+                              placeholder="Search problems..."
+                              className="input input-sm input-bordered w-full pl-10 bg-base-100"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="form-control">
+                          <div className="relative">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40 pointer-events-none" />
+                            <select
+                              className="select select-sm select-bordered w-full pl-10 bg-base-100"
+                              value={difficultyFilter}
+                              onChange={(e) => setDifficultyFilter(e.target.value)}
+                            >
+                              <option value="all">All Difficulties</option>
+                              <option value="Easy">Easy</option>
+                              <option value="Medium">Medium</option>
+                              <option value="Hard">Hard</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Problems Table */}
+                      <div className="overflow-x-auto max-h-[500px] overflow-y-auto border border-base-300 rounded-lg">
+                        <table className="table table-sm table-pin-rows">
+                          <thead>
+                            <tr className="bg-base-200">
+                              <th className="w-12"></th>
+                              <th>Problem</th>
+                              <th className="w-24">Difficulty</th>
+                              <th className="w-24 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredAndSortedProblems.length === 0 ? (
+                              <tr>
+                                <td colSpan="4" className="text-center py-8 text-base-content/50">
+                                  No problems found
+                                </td>
+                              </tr>
+                            ) : (
+                              filteredAndSortedProblems.map((problem) => {
+                                const isSelected = selectedProblemIds.has(problem.id);
+                                return (
+                                  <tr 
+                                    key={problem.id} 
+                                    className={`hover:bg-base-300/50 ${isSelected ? 'bg-success/10' : ''}`}
+                                  >
+                                    <td>
+                                      {isSelected && (
+                                        <Check className="w-4 h-4 text-success" />
+                                      )}
+                                    </td>
+                                    <td>
+                                      <div className="font-medium text-sm">
+                                        {problem.title || `Problem ${problem.id}`}
+                                      </div>
+                                    </td>
+                                    <td>
+                                      <span className={`text-xs px-2 py-0.5 rounded-full border ${getDifficultyColor(problem.difficulty)}`}>
+                                        {problem.difficulty}
+                                      </span>
+                                    </td>
+                                    <td className="text-right">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleAddProblem(problem)}
+                                        disabled={isSelected}
+                                        className={`btn btn-xs gap-1 ${
+                                          isSelected 
+                                            ? 'btn-disabled opacity-50' 
+                                            : 'btn-ghost text-emerald-500 hover:bg-emerald-500/10'
+                                        }`}
+                                      >
+                                        <Plus className="w-3 h-3" />
+                                        {isSelected ? 'Added' : 'Add'}
+                                      </button>
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      
+                      {filteredAndSortedProblems.length > 0 && (
+                        <div className="text-xs text-base-content/50 mt-2 text-center">
+                          Showing {filteredAndSortedProblems.length} problem{filteredAndSortedProblems.length !== 1 && 's'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Validation Error */}
+                {selectedProblems.length === 0 && (
+                  <div className="text-warning text-sm flex items-center gap-2 bg-warning/10 p-3 rounded-lg border border-warning/30">
+                    <AlertCircle className="w-4 h-4" />
+                    Please select at least one problem for the contest
+                  </div>
+                )}
+              </div>
+```
+
+This replaces the entire problems section from the header through the old dropdown/field array implementation.

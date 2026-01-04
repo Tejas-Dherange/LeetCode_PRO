@@ -15,6 +15,7 @@ import Dashboard from "./page/dashboard";
 import ContestPage from "./page/ContestPage";
 import RegisterContestPage from "./page/RegisterContestPage";
 import CreateContestPage from "./page/CreateContestPage";
+import ContestDetailPage from "./page/ContestDetailPage";
 import ContestProblemExecPage from "./page/ContestProblemExecPage";
 import { Analytics } from '@vercel/analytics/react';
 import EditProfileForm from "./components/EditProfileForm";
@@ -73,6 +74,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="contest" element={<ContestPage />} />
           <Route path="contest/register/:id" element={<RegisterContestPage />} />
+          <Route path="contest/detail/:id" element={<ContestDetailPage />} />
           <Route path="contest/create-contest" element={<CreateContestPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="pricing" element={<PricingPage />} />

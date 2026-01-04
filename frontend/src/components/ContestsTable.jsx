@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import { useContestStore } from "../store/useContestStore";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-function ContestsTable() {
-  const { contests } = useContestStore();
+function ContestsTable({ contests: propContests }) {
+  const { contests: storeContests } = useContestStore();
+  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
+  // Use prop contests if provided, otherwise use store contests
+  const contests = propContests || storeContests;
+  
+  // Calculate pagination
+  const totalPages = Math.ceil(contests.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedContests = contests.slice(startIndex, endIndex);
 
   return (
-    <div className="overflow-x-auto w-full">
+    <div className=" w-full">
       <table className="table w-full">
         <thead>
           <tr className="text-base-content/60 border-b border-base-content/10">
@@ -17,14 +30,14 @@ function ContestsTable() {
           </tr>
         </thead>
         <tbody className="text-base-content/80">
-          {contests.length === 0 ? (
+          {paginatedContests.length === 0 ? (
             <tr>
               <td colSpan="4" className="text-center py-8 text-base-content/50">
                 No contest history available
               </td>
             </tr>
           ) : (
-            contests.map((contest) => {
+            paginatedContests.map((contest) => {
               const now = new Date();
               const start = new Date(contest.startTime);
               const end = new Date(contest.endTime);
@@ -40,7 +53,18 @@ function ContestsTable() {
               }
 
               return (
-                <tr key={contest.id || contest._id} className="hover:bg-base-200/50 transition-colors border-b border-base-content/5"> 
+                <tr 
+                  key={contest.id || contest._id} 
+                  onClick={() => {
+                    // Navigate to detail page if past, otherwise to register
+                    if (status === "Past") {
+                      navigate(`/dashboard/contest/detail/${contest.id || contest._id}`);
+                    } else {
+                      navigate(`/dashboard/contest/register/${contest.id || contest._id}`);
+                    }
+                  }}
+                  className="hover:bg-base-200/50 transition-colors border-b border-base-content/5 cursor-pointer"
+                > 
                   <td className="font-medium text-base py-4">{contest.name}</td>
                   <td className="py-4">
                     <div className="flex items-center gap-2 text-sm">
@@ -67,6 +91,51 @@ function ContestsTable() {
           )}
         </tbody>
       </table>
+      
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 px-2">
+          <div className="text-sm text-base-content/60">
+            Showing {startIndex + 1}-{Math.min(endIndex, contests.length)} of {contests.length} contests
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="btn btn-sm btn-ghost gap-1 disabled:opacity-30"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </button>
+            
+            <div className="flex gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`btn btn-sm ${
+                    currentPage === page 
+                      ? 'btn-primary bg-emerald-500 text-white' 
+                      : 'btn-ghost'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="btn btn-sm btn-ghost gap-1 disabled:opacity-30"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

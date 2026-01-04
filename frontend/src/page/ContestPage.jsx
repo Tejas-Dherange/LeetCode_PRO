@@ -29,6 +29,7 @@ function ContestPage() {
   const { getAllContests, isContestsLoading, contests } = useContestStore();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [historyTab, setHistoryTab] = useState("all"); // all | my
 
   useEffect(() => {
     getAllContests();
@@ -38,9 +39,12 @@ function ContestPage() {
   const live = contests.filter(
     (c) => getStatus(c.startTime, c.endTime) === "live",
   );
-  const upcoming = contests.filter(
-    (c) => getStatus(c.startTime, c.endTime) === "upcoming",
-  );
+  const upcoming = contests
+    .filter((c) => getStatus(c.startTime, c.endTime) === "upcoming")
+    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime)); // Earliest first
+  const past = contests
+    .filter((c) => getStatus(c.startTime, c.endTime) === "past")
+    .sort((a, b) => new Date(b.startTime) - new Date(a.startTime)); // Latest first
   
   const filteredContests = contests.filter(c =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -59,7 +63,21 @@ function ContestPage() {
   }
 
   const liveFiltered = filteredContests.filter(c => getStatus(c.startTime, c.endTime) === "live");
-  const upcomingFiltered = filteredContests.filter(c => getStatus(c.startTime, c.endTime) === "upcoming");
+  const upcomingFiltered = filteredContests
+    .filter(c => getStatus(c.startTime, c.endTime) === "upcoming")
+    .sort((a, b) => new Date(a.startTime) - new Date(b.startTime)); // Earliest first
+  
+  // Past contests with tab filtering
+  let pastFiltered = filteredContests
+    .filter(c => getStatus(c.startTime, c.endTime) === "past")
+    .sort((a, b) => new Date(b.startTime) - new Date(a.startTime)); // Latest first
+  
+  // If "my" tab is active, filter to show only user's contests
+  // TODO: Add logic to check if user is registered for contest
+  // For now showing all, will be implemented with backend integration
+  if (historyTab === "my") {
+    // pastFiltered = pastFiltered.filter(c => c.registeredUsers?.includes(currentUserId));
+  }
 
   return (
     <div className="min-h-screen bg-base-100 w-[99vw] mt-[-150px] pt-32 relative overflow-hidden">
@@ -170,19 +188,46 @@ function ContestPage() {
           <Section title="Upcoming Contests" data={upcomingFiltered} showEmpty={true} />
         </div>
 
-        {/* Contest History Table */}
-        {contests.length > 0 && (
+        {/* Contest History Table with Tabs */}
+        {past.length > 0 && (
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className="mt-16 bg-base-100/40 backdrop-blur-md border border-base-200 rounded-2xl shadow-lg p-6 md:p-8"
           >
-            <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-emerald-500 flex items-center gap-3">
-              <Trophy className="w-7 h-7" />
-              Contest History
-            </h2>
-            <ContestsTable />
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 gap-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-emerald-500 flex items-center gap-3">
+                <Trophy className="w-7 h-7" />
+                Contest History
+              </h2>
+              
+              {/* Tabs */}
+              <div className="flex gap-2 bg-base-200/50 p-1 rounded-xl">
+                <button
+                  onClick={() => setHistoryTab("all")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    historyTab === "all"
+                      ? "bg-emerald-500 text-white shadow-lg"
+                      : "text-base-content/60 hover:text-base-content"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setHistoryTab("my")}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    historyTab === "my"
+                      ? "bg-emerald-500 text-white shadow-lg"
+                      : "text-base-content/60 hover:text-base-content"
+                  }`}
+                >
+                  My Contests
+                </button>
+              </div>
+            </div>
+            
+            <ContestsTable contests={pastFiltered} />
           </motion.div>
         )}
       </div>
@@ -329,8 +374,13 @@ function ContestCard({ id, name, description, startTime, endTime, status }) {
         {/* CTA Button */}
         <button
           className={`${config.buttonClass} cursor-pointer w-full py-3 rounded-xl font-bold shadow-lg shadow-emerald-500/10 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] outline-none`}
-          disabled={status === "past"}
-          onClick={() => navigate(`/dashboard/contest/register/${id}`)}
+          onClick={() => {
+            if (status === "past") {
+              navigate(`/dashboard/contest/detail/${id}`);
+            } else {
+              navigate(`/dashboard/contest/register/${id}`);
+            }
+          }}
         >
           {config.buttonText}
         </button>

@@ -215,7 +215,7 @@ function HomePage() {
                   className="group relative overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 bg-[length:200%_auto] hover:bg-right text-white font-bold px-8 md:px-10 py-4 rounded-xl text-base md:text-lg shadow-2xl shadow-emerald-500/30 transition-all duration-500 cursor-pointer"
                 >
                   <span className="relative z-10 flex items-center gap-2">
-                    <Rocket className="w-5 h-5" />
+                  
                     Start Coding Now
                   </span>
                   <motion.div

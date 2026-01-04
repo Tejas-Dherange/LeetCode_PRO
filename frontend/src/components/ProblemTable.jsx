@@ -20,7 +20,8 @@ const ProblemTable = ({ problems: initialProblems }) => {
   const { 
     problems, 
     pagination, 
-    isLoadingMore, 
+    isLoadingMore,
+    isFiltering, // NEW: filter loading state
     loadMoreProblems, 
     updateFilters,
     filters,
@@ -299,7 +300,34 @@ const ProblemTable = ({ problems: initialProblems }) => {
             </tr>
           </thead>
           <tbody>
-            {localProblems.length > 0 ? (
+            {/* Skeleton loader during filtering */}
+            {isFiltering ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={`skeleton-${idx}`} className="animate-pulse">
+                  <td>
+                    <div className="w-4 h-4 bg-base-300 rounded"></div>
+                  </td>
+                  <td>
+                    <div className="h-4 bg-base-300 rounded w-3/4"></div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <div className="h-6 w-16 bg-base-300 rounded-full"></div>
+                      <div className="h-6 w-20 bg-base-300 rounded-full"></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="h-6 w-16 bg-base-300 rounded-full"></div>
+                  </td>
+                  <td>
+                    <div className="flex gap-2">
+                      <div className="h-8 w-8 bg-base-300 rounded"></div>
+                      <div className="h-8 w-8 bg-base-300 rounded"></div>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : localProblems.length > 0 ? (
               localProblems.map((problem) => {
                 const isSolved = (problem.solvedBy || []).some(
                   (user) => user.userId === authUser?.id,

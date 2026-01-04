@@ -1,0 +1,127 @@
+import { useForm } from "react-hook-form";
+import { useContestStore } from "../store/useContestStore.js";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useProblemStore } from "../store/useProblemStore";
+import { motion } from "framer-motion";
+import { 
+  Trophy, 
+  Calendar, 
+  Clock, 
+  Plus, 
+  Trash2, 
+  FileText, 
+  Save, 
+  ArrowLeft,
+  AlertCircle,
+  Sparkles,
+  Search,
+  Filter,
+  Check,
+  X
+} from "lucide-react";
+
+function CreateContestPage() {
+  const { createContest } = useContestStore();
+  const navigate = useNavigate();
+  const { problems, getAllProblems } = useProblemStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [selectedProblems, setSelectedProblems] = useState([]);
+
+  useEffect(() => {
+    getAllProblems();
+  }, [getAllProblems]);
+
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+      startTime: "",
+      endTime: "",
+    },
+  });
+
+
+  const onSubmit = async (data) => {
+    try {
+      // Validate at least one problem is selected
+      if (selectedProblems.length === 0) {
+        alert(" Please select at least one problem");
+        return;
+      }
+
+      // Convert marks to int and times to ISO string
+      const payload = {
+        ...data,
+        startTime: new Date(data.startTime).toISOString(),
+        endTime: new Date(data.endTime).toISOString(),
+        problems: selectedProblems.map((p) => ({
+          problemId: p.id,
+          marks: parseInt(p.marks) || 0,
+        })),
+      };
+      console.log("Creating contest with payload:", payload);
+
+      await createContest(payload);
+      navigate("/dashboard/contest");
+      reset();
+      setSelectedProblems([]);
+    } catch (err) {
+      alert(err?.response?.data?.message || "Error creating contest");
+    }
+  };
+
+  // Filter and sort problems
+  const filteredAndSortedProblems = problems
+    .filter((problem) => {
+      // Search filter
+      const matchesSearch = problem.title?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Difficulty filter
+      const matchesDifficulty = difficultyFilter === "all" || problem.difficulty === difficultyFilter;
+      
+      return matchesSearch &&  matchesDifficulty;
+    })
+    .sort((a, b) => {
+      // Sort by creation date (newest first)
+      const dateA = new Date(a.createdAt || 0);
+      const dateB = new Date(b.createdAt || 0);
+      return dateB - dateA;
+    });
+
+  // Get selected problem IDs for quick lookup
+  const selectedProblemIds = new Set(selectedProblems.map(p => p.id));
+
+  // Helper functions
+  const handleAddProblem = (problem) => {
+    if (!selectedProblemIds.has(problem.id)) {
+      setSelectedProblems([...selectedProblems, { ...problem, marks: 100 }]);
+    }
+  };
+
+  const handleRemoveProblem = (problemId) => {
+    setSelectedProblems(selectedProblems.filter(p => p.id !== problemId));
+  };
+
+  const updateProblemMarks = (problemId, marks) => {
+    setSelectedProblems(selectedProblems.map(p => 
+      p.id === problemId ? { ...p, marks } : p
+    ));
+  };
+
+  // Get difficulty badge color
+  const getDifficultyColor = (difficulty) => {
+    switch(difficulty) {
+      case 'Easy': return 'bg-success/20 text-success border-success/30';
+      case 'Medium': return 'bg-warning/20 text-warning border-warning/30';
+      case 'Hard': return 'bg-error/20 text-error border-error/30';
+      default: return 'bg-base-300 text-base-content';
+    }
+  };

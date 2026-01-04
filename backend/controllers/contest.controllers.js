@@ -81,16 +81,48 @@ const createContest = async (req, res) => {
 
 const getAllContest = async (req, res) => {
   try {
-    const contests = await db.contest.findMany({
+    const { getPaginationParams, paginatedResponse } = await import("../libs/pagination.lib.js");
+    
+    // Get pagination params (optional - defaults to all if not provided)
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    
+    let queryOptions = {
       include: {
         problems: true,
       },
-    });
+      orderBy: { createdAt: "desc" }
+    };
+    
+    // Only apply pagination if page/limit provided
+    if (page && limit) {
+      const { skip, take } = getPaginationParams(req.query, {
+        defaultLimit: 50,
+        maxLimit: 100
+      });
+      queryOptions.skip = skip;
+      queryOptions.take = take;
+    }
 
-    if (!contests) {
+    const [total, contests] = await Promise.all([
+      db.contest.count(),
+      db.contest.findMany(queryOptions)
+    ]);
+
+    if (!contests || contests.length === 0) {
       return res.status(404).json({ message: "no contests found" });
     }
 
+    // Return paginated response if pagination requested
+    if (page && limit) {
+      return res.status(200).json({
+        success: true,
+        message: "contests fetched successfully",
+        ...paginatedResponse(contests, total, page, limit)
+      });
+    }
+
+    // Legacy response for backward compatibility
     return res.status(200).json({
       success: true,
       message: "contests fetched successfully",

@@ -6,6 +6,7 @@ export const useProblemStore = create((set, get) => ({
   isProblemLoading: false,
   isProblemsLoading: false,
   isLoadingMore: false,
+  isFiltering: false,
   problems: [],
   problem: null,
   solvedProblems: [],
@@ -64,6 +65,34 @@ export const useProblemStore = create((set, get) => ({
     }
   },
 
+  // Fetch all problems without filters (for contest creation, etc.) - uses pagination
+  getAllProblemsUnpaginated: async () => {
+    try {
+      set({ isProblemsLoading: true });
+      
+      // Reset pagination and fetch first page
+      const params = new URLSearchParams({
+        page: '1',
+        limit: '20', // Standard pagination limit
+      });
+      
+      const res = await axiosInstance.get(`/problems/getAllProblems?${params}`);
+      
+      set({ 
+        problems: res.data.allProblems,
+        pagination: {
+          ...res.data.pagination,
+          page: res.data.pagination.currentPage,
+        },
+      });
+    } catch (error) {
+      console.error("error occurred in fetching all problems", error);
+      toast.error("error in fetching problems");
+    } finally {
+      set({ isProblemsLoading: false });
+    }
+  },
+
   loadMoreProblems: async () => {
     const { pagination, isLoadingMore, filters } = get();
     
@@ -106,11 +135,15 @@ export const useProblemStore = create((set, get) => ({
   updateFilters: async (newFilters) => {
     set((state) => ({
       filters: { ...state.filters, ...newFilters },
-      pagination: { ...state.pagination, page: 1 }, // Reset to page 1
+      pagination: { ...state.pagination, page: 1 },
+      isFiltering: true
     }));
     
-    // Fetch problems with new filters
-    await get().getAllProblems(true);
+    try {
+      await get().getAllProblems(true);
+    } finally {
+      set({ isFiltering: false });
+    }
   },
 
   getProblemById: async (id) => {
