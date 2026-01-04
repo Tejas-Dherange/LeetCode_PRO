@@ -352,7 +352,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                       </Link>
                     </td>
                     <td>
-                      <div className="flex flex-wrap gap-1 items-center relative">
+                      <div className="flex flex-wrap gap-1 items-center ">
                         {(() => {
                           const validTags = (problem.tags || []).filter(
                             (tag) => tag && tag.trim(),
@@ -363,6 +363,7 @@ const ProblemTable = ({ problems: initialProblems }) => {
                             : validTags;
                           return (
                             <>
+                              
                               {displayTags.length > 0 ? (
                                 displayTags.map((tag, idx) => (
                                   <span
@@ -382,52 +383,11 @@ const ProblemTable = ({ problems: initialProblems }) => {
                                 </span>
                               )}
                               {showEllipsis && (
-                                <button
-                                  type="button"
-                                  className="btn btn-ghost btn-xs px-1"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowTagsPopup(
-                                      showTagsPopup === problem.id ? null : problem.id,
-                                    );
-                                  }}
-                                >
-                                  <MoreHorizontal className="w-6 h-4 bg-amber-900 rounded-xl" />
-                                </button>
+                                <span className="badge-ghost text-xl ">...</span>
                               )}
                             </>
                           );
                         })()}
-                        {showTagsPopup === problem.id && (
-                          <div
-                            className="absolute left-0 z-50 bg-base-100 border rounded shadow-lg p-2 mt-2"
-                            style={{ top: "100%", marginTop: 8 }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <div className="flex flex-wrap gap-1 max-w-xs">
-                              {problem.tags
-                                .filter((tag) => tag && tag.trim())
-                                .map((tag, idx) => (
-                                  <span
-                                    key={idx}
-                                    className={
-                                      tag === "demo"
-                                        ? "badge px-5 py-3 text-lg text-white bg-indigo-500 uppercase animate-pulse transition-all duration-300 ease-in-out"
-                                        : "badge badge-outline badge-warning text-xs font-bold"
-                                    }
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
-                            </div>
-                            <button
-                              className="btn btn-xs btn-error mt-2 w-full"
-                              onClick={() => setShowTagsPopup(null)}
-                            >
-                              Close
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </td>
                     {/* <td>
