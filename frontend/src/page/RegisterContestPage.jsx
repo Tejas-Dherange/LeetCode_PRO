@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useContestStore } from "../store/useContestStore";
-import { Loader, Clock, Trophy, AlertCircle, Lock, FileText, Timer, Crown, Medal, Users } from "lucide-react";
+import { Loader, Clock, Trophy, AlertCircle, Lock, FileText, Timer, Crown, Medal, Users, Search, Target, Zap } from "lucide-react";
+import io from "socket.io-client";
 import ContestProblem from "../components/ContestProblem";
 
 function RegisterContestPage() {
@@ -20,8 +21,7 @@ function RegisterContestPage() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [startsIn, setStartsIn] = useState("");
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [isLeaderboardLoading, setIsLeaderboardLoading] = useState(false);
+
 
   // Helper: contest live check
   const isContestLive =
@@ -83,6 +83,17 @@ function RegisterContestPage() {
     return () => clearInterval(interval);
   }, [getStartsIn, contest?.startTime]);
 
+  const formatTime = (ms) => {
+    if (ms <= 0) return "00:00:00";
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, "0")}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   const handleRegisterContest = async () => {
     if (!id) return;
     setIsLoading(true);
@@ -109,14 +120,36 @@ function RegisterContestPage() {
     }
   };
 
-  // Fetch leaderboard when contest id changes
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [isLeaderboardLoading, setIsLeaderboardLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pagination, setPagination] = useState({ page: 1, totalPages: 1, total: 0 });
+  
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Fetch leaderboard when contest id, page or search changes
   useEffect(() => {
     const fetchLeaderboard = async () => {
       if (!id) return;
       setIsLeaderboardLoading(true);
       try {
-        const data = await useContestStore.getState().contestLeaderBoard(id);
-        setLeaderboard(data || []);
+        const data = await useContestStore.getState().contestLeaderBoard(id, currentPage, 10, debouncedSearch);
+        if (data) {
+          setLeaderboard(data.leaderboard || []);
+          if (data.pagination) {
+            setPagination({
+              page: data.pagination.page,
+              totalPages: data.pagination.totalPages,
+              total: data.pagination.total
+            });
+          }
+        }
       } catch (err) {
         setLeaderboard([]);
         console.error("Error fetching leaderboard:", err);
@@ -125,7 +158,50 @@ function RegisterContestPage() {
       }
     };
     fetchLeaderboard();
-  }, [id]);
+  }, [id, currentPage, debouncedSearch]);
+
+  // WebSocket Connection for Real-time Updates
+  useEffect(() => {
+    if (!id || !isContestLive) return;
+
+    let socket;
+    try {
+       // Determine socket URL based on environment (assume same host as API or specific config)
+       const socketUrl = import.meta.env.MODE === "development" 
+         ? "http://localhost:3000" 
+         : "https://api.codeloom.software"; 
+
+       socket = io(socketUrl);
+
+       socket.on("connect", () => {
+         console.log("Connected to contest socket");
+         socket.emit("joinContest", id);
+       });
+
+       socket.on("leaderboardUpdate", (data) => {
+         if (data.contestId === id) {
+           console.log("Received leaderboard update, refetching...");
+           // Only refetch if we are on the first page to avoid disrupting pagination flow for user
+           // OR refetch regardless but keep current page
+           // For now, let's just trigger the fetch
+           useContestStore.getState().contestLeaderBoard(id, currentPage, 10, debouncedSearch)
+             .then((data) => {
+                if (data) setLeaderboard(data.leaderboard || []);
+             });
+         }
+       });
+
+    } catch (error) {
+       console.error("Socket connection error:", error);
+    }
+
+    return () => {
+      if (socket) {
+        socket.emit("leaveContest", id);
+        socket.disconnect();
+      }
+    };
+  }, [id, isContestLive, currentPage, debouncedSearch]);
 
   // Timer for contest remaining time
   const [remainingTime, setRemainingTime] = useState(0);
@@ -142,25 +218,21 @@ function RegisterContestPage() {
     return () => clearInterval(interval);
   }, [contest?.endTime]);
 
-  const formatTime = (ms) => {
-    if (ms <= 0) return "00:00:00";
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  const handleFindMe = async () => {
+    if (!id) return;
+    try {
+      const data = await useContestStore.getState().getMyRankInContest(id);
+      if (data && data.page) {
+        setCurrentPage(data.page);
+        // Optionally clear search to show general leaderboard around user
+        setSearchQuery(""); 
+      } else {
+        // toast.error("You are not ranked in this contest yet");
+      }
+    } catch (error) {
+      console.error("Find Me error:", error);
+    }
   };
-
-  // Pagination state for leaderboard
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-  const totalPages = Math.ceil(leaderboard.length / pageSize);
-  const paginatedLeaderboard = leaderboard.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
 
   return (
     <div className="min-h-screen bg-base-100 p-4 md:p-6">
@@ -296,8 +368,39 @@ function RegisterContestPage() {
         <div className="lg:w-[500px] xl:w-[700px] bg-base-100/40 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-base-200 hover:border-emerald-500/50 transition-all duration-300">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-emerald-500 flex items-center gap-3">
             <Trophy className="w-7 h-7" />
+            <Trophy className="w-7 h-7" />
             Leaderboard
+            <div className="ml-auto flex items-center gap-2">
+               <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+               <span className="text-xs font-semibold text-emerald-500 uppercase tracking-widest hidden sm:inline-block">Live</span>
+            </div>
           </h2>
+          
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="relative flex-1">
+              <input 
+                type="text" 
+                placeholder="Search user..." 
+                className="input input-bordered w-full pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <Search className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50" />
+            </div>
+            {isRegistered && (
+              <button 
+                className="btn btn-outline gap-2"
+                onClick={handleFindMe}
+              >
+                <Target className="w-4 h-4" />
+                Find Me
+              </button>
+            )}
+          </div>
+
           <div className="overflow-x-auto rounded-xl shadow-lg border border-base-300">
             <table className="table w-full bg-base-100">
               <thead>
@@ -317,9 +420,9 @@ function RegisterContestPage() {
                       </div>
                     </td>
                   </tr>
-                ) : paginatedLeaderboard && paginatedLeaderboard.length > 0 ? (
-                  paginatedLeaderboard.map((entry, idx) => {
-                    const globalRank = (currentPage - 1) * pageSize + idx + 1;
+                ) : leaderboard && leaderboard.length > 0 ? (
+                  leaderboard.map((entry, idx) => {
+                    const globalRank = entry.rank;
                     const isTopThree = globalRank <= 3;
                     
                     return (
@@ -374,7 +477,7 @@ function RegisterContestPage() {
           </div>
           
           {/* Pagination Controls */}
-          {totalPages > 1 && (
+          {pagination.totalPages > 1 && (
             <div className="flex justify-center items-center gap-3 mt-6">
               <button
                 className="btn btn-sm bg-emerald-600 hover:bg-emerald-500 text-white border-none shadow-md hover:shadow-lg transition-all duration-300"
@@ -384,12 +487,12 @@ function RegisterContestPage() {
                 Previous
               </button>
               <span className="text-sm font-semibold text-base-content px-3">
-                Page {currentPage} of {totalPages}
+                Page {currentPage} of {pagination.totalPages}
               </span>
               <button
                 className="btn btn-sm bg-emerald-600 hover:bg-emerald-500 text-white border-none shadow-md hover:shadow-lg transition-all duration-300"
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((p) => Math.min(pagination.totalPages, p + 1))}
+                disabled={currentPage === pagination.totalPages}
               >
                 Next
               </button>

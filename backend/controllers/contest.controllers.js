@@ -5,6 +5,7 @@ import {
   submitBatch,
 } from "../libs/judge0.lib.js";
 import { addCodeExecutionJob } from "../libs/queue.lib.js";
+import { Prisma } from "../src/generated/prisma/index.js";
 
 const createContest = async (req, res) => {
   const userId = req.user.id;
@@ -242,95 +243,160 @@ const deleteContest = async (req, res) => {
 
 const contestLeaderBoard = async (req, res) => {
   const { cid } = req.params;
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const search = req.query.search || "";
+  const skip = (page - 1) * limit;
+
   try {
     if (!cid) {
       return res.status(400).json({ message: "contest id is required" });
     }
 
-    // Get all submissions for the contest (include obtainedMarks)
-    const submissions = await db.contestSubmission.findMany({
-      where: { contestId: cid },
-      select: {
-        userId: true,
-        problemId: true,
-        status: true,
-        createdAt: true,
-        obtainedMarks: true,
-      },
-      orderBy: { createdAt: "asc" },
-    });
-
-    if (!submissions || submissions.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "no submissions found for this contest" });
+    // 1. Get filtered count for pagination
+    let filteredCount = 0;
+    if (search) {
+      const countResult = await db.$queryRaw`
+        SELECT COUNT(DISTINCT cs."userId")::int as count
+        FROM "ContestSubmission" cs
+        JOIN "User" u ON cs."userId" = u.id
+        WHERE cs."contestId" = ${cid} AND u.name ILIKE ${`%${search}%`}
+      `;
+      filteredCount = countResult[0]?.count || 0;
+    } else {
+      const countResult = await db.$queryRaw`
+        SELECT COUNT(DISTINCT "userId")::int as count 
+        FROM "ContestSubmission" 
+        WHERE "contestId" = ${cid}
+      `;
+      filteredCount = countResult[0]?.count || 0;
     }
 
-    // For each user, for each problem, keep the highest obtainedMarks (usually only one accepted per problem)
-    const userProblemBest = {};
-    submissions.forEach((sub) => {
-      if (!userProblemBest[sub.userId]) userProblemBest[sub.userId] = {};
-      const prev = userProblemBest[sub.userId][sub.problemId];
-      if (!prev || (sub.obtainedMarks || 0) > (prev.obtainedMarks || 0)) {
-        userProblemBest[sub.userId][sub.problemId] = sub;
-      }
-    });
+    // 2. Fetch Leaderboard
+    const leaderboard = await db.$queryRaw`
+      WITH UserProblemBest AS (
+        SELECT 
+          "userId", 
+          "problemId", 
+          MAX("obtainedMarks") as "marks",
+          MIN("createdAt") as "submittedAt"
+        FROM "ContestSubmission"
+        WHERE "contestId" = ${cid}
+        GROUP BY "userId", "problemId"
+      ),
+      UserStats AS (
+        SELECT 
+          "userId", 
+          SUM("marks") as "totalMarks",
+          CAST(COUNT(CASE WHEN "marks" > 0 THEN 1 END) AS INTEGER) as "solvedCount",
+          MAX("submittedAt") as "lastAcceptedAt"
+        FROM UserProblemBest
+        GROUP BY "userId"
+      ),
+      RankedUsers AS (
+        SELECT 
+          us.*,
+          u.name as "username",
+          u.image as "avatar",
+          RANK() OVER (ORDER BY "totalMarks" DESC, "solvedCount" DESC, "lastAcceptedAt" ASC)::int as "rank"
+        FROM UserStats us
+        JOIN "User" u ON us."userId" = u.id
+        WHERE ${search ? Prisma.sql`u.name ILIKE ${`%${search}%`}` : Prisma.sql`1=1`}
+      )
+      SELECT * FROM RankedUsers
+      ORDER BY "rank" ASC
+      LIMIT ${limit} OFFSET ${skip}
+    `;
 
-    // Build leaderboard: userId -> { totalMarks, solvedCount, firstAcceptedAt }
-    const leaderboardArr = Object.entries(userProblemBest).map(
-      ([userId, problems]) => {
-        let totalMarks = 0;
-        let solvedCount = 0;
-        let firstAcceptedAt = null;
-        Object.values(problems).forEach((sub) => {
-          if (sub.status === "Accepted" && (sub.obtainedMarks || 0) > 0) {
-            totalMarks += sub.obtainedMarks || 0;
-            solvedCount += 1;
-            if (!firstAcceptedAt || sub.createdAt < firstAcceptedAt) {
-              firstAcceptedAt = sub.createdAt;
-            }
-          }
-        });
-        return {
-          userId,
-          totalMarks,
-          solvedCount,
-          firstAcceptedAt,
-        };
-      },
-    );
-
-    // Fetch usernames for all userIds in leaderboard
-    const userIds = leaderboardArr.map((entry) => entry.userId);
-    const users = await db.user.findMany({
-      where: { id: { in: userIds } },
-      select: { id: true, name: true },
-    });
-    const userMap = Object.fromEntries(users.map((u) => [u.id, u.name]));
-
-    // Add username to each leaderboard entry
-    leaderboardArr.forEach((entry) => {
-      entry.username = userMap[entry.userId] || entry.userId;
-    });
-
-    // Sort by totalMarks desc, then solvedCount desc, then firstAcceptedAt asc
-    leaderboardArr.sort((a, b) => {
-      if (b.totalMarks !== a.totalMarks) return b.totalMarks - a.totalMarks;
-      if (b.solvedCount !== a.solvedCount) return b.solvedCount - a.solvedCount;
-      return new Date(a.firstAcceptedAt) - new Date(b.firstAcceptedAt);
-    });
+    const totalPages = Math.ceil(filteredCount / limit);
 
     return res.status(200).json({
       success: true,
       message: "leaderboard fetched successfully",
-      leaderboard: leaderboardArr,
+      leaderboard: leaderboard.map(l => ({
+        ...l, 
+        totalMarks: Number(l.totalMarks),
+        rank: Number(l.rank),
+        solvedCount: Number(l.solvedCount)
+      })),
+      pagination: {
+        total: Number(filteredCount),
+        page,
+        limit,
+        totalPages,
+        hasMore: page < totalPages
+      }
     });
+
   } catch (error) {
     console.error("error in fetching leaderboard", error);
     return res.status(500).json({
       success: false,
       message: "error in fetching leaderboard",
     });
+  }
+};
+
+const getUserRankInContest = async (req, res) => {
+  const { cid } = req.params;
+  const userId = req.user.id; // Corrected: user.id from auth middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    if (!cid) return res.status(400).json({ message: "contest id is required" });
+
+    // Use a CTE to calculate ranks, then select the specific user's rank
+    const result = await db.$queryRaw`
+      WITH UserProblemBest AS (
+        SELECT 
+          "userId", 
+          "problemId", 
+          MAX("obtainedMarks") as "marks",
+          MIN("createdAt") as "submittedAt"
+        FROM "ContestSubmission"
+        WHERE "contestId" = ${cid}
+        GROUP BY "userId", "problemId"
+      ),
+      UserStats AS (
+        SELECT 
+          "userId", 
+          SUM("marks") as "totalMarks",
+          CAST(COUNT(CASE WHEN "marks" > 0 THEN 1 END) AS INTEGER) as "solvedCount",
+          MAX("submittedAt") as "lastAcceptedAt"
+        FROM UserProblemBest
+        GROUP BY "userId"
+      ),
+      RankedUsers AS (
+        SELECT 
+          "userId",
+          "totalMarks",
+          RANK() OVER (ORDER BY "totalMarks" DESC, "solvedCount" DESC, "lastAcceptedAt" ASC)::int as "rank"
+        FROM UserStats
+      )
+      SELECT * FROM RankedUsers WHERE "userId" = ${userId}
+    `;
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: "User not ranked in this contest" });
+    }
+
+    const userRank = result[0];
+    const limit = 10;
+    const page = Math.ceil(Number(userRank.rank) / limit);
+
+    return res.status(200).json({
+      success: true,
+      rank: Number(userRank.rank),
+      totalMarks: Number(userRank.totalMarks),
+      page
+    });
+
+  } catch (error) {
+    console.error("error in fetching user rank", error);
+    return res.status(500).json({ message: "error fetching user rank" });
   }
 };
 
@@ -533,6 +599,40 @@ const unRegisterContest = async (req, res) => {
   }
 };
 
+const getUserContestSubmissions = async (req, res) => {
+  const { contestId } = req.params;
+  const userId = req.user.id;
+
+  if (!contestId) {
+    return res.status(400).json({ message: "contestId is required" });
+  }
+
+  try {
+    const submissions = await db.contestSubmission.findMany({
+      where: {
+        contestId,
+        userId,
+      },
+      select: {
+        problemId: true,
+        status: true,
+        obtainedMarks: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      submissions,
+    });
+  } catch (error) {
+    console.error("Error fetching user contest submissions", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching user contest submissions",
+    });
+  }
+};
+
 const contestSubmitCode = async (req, res) => {
   const {
     source_code,
@@ -686,6 +786,7 @@ export {
   getAllContest,
   // contestInterface,
   contestLeaderBoard,
+  getUserRankInContest,
   getContestById,
   deleteContest,
   addProblemToContest,
@@ -695,4 +796,5 @@ export {
   unRegisterContest,
   contestSubmitCode,
   getUserContestRating,
+  getUserContestSubmissions,
 };

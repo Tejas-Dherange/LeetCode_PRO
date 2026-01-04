@@ -54,7 +54,7 @@ const runCode = async (req, res) => {
 
 // Controller: Submit code (save to DB)
 const submitCode = async (req, res) => {
-  const { source_code, language_id, stdin, expected_outputs, problemId } = req.body;
+  const { source_code, language_id, stdin, expected_outputs, problemId, contestId } = req.body;
   const userId = req.user.id;
 
   if (!userId) {
@@ -77,9 +77,10 @@ const submitCode = async (req, res) => {
 
     // Add job to queue instead of direct execution
     const job = await addCodeExecutionJob({
-      jobType: 'submit',
+      jobType: contestId ? 'contest' : 'submit',
       userId,
       problemId,
+      contestId, // Pass contestId to job
       source_code,
       language_id,
       stdin,

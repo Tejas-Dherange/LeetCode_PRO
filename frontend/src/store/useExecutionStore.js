@@ -57,6 +57,7 @@ export const useExecutionStore = create((set) => ({
     stdin,
     expected_outputs,
     problemId,
+    contestId = null, // Add contestId optional param
   ) => {
     try {
       set({ isSubmitExecuting: true });
@@ -66,6 +67,7 @@ export const useExecutionStore = create((set) => ({
         stdin,
         expected_outputs,
         problemId,
+        contestId, // Send contestId to backend
       });
 
       // console.log(res.data);

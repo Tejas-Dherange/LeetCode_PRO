@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useContestStore } from "../store/useContestStore";
 import { useProblemStore } from "../store/useProblemStore";
-import { Loader } from "lucide-react";
+import { axiosInstance } from "../libs/axios";
+import { Loader, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function ContestProblem({ contestId }) {
@@ -67,24 +68,26 @@ function ContestProblem({ contestId }) {
       if (!contestId) return;
       try {
         // Fetch contest submissions for the current user for this contest
-        const res = await fetch(
-          `/api/contest/contest-submission/user/${contestId}`
+        // Fetch contest submissions for the current user for this contest
+        const res = await axiosInstance.get(
+          `/contest/contest-submission/user/${contestId}`
         );
-        if (res.ok) {
-          const data = await res.json();
+        if (res.data.success) {
+          const submissions = res.data.submissions || [];
           // Map: problemId -> obtainedMarks (pick highest)
           const map = {};
-          (data.submissions || []).forEach((sub) => {
+          submissions.forEach((sub) => {
             if (sub.status === "Accepted" && sub.obtainedMarks > 0) {
               if (!map[sub.problemId] || sub.obtainedMarks > map[sub.problemId]) {
                 map[sub.problemId] = sub.obtainedMarks;
               }
             }
           });
+          console.log("Solved Map Constructed:", map);
           setSolvedMap(map);
         }
       } catch (err) {
-        // ignore
+        console.error("Error fetching solved problems:", err);
       }
     };
     fetchSolved();
@@ -132,11 +135,12 @@ function ContestProblem({ contestId }) {
                       </td>
                       <td className="px-6 py-3 text-center font-bold text-success text-lg">
                         {solved ? (
-                          <span className="text-success font-bold">
-                            {solvedMap[problem.problem.id]}
-                          </span>
+                          <div className="flex items-center justify-center gap-2 text-success">
+                            <CheckCircle className="w-6 h-6 fill-success text-base-100" />
+                            <span>{solvedMap[problem.problem.id]}</span>
+                          </div>
                         ) : (
-                          problem.marks || "-"
+                          <span className="text-base-content/50">{problem.marks || "-"}</span>
                         )}
                       </td>
                     </tr>

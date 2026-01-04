@@ -23,7 +23,10 @@ dotenv.config();
 
 const port = process.env.PORT || 4000;
 
-const app = express();
+import { app, server } from "../socket/socket.js";
+import "../workers/codeExecutionWorker.js"; // Start the worker
+
+// const app = express(); // Removed in favor of app from socket.js
 
 app.use(
   cors({
@@ -86,12 +89,12 @@ app.get("/api/health", async (req, res) => {
 
 app.use("/api/v1/user", authRouter);
 app.use("/api/v1/problems", problemsRouter);
-app.use("/api/v1/execute-code", rateLimiter, codeExecutionRouter); // Rate limited
+app.use("/api/v1/execute-code", codeExecutionRouter);
 app.use("/api/v1/submissions", submissionRouter);
 app.use("/api/v1/playlist", playListRoutes);
 app.use("/api/v1/contest", contestRoutes);
-app.use("/api/v1/contest-submission", rateLimiter, contestSubmissionRoutes); // Rate limited
-app.use("/api/v1/ai", rateLimiter, aiRoutes); // Rate limited
+app.use("/api/v1/contest-submission", contestSubmissionRoutes);
+app.use("/api/v1/ai", aiRoutes);
 app.use("/api/v1/upload", uploadRoutes);
 app.use("/api/v1/subscription", subscriptionRouter);
 app.use("/api/v1/payment", paymentRouter);
@@ -99,6 +102,6 @@ app.use("/api/v1/company-sheets", companySheetsRouter);
 app.use("/api/v1/contribution", contributionRouter);
 app.use("/api/v1/patterns", patternRouter);
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`app is running on port ${port}`);
 });

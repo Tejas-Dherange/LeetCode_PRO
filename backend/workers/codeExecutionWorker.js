@@ -37,7 +37,7 @@ async function processCodeExecution(job) {
     expected_outputs,
   } = job.data;
 
-  console.log(`[Worker] Processing job ${job.id} (type: ${jobType}, user: ${userId})`);
+  console.log(`[Worker] Processing job ${job.id} (type: ${jobType}, user: ${userId}) [V2-PUB-SUB-ACTIVE]`);
 
   try {
     // Step 1: Execute code using Judge0 (existing logic)
@@ -311,6 +311,18 @@ async function saveContestSubmission(
     where: { id: submission.id },
     include: { testCases: true },
   });
+
+  // Publish update to Redis for real-time leaderboard
+  try {
+    const redis = getRedisClient();
+    await redis.publish(
+      "leaderboard_updates",
+      JSON.stringify({ contestId })
+    );
+    // console.log(`[Worker] Published leaderboard update for contest ${contestId}`);
+  } catch (redisError) {
+    console.error("[Worker] Failed to publish leaderboard update:", redisError);
+  }
 
   return {
     success: true,

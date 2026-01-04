@@ -90,19 +90,31 @@ export const useContestStore = create((set) => ({
     }
   },
 
-  contestLeaderBoard: async (contestId) => {
+  contestLeaderBoard: async (contestId, page = 1, limit = 10, search = "") => {
     try {
       set({ isContestLoading: true });
-      const res = await axiosInstance.post(
+      const res = await axiosInstance.get(
         `/contest/contest/${contestId}/leaderboard`,
+        { params: { page, limit, search } }
       );
-      toast.success(res.data.message || "Leaderboard fetched successfully");
-      return res.data.leaderboard; // Assuming the response contains a leaderboard
+      // toast.success(res.data.message || "Leaderboard fetched successfully");
+      return res.data; // Returns { leaderboard, pagination }
     } catch (error) {
       console.error("Error occurred in fetching contest leaderboard", error);
       // toast.error("Error in fetching contest leaderboard");
+      return null;
     } finally {
       set({ isContestLoading: false });
+    }
+  },
+
+  getMyRankInContest: async (contestId) => {
+    try {
+      const res = await axiosInstance.get(`/contest/contest/${contestId}/my-rank`);
+      return res.data;
+    } catch (error) {
+      // console.error("Error fetching my rank", error);
+      return null;
     }
   },
 

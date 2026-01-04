@@ -658,7 +658,6 @@ useEffect(() => {
                   showFoldingControls: "always",
                   lineNumbersMinChars: 3,
                   mouseWheelZoom: true,
-                  roundedSelection: true,
                   }}
               />
             </div>

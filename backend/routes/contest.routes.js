@@ -15,6 +15,8 @@ import {
   registerForContest,
   unRegisterContest,
   getUserContestRating,
+  getUserRankInContest,
+  getUserContestSubmissions,
 } from "../controllers/contest.controllers.js";
 
 const router = express.Router();
@@ -23,7 +25,8 @@ router.post("/create-contest", isLoggedIn, createContest);
 router.get("/get-all-contests", isLoggedIn, getAllContest);
 router.get("/get-contest/:id", isLoggedIn, getContestById);
 router.delete("/delete-contest/:id", isLoggedIn, deleteContest);
-router.post("/contest/:cid/leaderboard", isLoggedIn, contestLeaderBoard); //remaining to check
+router.get("/contest/:cid/leaderboard", isLoggedIn, contestLeaderBoard);
+router.get("/contest/:cid/my-rank", isLoggedIn, getUserRankInContest);
 router.post("/add-problem-to-contest/:cid", isLoggedIn, addProblemToContest); //remaining to check
 
 // router.post(
@@ -41,6 +44,11 @@ router.get(
   "/get-all-problems-in-contest/:cid",
   isLoggedIn,
   getAllProblemsInContest,
+);
+router.get(
+  "/contest-submission/user/:contestId",
+  isLoggedIn,
+  getUserContestSubmissions
 );
 router.post("/register", isLoggedIn, registerForContest);
 router.get("/is-registered/:contestId", isLoggedIn, isRegisteredForContest);
