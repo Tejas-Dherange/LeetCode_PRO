@@ -27,6 +27,7 @@ import EditSheetPage from "./page/EditSheetPage";
 import PatternsPage from "./page/PatternsPage";
 import PatternDetailPage from "./page/PatternDetailPage";
 import ManagePatternsPage from "./page/ManagePatternsPage";
+import AdminMonitoringPage from "./page/AdminMonitoringPage";
 
 
 const App = () => {
@@ -111,6 +112,7 @@ const App = () => {
         <Route element={<AdminRoute />}>
           <Route path="/add-problem" element={<AddProblemPage />} />
           <Route path="/admin/patterns" element={<ManagePatternsPage />} />
+          <Route path="/admin/monitoring" element={<AdminMonitoringPage />} />
         </Route>
       </Routes>
     </div>

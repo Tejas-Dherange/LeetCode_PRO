@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut, Trophy, Moon, Sun, Sheet, BookOpen } from "lucide-react";
+import { User, Code, LogOut, Trophy, Moon, Sun, Sheet, BookOpen, Activity } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 import { useEffect, useState } from "react";
@@ -158,6 +158,17 @@ const Navbar = () => {
                   >
                     <Sheet className="w-4 h-4 mr-1" />
                     Manage Sheets
+                  </Link>
+                </li>
+              )}
+              {authUser?.role === "ADMIN" && (
+                <li>
+                  <Link
+                    to="/admin/monitoring"
+                    className="hover:bg-success hover:text-white text-base font-semibold"
+                  >
+                    <Activity className="w-4 h-4 mr-1" />
+                    Monitoring Dashboard
                   </Link>
                 </li>
               )}

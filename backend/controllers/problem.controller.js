@@ -50,15 +50,17 @@ const createProblem = async (req, res) => {
       }));
 
       const submissionResults = await submitBatch(submissions);
-      console.log("ndfhufghig", submissionResults);
+      console.log("✅ Batch submitted successfully for", language);
+      console.log("📝 Tokens received:", submissionResults.map(r => r.token));
 
       const tokens = submissionResults.map((res) => res.token);
 
-      console.log("tokens",tokens);
+      console.log("⏳ Polling for results...");
       
       const results = await pollBatchResults(tokens);
 
-      console.log(results);
+      console.log("✅ Results received for", language);
+      console.log("📊 Total results:", results.length);
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
 

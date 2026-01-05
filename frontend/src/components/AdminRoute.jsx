@@ -14,12 +14,19 @@ const AdminRoute = () => {
   }
 
   if (!authUser) {
+    console.log("[AdminRoute] No authUser, redirecting to login");
     return <Navigate to={"/login"} />;
   }
 
+  console.log("[AdminRoute] authUser:", authUser);
+  console.log("[AdminRoute] role:", authUser.role);
+
   if (authUser.role !== "ADMIN") {
+    console.log("[AdminRoute] Not admin, redirecting to /");
     return <Navigate to="/" />;
   }
+
+  console.log("[AdminRoute] Admin verified, rendering outlet");
   return <Outlet />;
 };
 

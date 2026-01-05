@@ -149,7 +149,7 @@ function HomePage() {
                 Welcome to{" "}
                 <span className="relative inline-block">
                   <span className="relative z-10 bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-                    CodeLoom
+                    AlgoPattern
                   </span>
                   <motion.span
                     animate={{

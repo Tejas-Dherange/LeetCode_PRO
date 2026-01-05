@@ -15,21 +15,42 @@ let redisClient = null;
  */
 export const getRedisClient = () => {
   if (!redisClient) {
-    const redisConfig = {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      password: process.env.REDIS_PASSWORD || undefined,
-      retryStrategy: (times) => {
-        // Retry connection with exponential backoff
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-      },
-      maxRetriesPerRequest: null, // Required by BullMQ for blocking operations
-      enableReadyCheck: true,
-      lazyConnect: false,
-    };
-
-    redisClient = new Redis(redisConfig);
+    // Support both Upstash Redis URL and local Redis configuration
+    let redisConfig;
+    
+    if (process.env.REDIS_URL && process.env.REDIS_URL.startsWith('redis')) {
+      // Upstash or external Redis with full URL (e.g., rediss://...)
+      redisConfig = {
+        // ioredis automatically parses redis:// or rediss:// URLs
+        // For TLS connections, it will enable TLS automatically
+        maxRetriesPerRequest: null, // Required by BullMQ for blocking operations
+        enableReadyCheck: true,
+        lazyConnect: false,
+        retryStrategy: (times) => {
+          const delay = Math.min(times * 50, 2000);
+          return delay;
+        },
+      };
+      
+      // Pass URL as first parameter
+      redisClient = new Redis(process.env.REDIS_URL, redisConfig);
+    } else {
+      // Local Redis with host/port configuration
+      redisConfig = {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: parseInt(process.env.REDIS_PORT || '6379'),
+        password: process.env.REDIS_PASSWORD || undefined,
+        retryStrategy: (times) => {
+          const delay = Math.min(times * 50, 2000);
+          return delay;
+        },
+        maxRetriesPerRequest: null,
+        enableReadyCheck: true,
+        lazyConnect: false,
+      };
+      
+      redisClient = new Redis(redisConfig);
+    }
 
     // Connection event handlers
     redisClient.on('connect', () => {

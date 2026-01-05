@@ -17,6 +17,7 @@ import paymentRouter from "../routes/payment.routes.js";
 import companySheetsRouter from "../routes/companySheets.routes.js";
 import contributionRouter from "../routes/contibution.routes.js";
 import patternRouter from "../routes/pattern.routes.js";
+import monitoringRouter from "../routes/monitoring.routes.js";
 import rateLimiter from "../middleware/rateLimiter.middleware.js";
 import db from "../libs/db.js";
 dotenv.config();
@@ -101,6 +102,7 @@ app.use("/api/v1/payment", paymentRouter);
 app.use("/api/v1/company-sheets", companySheetsRouter);
 app.use("/api/v1/contribution", contributionRouter);
 app.use("/api/v1/patterns", patternRouter);
+app.use("/api/v1/admin/monitoring", monitoringRouter);
 
 server.listen(port, () => {
   console.log(`app is running on port ${port}`);

@@ -1,0 +1,105 @@
+import { create } from "zustand";
+import { axiosInstance } from "../libs/axios";
+import toast from "react-hot-toast";
+
+export const useMonitoringStore = create((set, get) => ({
+  // State
+  queueMetrics: null,
+  judge0Health: null,
+  redisMetrics: null,
+  submissionAnalytics: null,
+  systemHealth: null,
+  isLoading: false,
+  lastUpdated: null,
+  autoRefreshInterval: null,
+
+  // Actions
+  fetchQueueMetrics: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/queue");
+      set({ queueMetrics: res.data.data, lastUpdated: new Date() });
+    } catch (error) {
+      console.error("Error fetching queue metrics:", error);
+      if (error.response?.status !== 403) {
+        toast.error("Failed to fetch queue metrics");
+      }
+    }
+  },
+
+  fetchJudge0Health: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/judge0");
+      set({ judge0Health: res.data.data });
+    } catch (error) {
+      console.error("Error fetching Judge0 health:", error);
+    }
+  },
+
+  fetchRedisMetrics: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/redis");
+      set({ redisMetrics: res.data.data });
+    } catch (error) {
+      console.error("Error fetching Redis metrics:", error);
+    }
+  },
+
+  fetchSubmissionAnalytics: async (period = "24h") => {
+    try {
+      const res = await axiosInstance.get(`/admin/monitoring/submissions?period=${period}`);
+      set({ submissionAnalytics: res.data.data });
+    } catch (error) {
+      console.error("Error fetching submission analytics:", error);
+    }
+  },
+
+  fetchSystemHealth: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/system");
+      set({ systemHealth: res.data.data });
+    } catch (error) {
+      console.error("Error fetching system health:", error);
+    }
+  },
+
+  fetchAllMetrics: async () => {
+    set({ isLoading: true });
+    try {
+      await Promise.all([
+        get().fetchQueueMetrics(),
+        get().fetchJudge0Health(),
+        get().fetchRedisMetrics(),
+        get().fetchSubmissionAnalytics(),
+        get().fetchSystemHealth(),
+      ]);
+    } finally {
+      set({ isLoading: false, lastUpdated: new Date() });
+    }
+  },
+
+  startAutoRefresh: (intervalMs = 5000) => {
+    // Clear existing interval
+    const currentInterval = get().autoRefreshInterval;
+    if (currentInterval) {
+      clearInterval(currentInterval);
+    }
+
+    // Fetch immediately
+    get().fetchAllMetrics();
+
+    // Set new interval
+    const newInterval = setInterval(() => {
+      get().fetchAllMetrics();
+    }, intervalMs);
+
+    set({ autoRefreshInterval: newInterval });
+  },
+
+  stopAutoRefresh: () => {
+    const currentInterval = get().autoRefreshInterval;
+    if (currentInterval) {
+      clearInterval(currentInterval);
+      set({ autoRefreshInterval: null });
+    }
+  },
+}));

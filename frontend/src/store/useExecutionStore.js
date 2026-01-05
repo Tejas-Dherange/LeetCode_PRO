@@ -7,6 +7,7 @@ export const useExecutionStore = create((set) => ({
   isSubmitExecuting: false,
   submission: null,
   runResults: null,
+  queueInfo: null, // Store queue position information
   runCode: async (
     source_code,
     language_id,
@@ -25,8 +26,17 @@ export const useExecutionStore = create((set) => ({
       });
 
       // console.log(res.data);
-      set({ runResults: res.data.results, submission: null });
-      toast.success(res.data.message || "code executed succesfully");
+      set({ runResults: res.data.results, submission: null, queueInfo: res.data.queueInfo || null });
+      
+      // Show queue info if available
+      if (res.data.queueInfo && res.data.queueInfo.waiting > 0) {
+        toast.success(
+          `Code executed! (Queue position: ${res.data.queueInfo.position}, Wait: ${res.data.queueInfo.estimatedWait})`,
+          { duration: 4000 }
+        );
+      } else {
+        toast.success(res.data.message || "code executed succesfully");
+      }
     } catch (error) {
       console.error("error in execution", error);
       
@@ -71,8 +81,17 @@ export const useExecutionStore = create((set) => ({
       });
 
       // console.log(res.data);
-      set({ submission: res.data.submission, runResults: null });
-      toast.success(res.data.message || "code executed succesfully");
+      set({ submission: res.data.submission, runResults: null, queueInfo: res.data.queueInfo || null });
+      
+      // Show queue info if available
+      if (res.data.queueInfo && res.data.queueInfo.waiting > 0) {
+        toast.success(
+          `Code submitted! (Queue position: ${res.data.queueInfo.position}, Wait: ${res.data.queueInfo.estimatedWait})`,
+          { duration: 4000 }
+        );
+      } else {
+        toast.success(res.data.message || "code executed succesfully");
+      }
     } catch (error) {
       console.error("error in execution", error);
       
