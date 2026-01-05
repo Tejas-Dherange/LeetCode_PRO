@@ -57,9 +57,9 @@ function LoginPage() {
           </div>
         
           
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6"> */}
             {/* Email */}
-            <div className="form-control">
+            {/* <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Email</span>
               </label>
@@ -81,9 +81,9 @@ function LoginPage() {
                   {errors.email.message}
                 </p>
               )}
-            </div>
+            </div> */}
             {/* Password */}
-            <div className="form-control">
+            {/* <div className="form-control">
               <label className="label">
                 <span className="label-text font-medium">Password</span>
               </label>
@@ -116,11 +116,11 @@ function LoginPage() {
                   {errors.password.message}
                 </p>
               )}
-            </div>
+            </div> */}
             {/* Google Login Button */}
 
             {/* Submit Button */}
-            <button
+            {/* <button
               type="submit"
               className="btn btn-primary w-full"
               disabled={isLogingIn}
@@ -133,8 +133,8 @@ function LoginPage() {
               ) : (
                 "Log In"
               )}
-            </button>
-          </form>
+            </button> */}
+          {/* </form> */}
           
     <button onClick={handleGoogleLogin}
            className=" cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-900 p-1 w-full  flex gap-20 items-center"
@@ -172,14 +172,14 @@ function LoginPage() {
             </div>
           </button>
           {/* Footer */}
-          <div className="text-center">
+          {/* <div className="text-center">
             <p className="text-base-content/60">
               Don't have an account?{" "}
               <Link to="/signup" className="link link-primary">
                 Sign Up
               </Link>
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
 

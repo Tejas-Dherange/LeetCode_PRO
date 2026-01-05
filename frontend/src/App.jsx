@@ -61,10 +61,10 @@ const App = () => {
           path="/login"
           element={!authUser ? <LoginPage /> : <Navigate to={"/dashboard"} />}
         />
-        <Route
+        {/* <Route
           path="/signup"
           element={!authUser ? <SignUpPage /> : <Navigate to={"/dashboard"} />}
-        />
+        /> */}
         <Route
           path="/"
           element={<HomePage />}

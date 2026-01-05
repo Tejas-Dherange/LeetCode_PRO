@@ -365,6 +365,7 @@ useEffect(() => {
     submission,
     isSubmitExecuting,
     isRunExecuting,
+    cooldownSeconds,
   } = useExecutionStore();
 
   const handleRunCode = (e) => {
@@ -497,31 +498,45 @@ useEffect(() => {
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-2 items-center z-20">
             {/* Run Button */}
             <button
-              className="btn btn-primary btn-sm gap-2 min-w-[90px] flex items-center justify-center"
-              onClick={handleRunCode}
-              disabled={isRunExecuting}
-            >
-              {isRunExecuting ? (
-                <span className="loading loading-spinner w-4 h-4" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-              <span className="hidden sm:inline">Run</span>
-            </button>
+  className="btn btn-primary btn-sm gap-2 min-w-[90px] flex items-center justify-center"
+  onClick={handleRunCode}
+  disabled={isRunExecuting || cooldownSeconds > 0}
+>
+  {cooldownSeconds > 0 ? (
+    <>
+      <span className="loading loading-spinner w-4 h-4" />
+      <span>{cooldownSeconds}s</span>
+    </>
+  ) : isRunExecuting ? (
+    <span className="loading loading-spinner w-4 h-4" />
+  ) : (
+    <Play className="w-4 h-4" />
+  )}
+  <span className="hidden sm:inline">
+    {cooldownSeconds > 0 ? 'Wait' : 'Run'}
+  </span>
+</button>
 
             {/* Submit Button */}
-            <button
-              className="btn btn-success btn-sm gap-2 min-w-[90px] flex items-center justify-center"
-              onClick={handleSubmitCode}
-              disabled={isSubmitExecuting}
-            >
-              {isSubmitExecuting ? (
-                <span className="loading loading-spinner w-4 h-4" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-              <span className="hidden sm:inline">Submit</span>
-            </button>
+           <button
+  className="btn btn-success btn-sm gap-2 min-w-[90px] flex items-center justify-center"
+  onClick={handleSubmitCode}
+  disabled={isSubmitExecuting || cooldownSeconds > 0}
+>
+  {cooldownSeconds > 0 ? (
+    <>
+      <span className="loading loading-spinner w-4 h-4" />
+      <span>{cooldownSeconds}s</span>
+    </>
+  ) : isSubmitExecuting ? (
+    <span className="loading loading-spinner w-4 h-4" />
+  ) : (
+    <Play className="w-4 h-4" />
+  )}
+  <span className="hidden sm:inline">
+    {cooldownSeconds > 0 ? 'Wait' : 'Submit'}
+  </span>
+</button>
           </div>
         </div>
 

@@ -2,12 +2,14 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 import { axiosInstance } from "../libs/axios";
 
-export const useExecutionStore = create((set) => ({
+export const useExecutionStore = create((set, get) => ({
   isRunExecuting: false,
   isSubmitExecuting: false,
   submission: null,
   runResults: null,
   queueInfo: null, // Store queue position information
+  cooldownEndTime: null, // Timestamp when cooldown ends
+  cooldownSeconds: 0, // Remaining seconds in cooldown
   runCode: async (
     source_code,
     language_id,
@@ -37,6 +39,9 @@ export const useExecutionStore = create((set) => ({
       } else {
         toast.success(res.data.message || "code executed succesfully");
       }
+      
+      // Start cooldown timer for run code too
+      get().startCooldown(30);
     } catch (error) {
       console.error("error in execution", error);
       
@@ -61,6 +66,24 @@ export const useExecutionStore = create((set) => ({
       set({ isRunExecuting: false });
     }
   },
+
+  // Start cooldown timer
+  startCooldown: (seconds) => {
+    const endTime = Date.now() + (seconds * 1000);
+    set({ cooldownEndTime: endTime, cooldownSeconds: seconds });
+
+    // Update countdown every second
+    const interval = setInterval(() => {
+      const remaining = Math.ceil((endTime - Date.now()) / 1000);
+      if (remaining <= 0) {
+        set({ cooldownEndTime: null, cooldownSeconds: 0 });
+        clearInterval(interval);
+      } else {
+        set({ cooldownSeconds: remaining });
+      }
+    }, 1000);
+  },
+
   submitCode: async (
     source_code,
     language_id,
@@ -85,12 +108,17 @@ export const useExecutionStore = create((set) => ({
       
       // Show queue info if available
       if (res.data.queueInfo && res.data.queueInfo.waiting > 0) {
+        const waitSeconds = res.data.queueInfo.waiting * 15; // Estimate
         toast.success(
-          `Code submitted! (Queue position: ${res.data.queueInfo.position}, Wait: ${res.data.queueInfo.estimatedWait})`,
+          `Code submitted! Queue position: ${res.data.queueInfo.position}`,
           { duration: 4000 }
         );
+        // Start cooldown timer
+        get().startCooldown(waitSeconds);
       } else {
         toast.success(res.data.message || "code executed succesfully");
+        // Default 30 second cooldown
+        get().startCooldown(30);
       }
     } catch (error) {
       console.error("error in execution", error);
