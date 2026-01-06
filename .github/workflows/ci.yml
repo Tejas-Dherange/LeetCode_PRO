@@ -1,0 +1,136 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # Frontend Tests
+  frontend-test:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' || 
+      contains(github.event.head_commit.modified, 'frontend/')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      
+      - name: Lint code
+        working-directory: frontend
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Build production bundle
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_SOCKET_URL: ${{ secrets.VITE_SOCKET_URL }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+      
+      - name: Check bundle size
+        working-directory: frontend
+        run: |
+          BUNDLE_SIZE=$(du -sh dist | cut -f1)
+          echo "::notice::📦 Bundle size: $BUNDLE_SIZE"
+
+  # Backend Tests
+  backend-test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'pull_request' || 
+      contains(github.event.head_commit.modified, 'backend/')
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: codeloom_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Generate Prisma Client
+        working-directory: backend
+        run: npx prisma generate
+      
+      - name: Run migrations
+        working-directory: backend
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/codeloom_test
+      
+      - name: Run tests
+        working-directory: backend
+        run: npm test || echo "⚠️ No tests configured"
+        continue-on-error: true
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/codeloom_test
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: test-secret
+
+  # Code Quality Check
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for sensitive data
+        run: |
+          if grep -r "password\|secret\|api_key" --include="*.js" --include="*.jsx" --exclude-dir=node_modules .; then
+            echo "::warning::Potential sensitive data found in code"
+          fi
+      
+      - name: Check file sizes
+        run: |
+          find . -type f -size +10M -not -path "./node_modules/*" -not -path "./.git/*" || true

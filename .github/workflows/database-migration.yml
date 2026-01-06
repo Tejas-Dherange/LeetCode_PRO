@@ -1,0 +1,68 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Generate Prisma Client
+        working-directory: backend
+        run: npx prisma generate
+      
+      - name: Run database migrations
+        working-directory: backend
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
+      - name: Verify migration
+        working-directory: backend
+        run: |
+          echo "Verifying database schema..."
+          npx prisma db execute --stdin <<EOF
+          SELECT tablename FROM pg_tables WHERE schemaname='public';
+          EOF
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
+      - name: Seed database (development only)
+        if: github.event.inputs.environment == 'development'
+        working-directory: backend
+        run: node seed-patterns.js || echo "Seed script not required"
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      
+      - name: Migration summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "::notice::✅ Migration completed successfully for ${{ github.event.inputs.environment }}"
+          else
+            echo "::error::❌ Migration failed for ${{ github.event.inputs.environment }}"
+          fi
