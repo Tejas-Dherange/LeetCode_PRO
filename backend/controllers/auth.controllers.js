@@ -253,7 +253,8 @@ const googleCallback = async (req, res) => {
     const user = req.user;
 
     if (!user) {
-      return res.redirect(`${process.env.CLIENT_HOME_URL}/login?error=authentication_failed`);
+      const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+      return res.redirect(`${frontendURL}/login?error=authentication_failed`);
     }
 
     // Create JWT token
@@ -274,7 +275,8 @@ const googleCallback = async (req, res) => {
     return res.redirect(`${frontendURL}/dashboard`);
   } catch (error) {
     console.log(error);
-    return res.redirect(`${process.env.CLIENT_HOME_URL}/login?error=server_error`);
+    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+    return res.redirect(`${frontendURL}/login?error=server_error`);
   }
 };
 
