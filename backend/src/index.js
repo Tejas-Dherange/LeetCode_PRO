@@ -33,9 +33,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      // Add production domains here:
-      // "https://yourdomain.com",
-      // "https://www.yourdomain.com"
+    "https://codeloom.software",
+    "https://www.codeloom.software",
+    "https://leet-code-pro.vercel.app"
     ],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
