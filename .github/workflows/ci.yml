@@ -11,9 +11,6 @@ jobs:
   frontend-test:
     name: Frontend Tests
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'pull_request' || 
-      contains(github.event.head_commit.modified, 'frontend/')
     
     steps:
       - name: Checkout code
@@ -53,9 +50,6 @@ jobs:
   backend-test:
     name: Backend Tests
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'pull_request' || 
-      contains(github.event.head_commit.modified, 'backend/')
     
     services:
       postgres:
@@ -134,3 +128,4 @@ jobs:
       - name: Check file sizes
         run: |
           find . -type f -size +10M -not -path "./node_modules/*" -not -path "./.git/*" || true
+
