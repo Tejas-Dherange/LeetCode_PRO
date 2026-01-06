@@ -43,8 +43,8 @@ const register = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true, // Always true in production
+      sameSite: "none", // Required for cross-domain
       maxAge: 60 * 60 * 24 * 7 * 1000,
     });
 
@@ -262,13 +262,14 @@ const googleCallback = async (req, res) => {
     // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none", // Required for cross-domain
       maxAge: 60 * 60 * 24 * 7 * 1000,
     });
 
     // Redirect to client home page
-    return res.redirect(process.env.CLIENT_HOME_URL || "http://localhost:5173/dashboard");
+    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+    return res.redirect(`${frontendURL}/dashboard`);
   } catch (error) {
     console.log(error);
     return res.redirect(`${process.env.CLIENT_HOME_URL}/login?error=server_error`);
