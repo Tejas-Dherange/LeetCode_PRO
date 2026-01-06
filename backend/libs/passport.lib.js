@@ -1,7 +1,8 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import db from "./db.js";
-
+import dotenv from "dotenv";
+dotenv.config();
 // Configure Google OAuth Strategy
 passport.use(
   new GoogleStrategy(
