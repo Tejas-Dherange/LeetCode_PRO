@@ -21,7 +21,7 @@ const RunResultsTable = ({ results }) => {
   const totalTests = results.length;
   const successRate = (passedTests / totalTests) * 100;
 
-  console.log("RunResultsTable - Results:", results);
+  // console.log("RunResultsTable - Results:", results);
   
   return (
     <div className="space-y-6">

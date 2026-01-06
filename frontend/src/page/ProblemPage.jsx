@@ -38,7 +38,7 @@ import { mergeStudentCodeWithTemplate } from "../utils/codeTemplateMerger";
 const ProblemPage = () => {
   const { id } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
-  console.log("ProblemPage Debug:", { problem });
+  // console.log("ProblemPage Debug:", { problem });
   
   const {
     submission: submissions,
