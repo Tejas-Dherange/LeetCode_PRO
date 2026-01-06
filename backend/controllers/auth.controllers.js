@@ -8,6 +8,7 @@ dotenv.config();
 
 const register = async (req, res) => {
   try {
+    // name email password image
     const { name, email, password, image } = req.body;
     console.log("name ", name);
 
