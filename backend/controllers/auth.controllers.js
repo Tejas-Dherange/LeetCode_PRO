@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserRole } from "../src/generated/prisma/index.js";
 import { uploadImage } from "../libs/cloudinary.lib.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const register = async (req, res) => {
   try {
