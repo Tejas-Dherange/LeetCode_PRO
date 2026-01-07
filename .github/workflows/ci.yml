@@ -161,31 +161,95 @@ jobs:
             echo "📥 Pulling latest code..."
             git pull origin main
             
-            # Run database migrations
-            echo "🗄️ Running database migrations..."
-            npx prisma migrate deploy
+            # Save current state for rollback
+            echo "� Backing up current deployment..."
+            docker tag algopattern-backend:latest algopattern-backend:backup 2>/dev/null || echo "No previous backend image to backup"
+            docker tag algopattern-worker:latest algopattern-worker:backup 2>/dev/null || echo "No previous worker image to backup"
             
-            # Build and restart containers
+            # Build and restart containers (migrations run automatically via entrypoint)
             echo "🐳 Rebuilding Docker containers..."
             docker-compose -f docker-compose.prod.yml up -d --build
             
-            # Clean up
-            echo "🧹 Cleaning up old images..."
-            docker image prune -f
-            
-            # Health check
+            # Health check with retries
             echo "🏥 Performing health check..."
-            sleep 10
+            RETRY_COUNT=0
+            MAX_RETRIES=3
+            RETRY_DELAY=10
+            HEALTH_STATUS=""
             
-            HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+            while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+              sleep $RETRY_DELAY
+              HEALTH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+              
+              if [ "$HEALTH_STATUS" = "200" ]; then
+                break
+              fi
+              
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⏳ Health check attempt $RETRY_COUNT/$MAX_RETRIES failed (HTTP $HEALTH_STATUS), retrying..."
+              fi
+            done
             
             if [ "$HEALTH_STATUS" = "200" ]; then
               echo "✅ Deployment successful! Backend is healthy."
+              
+              # Clean up old backup images
+              echo "🧹 Cleaning up old images..."
+              docker image rm algopattern-backend:backup 2>/dev/null || true
+              docker image rm algopattern-worker:backup 2>/dev/null || true
+              docker image prune -f
+              
               docker-compose -f docker-compose.prod.yml ps
+              echo "📋 Recent logs:"
+              docker-compose -f docker-compose.prod.yml logs --tail=20 backend
             else
-              echo "❌ Health check failed (HTTP $HEALTH_STATUS)"
-              echo "🔄 Rolling back..."
-              docker-compose -f docker-compose.prod.yml logs --tail=50
+              echo "❌ Health check failed after $MAX_RETRIES attempts (HTTP $HEALTH_STATUS)"
+              echo "🔄 Performing automatic rollback..."
+              
+              # Stop failed deployment
+              docker-compose -f docker-compose.prod.yml down
+              
+              # Restore backup images
+              echo "♻️ Restoring previous version..."
+              docker tag algopattern-backend:backup algopattern-backend:latest 2>/dev/null || echo "⚠️ No backup to restore"
+              docker tag algopattern-worker:backup algopattern-worker:latest 2>/dev/null || echo "⚠️ No backup to restore"
+              
+              # Start old containers
+              docker-compose -f docker-compose.prod.yml up -d
+              
+              sleep 10
+              
+              # Verify rollback with retries
+              echo "🏥 Verifying rollback..."
+              ROLLBACK_RETRY=0
+              ROLLBACK_STATUS=""
+              
+              while [ $ROLLBACK_RETRY -lt 3 ]; do
+                sleep 5
+                ROLLBACK_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/health)
+                
+                if [ "$ROLLBACK_STATUS" = "200" ]; then
+                  break
+                fi
+                
+                ROLLBACK_RETRY=$((ROLLBACK_RETRY + 1))
+              done
+              
+              if [ "$ROLLBACK_STATUS" = "200" ]; then
+                echo "✅ Rollback successful! Service restored to previous version."
+                docker-compose -f docker-compose.prod.yml ps
+                
+                # Verify database connection
+                echo "🔍 Verifying database connection..."
+                docker-compose -f docker-compose.prod.yml exec -T backend npx prisma db execute --stdin <<< "SELECT 1" > /dev/null 2>&1 && echo "✅ Database connection verified" || echo "⚠️ Database connection check failed"
+              else
+                echo "❌ Rollback verification failed! Manual intervention required."
+              fi
+              
+              echo "📋 Failure logs:"
+              docker-compose -f docker-compose.prod.yml logs --tail=50 backend
+              
               exit 1
             fi
       

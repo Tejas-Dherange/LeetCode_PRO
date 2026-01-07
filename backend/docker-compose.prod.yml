@@ -3,7 +3,9 @@ version: '3.8'
 services:
   # Backend API
   backend:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/algopattern-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: algopattern-backend
     restart: unless-stopped
     ports:
@@ -13,7 +15,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     networks:
       - app-network
     volumes:
@@ -27,7 +30,9 @@ services:
 
   # Queue Worker
   worker:
-    image: ghcr.io/YOUR_GITHUB_USERNAME/algopattern-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: algopattern-worker
     restart: unless-stopped
     command: node workers/codeExecutionWorker.js
@@ -36,7 +41,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - redis
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - app-network
 
