@@ -57,7 +57,7 @@ export const getSubscriptionStatus = async (req, res) => {
     });
 
     if (!subscription) {
-      return res.status(404).json({ message: "Subscription not found" });
+      return res.status(404).json({ message: "Subscribe to get access to all features" });
     }
 
     res.json({ subscription });

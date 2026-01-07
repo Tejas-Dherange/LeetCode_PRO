@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
-import { Code, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
-import AuthImagePattern from "../components/AuthImagePattern";
+import { Code, Eye, EyeOff, Loader2, Lock, Mail, ArrowRight, Sparkles } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -30,164 +30,121 @@ function LoginPage() {
     try {
       await login(data);
       navigate("/dashboard");
-      // console.log("Login in data", data);
     } catch (error) {
       console.error("error in log in");
     }
   };
 
   const handleGoogleLogin = () => {
-    // window.location.href = "http://localhost:3000/api/v1/user/google";
     googleSignIn();
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { 
+        duration: 0.5,
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
   return (
-    <div className="h-screen grid lg:grid-cols-2">
-      <div className="flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <div className="flex flex-col items-center gap-2 group">
-              <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <Code className="w-6 h-6 text-success" />
-              </div>
-              <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
-              <p className="text-base-content/60">LogIn to your account</p>
-            </div>
-          </div>
-        
-          
-          {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6"> */}
-            {/* Email */}
-            {/* <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Email</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-base-content/40" />
-                </div>
-                <input
-                  type="email"
-                  {...register("email")}
-                  className={`input input-bordered w-full pl-10 ${
-                    errors.email ? "input-error" : ""
-                  }`}
-                  placeholder="you@example.com"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
-              )}
-            </div> */}
-            {/* Password */}
-            {/* <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Password</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-base-content/40" />
-                </div>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  {...register("password")}
-                  className={`input input-bordered w-full pl-10 ${
-                    errors.password ? "input-error" : ""
-                  }`}
-                  placeholder="••••••••"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-base-content/40" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-base-content/40" />
-                  )}
-                </button>
-              </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
-              )}
-            </div> */}
-            {/* Google Login Button */}
-
-            {/* Submit Button */}
-            {/* <button
-              type="submit"
-              className="btn btn-primary w-full"
-              disabled={isLogingIn}
-            >
-              {isLogingIn ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                "Log In"
-              )}
-            </button> */}
-          {/* </form> */}
-          
-    <button onClick={handleGoogleLogin}
-           className=" cursor-pointer rounded-xl bg-blue-600 hover:bg-blue-900 p-1 w-full  flex gap-20 items-center"
-          >
-            <div className="bg-white rounded-lg ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              x="0px"
-              y="0px"
-              width="50"
-              height="40"
-              viewBox="0 0 48 48"
-            >
-              <path
-                fill="#FFC107"
-                d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
-              ></path>
-              <path
-                fill="#FF3D00"
-                d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"
-              ></path>
-              <path
-                fill="#4CAF50"
-                d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"
-              ></path>
-              <path
-                fill="#1976D2"
-                d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"
-              ></path>
-            </svg>
-            </div>
-            <div className="font-bold">
-
-            Continue with Google
-            </div>
-          </button>
-          {/* Footer */}
-          {/* <div className="text-center">
-            <p className="text-base-content/60">
-              Don't have an account?{" "}
-              <Link to="/signup" className="link link-primary">
-                Sign Up
-              </Link>
-            </p>
-          </div> */}
-        </div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#0a0a0a] relative overflow-hidden p-4">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0">
+          <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px]" />
+          <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-20" />
       </div>
 
-      {/* Right Side - Image/Pattern */}
-      <AuthImagePattern
-        title={"Welcome back to our platform!"}
-        subtitle={"LogIn to access our platform and start using our services."}
-      />
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 w-full max-w-5xl h-[600px] bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
+      >
+        {/* Left Side: Form */}
+        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center relative">
+           {/* Inner wash */}
+           <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+
+          <motion.div variants={itemVariants} className="text-center mb-10">
+            <motion.div 
+              whileHover={{ rotate: 360, scale: 1.1 }}
+              transition={{ duration: 0.6 }}
+              className="w-20 h-20 p-2 mx-auto mb-6 rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 shadow-xl shadow-emerald-500/5 cursor-pointer"
+            >
+               {/* User requested Custom Logo */}
+               <img src="/codeloom.png" alt="codeloom logo" className="w-full h-full object-contain" />
+            </motion.div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Welcome Back</h1>
+            <p className="text-slate-400">Log in to your account</p>
+          </motion.div>
+
+          <motion.div variants={itemVariants} className="space-y-6 max-w-sm mx-auto w-full">
+            {/* Google Button */}
+            <button 
+              onClick={handleGoogleLogin}
+              className="relative w-full cursor-pointer group overflow-hidden bg-white hover:bg-slate-50 text-slate-900 rounded-xl p-4 flex items-center justify-center gap-3 transition-all duration-300 shadow-lg hover:shadow-emerald-500/20 hover:scale-[1.02]"
+            >
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-6 h-6" alt="google logo" />
+              <span className="font-bold text-lg relative z-10">Continue with Google</span>
+              
+              {/* Shimmer Effect */}
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-slate-200/40 to-transparent" />
+            </button>
+
+             <div className="text-center">
+               <p className="text-xs text-slate-500 mt-6">
+                  By continuing, you agree to our <span className="text-emerald-500 cursor-pointer hover:underline">Terms of Service</span>.
+               </p>
+             </div>
+          </motion.div>
+        </div>
+
+        {/* Right Side: Visual Panel */}
+        <div className="hidden md:flex w-1/2 relative bg-slate-800/40 items-center justify-center overflow-hidden">
+           {/* Decorative Background */}
+           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-blue-500/10 opacity-50" />
+           
+           {/* Floating Image */}
+           <motion.div
+             initial={{ opacity: 0, scale: 0.9 }}
+             animate={{ opacity: 1, scale: 1 }}
+             transition={{ delay: 0.4, duration: 0.8 }}
+             className="relative z-10 p-8"
+           >
+              <motion.div
+                animate={{ y: [0, -15, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                className="relative"
+              >
+                  {/* Glow behind image */}
+                 <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-[60px] transform scale-75" />
+                 
+                 <img 
+                  src="/developer-team.png" 
+                  alt="Team Collaboration" 
+                  className="relative z-10 w-full max-w-md drop-shadow-2xl"
+                />
+              </motion.div>
+              
+              <div className="mt-8 text-center relative z-10">
+                <h3 className="text-2xl font-bold text-white mb-2">Join the Elite</h3>
+                <p className="text-slate-300 px-4">Master algorithms and build your career with the best community.</p>
+              </div>
+           </motion.div>
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -164,7 +164,7 @@ const PaymentButton = ({ plan }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const { processPayment } = usePaymentStore();
   const { authUser } = useAuthStore();
-  const { subscription } = useSubscriptionStore();
+  const { subscription, getSubscriptionStatus } = useSubscriptionStore();
 
   const handlePayment = async () => {
     if (!authUser) {
@@ -181,6 +181,10 @@ const PaymentButton = ({ plan }) => {
       };
 
       await processPayment(plan.id?.toUpperCase(), "monthly", userDetails);
+      
+      // Refresh subscription status to update UI instantly
+      await getSubscriptionStatus(authUser.id);
+      
       toast.success("Payment successful! Your subscription is now active.");
     } catch (error) {
       console.error("Payment error:", error);
@@ -196,21 +200,22 @@ const PaymentButton = ({ plan }) => {
     <button
       onClick={handlePayment}
       disabled={isProcessing || isActive}
-      className={`w-full font-semibold px-6 py-3  rounded-lg text-sm md:text-base shadow-md transition-all duration-200 ${
+      className={`w-full cursor-pointer font-semibold px-6 py-3  rounded-lg text-sm md:text-base shadow-md transition-all duration-200 ${
         isProcessing || isActive
           ? "bg-slate-700 text-slate-500 cursor-not-allowed"
           : "bg-emerald-600 hover:bg-emerald-500 text-white  hover:shadow-lg transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-emerald-400"
       }`}
     >
       {isProcessing ? (
-        <span className="flex items-center justify-center gap-2">
+        <span className="flex cursor-not-allowed items-center justify-center gap-2">
           <Loader2 className="animate-spin w-5 h-5" />
           Processing...
         </span>
       ) : isActive ? (
+
         "Active Subscription"
       ) : (
-        plan.cta
+          plan.cta
       )}
     </button>
   );

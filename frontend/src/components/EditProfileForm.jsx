@@ -49,7 +49,7 @@ export default function EditProfileForm() {
         setSelectedFile(null);
         setPreview(null);
         setIsImageChanged(false);
-        navigate("/dashboard/profile");
+        navigate("/profile");
       }, 1500);
       
     } catch (error) {
@@ -96,7 +96,7 @@ export default function EditProfileForm() {
         <div className="bg-base-100/40 backdrop-blur-md rounded-2xl shadow-xl mb-6 p-6 md:p-8 border border-base-200 hover:border-emerald-500/50 transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() => navigate("/dashboard/profile")}
+              onClick={() => navigate("/profile")}
               className="btn btn-ghost btn-sm gap-2 hover:bg-emerald-500/10 transition-colors"
               disabled={isLoading}
             >
@@ -231,7 +231,7 @@ export default function EditProfileForm() {
             <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button
                 type="button"
-                onClick={() => navigate("/dashboard/profile")}
+                onClick={() => navigate("/profile")}
                 className="btn btn-outline flex-1 gap-2 hover:bg-base-200 transition-all"
                 disabled={isLoading}
               >

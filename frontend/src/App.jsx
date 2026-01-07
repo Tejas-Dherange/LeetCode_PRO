@@ -48,7 +48,7 @@ const App = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-start">
+    <div className="min-h-screen w-full flex flex-col">
       
       <Analytics />
       <Toaster />
@@ -77,7 +77,6 @@ const App = () => {
           <Route path="contest/register/:id" element={<RegisterContestPage />} />
           <Route path="contest/detail/:id" element={<ContestDetailPage />} />
           <Route path="contest/create-contest" element={<CreateContestPage />} />
-          <Route path="profile" element={<ProfilePage />} />
           <Route path="pricing" element={<PricingPage />} />
           <Route path="edit-sheets" element={<EditSheetPage />} />
         </Route>
@@ -94,6 +93,10 @@ const App = () => {
         <Route
           path="/edit-profile"
           element={authUser ? <EditProfileForm /> : <Navigate to="/login" />}
+        />
+        <Route 
+          path="/profile" 
+          element={authUser ? <ProfilePage /> : <Navigate to="/login" />} 
         />
         <Route
           path="/problem/:id"

@@ -28,7 +28,7 @@ const Navbar = () => {
           className="flex items-center gap-3 cursor-pointer"
         >
           <img
-            src="/greenLogo.png"
+            src="/codeloom.png"
             className="h-18 w-18 bg-primary/20 text-primary border-none px-2 py-2 rounded-full"
           />
           <span className="text-lg md:text-2xl font-bold tracking-tight text-white hidden md:block">
@@ -92,7 +92,7 @@ const Navbar = () => {
               </li>
               <li>
                 <Link
-                  to="/dashboard/profile"
+                  to="/profile"
                   className="hover:bg-primary hover:text-white text-base font-semibold"
                 >
                   <User className="w-4 h-4 mr-2" />

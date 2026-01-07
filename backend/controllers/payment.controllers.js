@@ -1,10 +1,11 @@
 import { db } from '../libs/db.js';
 import { 
-  createRazorpayOrder, 
+  createRazorpayOrder,
   verifyRazorpaySignature,
   createRazorpayCustomer,
   RAZORPAY_PLANS 
 } from '../libs/razorpay.lib.js';
+import { sendPaymentSuccessEmail, sendPaymentFailedEmail } from '../libs/mailer.js';
 import crypto from 'crypto';
 
 // Create payment order for one-time payment
@@ -55,7 +56,7 @@ export const createPaymentOrder = async (req, res) => {
         userId, // This can be empty for new subscriptions
         paymentProvider: 'RAZORPAY',
         providerPaymentId: order.id,
-        amount: planDetails.amount / 100,
+        amount: planDetails.amount, // Store amount in rupees
         currency: planDetails.currency,
         status: 'pending',
         description: `${planType} ${billingCycle} subscription`
@@ -71,7 +72,7 @@ export const createPaymentOrder = async (req, res) => {
       planDetails: {
         type: planType,
         billing: billingCycle,
-        amount: planDetails.amount / 100
+        amount: planDetails.amount
       }
     });
 
@@ -192,6 +193,19 @@ export const verifyPayment = async (req, res) => {
       subscription
     });
 
+    // Send success email asynchronously
+    const userEmail = req.user.email; // Assuming email is available in req.user
+    if (userEmail) {
+      sendPaymentSuccessEmail(userEmail, {
+        type: planType,
+        amount: payment.amount,
+        currency: payment.currency,
+        billingCycle,
+        startDate: subscriptionData.startDate,
+        endDate: subscriptionData.endDate
+      });
+    }
+
   } catch (error) {
     console.error('Verify payment error:', error);
     res.status(500).json({
@@ -298,12 +312,30 @@ const handlePaymentCaptured = async (payment) => {
   }
 };
 
+
+
 const handlePaymentFailed = async (payment) => {
   try {
-    await db.payment.updateMany({
+    const updatedPayment = await db.payment.updateMany({
       where: { providerPaymentId: payment.id },
       data: { status: 'failed' }
     });
+    
+    // Find the payment and user to send email
+    const paymentRecord = await db.payment.findFirst({
+      where: { providerPaymentId: payment.id },
+      include: { user: true }
+    });
+
+    if (paymentRecord && paymentRecord.user && paymentRecord.user.email) {
+      await sendPaymentFailedEmail(paymentRecord.user.email, {
+        amount: payment.amount / 100, // Razorpay amount is in paise
+        currency: payment.currency,
+        date: new Date(),
+        reason: payment.error_description || 'Transaction declined'
+      });
+    }
+
   } catch (error) {
     console.error('Handle payment failed error:', error);
   }

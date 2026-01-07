@@ -92,7 +92,7 @@ const useAuthStore = create((set) => ({
   },
 
   googleSignIn: () => {
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || "https://api.codeloom.software/api/v1";
+    const apiUrl = import.meta.env.VITE_API_BASE_URL ||  "https://api.codeloom.software/api/v1";
     window.location.href = `${apiUrl}/user/google`;
   }
 }));

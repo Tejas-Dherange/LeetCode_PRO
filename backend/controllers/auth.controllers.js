@@ -10,7 +10,6 @@ const register = async (req, res) => {
   try {
     // name email password
     const { name, email, password, image } = req.body;
-    console.log("name ", name);
 
     if (!email || !password || !name) {
       return res.status(400).json({ message: "All fields are required" });
