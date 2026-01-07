@@ -2,79 +2,41 @@ import React, { useEffect, useState } from "react";
 import { useContestStore } from "../store/useContestStore";
 import { useProblemStore } from "../store/useProblemStore";
 import { axiosInstance } from "../libs/axios";
-import { Loader, CheckCircle } from "lucide-react";
+import { Loader, CheckCircle, Code2, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function ContestProblem({ contestId }) {
   const { getContestById, isContestLoading, contest, getAllProblemsInContest } =
     useContestStore();
   const {
-    getProblemById,
-    problem,
-    isProblemLoading,
     getProblemByMultipleIds,
-    multipleIdProblems
   } = useProblemStore();
 
   const [contestproblems, setContestproblems] = useState([]);
+  
   useEffect(() => {
     const fetchProblems = async () => {
       if (!contestId) return;
       try {
         const problems = await getAllProblemsInContest(contestId);
-        console.log("Fetched Problems:", problems);
         setContestproblems(problems || []);
       } catch (error) {
         console.error("Error fetching problems:", error);
       }
     };
     fetchProblems();
-  }, []);
-
-  // console.log("contest problems",await getAllProblemsInContest(contestId));
-
-  const [Contest, setContest] = useState("");
-  // const [problems, setProblems] = useState([]);
-
-  useEffect(() => {
-    getContestById(contestId);
-    setContest(contest);
   }, [contestId]);
 
-  useEffect(() => {
-    if (!contest || !contest.problems || !Array.isArray(contest.problems))
-      return;
-    const fetchProblems = async () => {
-      const problemIds = contest.problems.map((p) => p.problemId);
-      console.log("Problem IDs:", problemIds);
-      try {
-        const fetchedProblems = await getProblemByMultipleIds(problemIds);
-        // console.log("Fetched Problems:", fetchedProblems);
-        // setProblems(fetchedProblems || []);
-      } catch (err) {
-        console.error("Error fetching problems:", err);
-        // setProblems([]);
-      }
-    };
-    fetchProblems();
-    // console.log("Fetched Problems:", problems);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [contest]); // Only depend on contest, not getProblemById
-
-  // Track solved problems and marks for the current user
   const [solvedMap, setSolvedMap] = useState({});
   useEffect(() => {
     const fetchSolved = async () => {
       if (!contestId) return;
       try {
-        // Fetch contest submissions for the current user for this contest
-        // Fetch contest submissions for the current user for this contest
         const res = await axiosInstance.get(
           `/contest/contest-submission/user/${contestId}`
         );
         if (res.data.success) {
           const submissions = res.data.submissions || [];
-          // Map: problemId -> obtainedMarks (pick highest)
           const map = {};
           submissions.forEach((sub) => {
             if (sub.status === "Accepted" && sub.obtainedMarks > 0) {
@@ -83,7 +45,6 @@ function ContestProblem({ contestId }) {
               }
             }
           });
-          console.log("Solved Map Constructed:", map);
           setSolvedMap(map);
         }
       } catch (err) {
@@ -94,67 +55,74 @@ function ContestProblem({ contestId }) {
   }, [contestId]);
 
   return (
-    <div>
+    <div className="w-full">
       {isContestLoading ? (
-        <div className="flex justify-center items-center h-screen">
-          <Loader className="animate-spin" />
+        <div className="flex justify-center items-center py-20">
+          <Loader className="animate-spin w-8 h-8 text-emerald-500" />
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="table w-full  rounded-xl shadow bg-gradient-to-r from-gray-900 to-gray-800">
-            <thead>
-              <tr className="bg-gradient-to-r from-primary/30 to-success/30 text-primary-content text-lg">
-                <th className="px-6 py-3 rounded-tl-xl">#</th>
-                <th className="px-6 py-3">Title</th>
-                <th className="px-6 py-3 rounded-tr-xl">Marks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contestproblems && contestproblems.length > 0 ? (
-                contestproblems.map((problem, idx) => {
-                  const solved = solvedMap[problem.problem.id] !== undefined;
-                  return (
-                    <tr
-                      key={problem.id}
-                      className={
-                        idx % 2 === 0
-                          ? "bg-gray-800/80 hover:bg-primary/10 transition"
-                          : "bg-gray-900/80 hover:bg-primary/10 transition"
-                      }
-                    >
-                      <td className="px-6 py-3 font-bold text-xl text-center text-primary-content">
-                        {idx + 1}
-                      </td>
-                      <td className="px-6 py-3 text-center font-semibold">
-                        <Link
-                          to={`/contest-execution/${contestId}/${problem.problem.id}`}
-                          className="hover:underline text-primary-content block w-full h-full"
-                        >
-                          {problem.problem.title}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-3 text-center font-bold text-success text-lg">
-                        {solved ? (
-                          <div className="flex items-center justify-center gap-2 text-success">
-                            <CheckCircle className="w-6 h-6 fill-success text-base-100" />
-                            <span>{solvedMap[problem.problem.id]}</span>
-                          </div>
-                        ) : (
-                          <span className="text-base-content/50">{problem.marks || "-"}</span>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={3} className="text-center py-8 text-base-content/70">
-                    No problems available.
-                  </td>
+        <div className="overflow-hidden rounded-2xl border border-base-content/5 bg-base-100/60 backdrop-blur-xl shadow-xl">
+          <div className="overflow-x-auto">
+            <table className="table w-full">
+              <thead>
+                <tr className="bg-base-200/50 text-base-content/70 text-sm uppercase tracking-wider border-b border-base-content/5">
+                  <th className="px-6 py-4 font-bold w-20">#</th>
+                  <th className="px-6 py-4 font-bold">Problem Title</th>
+                  <th className="px-6 py-4 font-bold text-center w-32">Marks</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {contestproblems && contestproblems.length > 0 ? (
+                  contestproblems.map((problem, idx) => {
+                    const solved = solvedMap[problem.problem.id] !== undefined;
+                    return (
+                      <tr
+                        key={problem.id}
+                        className="hover:bg-base-content/5 transition-colors border-b border-base-content/5 last:border-none group"
+                      >
+                        <td className="px-6 py-4 font-mono text-base-content/50">
+                          {idx + 1}
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link
+                            to={`/contest-execution/${contestId}/${problem.problem.id}`}
+                            className="flex items-center gap-3 group-hover:text-emerald-500 transition-colors font-medium text-base-content"
+                          >
+                            <div className={`p-2 rounded-lg ${solved ? 'bg-emerald-500/10 text-emerald-500' : 'bg-base-200 text-base-content/40'}`}>
+                               <Code2 className="w-5 h-5" />
+                            </div>
+                            {problem.problem.title}
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          {solved ? (
+                            <div className="flex items-center justify-center gap-2 text-emerald-500 font-bold bg-emerald-500/5 py-1 px-3 rounded-full border border-emerald-500/20">
+                              <CheckCircle className="w-4 h-4" />
+                              <span>{solvedMap[problem.problem.id]}</span>
+                            </div>
+                          ) : (
+                            <div className="inline-flex items-center gap-1 text-base-content/40 font-mono text-sm">
+                              <Trophy className="w-3 h-3" />
+                              <span>{problem.marks || "-"}</span>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={3} className="text-center py-12 text-base-content/50">
+                      <div className="flex flex-col items-center gap-2">
+                        <Code2 className="w-8 h-8 opacity-20" />
+                        <span>No problems available for this contest.</span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

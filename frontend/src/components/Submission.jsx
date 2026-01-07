@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import useAiStore from "../store/useAiStore";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -225,11 +226,11 @@ const Submission = ({ submission }) => {
       </div>
 
       {/* Complexity Popup */}
-      {showComplexityPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+      {showComplexityPopup && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div
             ref={popupRef}
-            className="bg-base-100 rounded-2xl shadow-2xl p-8 min-w-[400px] max-w-2xl w-full mx-4 relative border border-base-300"
+            className="bg-base-100 rounded-2xl shadow-2xl p-8 min-w-[400px] max-w-2xl w-full mx-4 relative border border-base-300 animate-in fade-in zoom-in duration-200"
           >
             <button
               className="absolute top-4 right-4 btn btn-sm btn-circle btn-ghost"
@@ -423,7 +424,8 @@ const Submission = ({ submission }) => {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

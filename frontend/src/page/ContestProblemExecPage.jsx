@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import Editor from "@monaco-editor/react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Play,
   FileText,
@@ -22,6 +23,11 @@ import {
   Maximize,
   Sun,
   Moon,
+  Zap,
+  Cpu,
+  Settings,
+  X,
+  Check
 } from "lucide-react";
 import { useProblemStore } from "../store/useProblemStore";
 import myCustomTheme from "../themes/customTheme";
@@ -34,10 +40,13 @@ import { useSubmissionStore } from "../store/useSubmissionStore";
 import RunResultsTable from "../components/RunResultsTable";
 import { useContestStore } from "../store/useContestStore";
 import { mergeStudentCodeWithTemplate } from "../utils/codeTemplateMerger";
+import useAuthStore from "../store/useAuthStore";
 
 const ContestProblemPage = () => {
   const { id, cid } = useParams();
   const { isProblemLoading, problem, getProblemById } = useProblemStore();
+  
+  // Submission Store (General)
   const {
     submission: submissions,
     isLoading: isSubmissionsLoading,
@@ -46,15 +55,35 @@ const ContestProblemPage = () => {
     submissionCount,
   } = useSubmissionStore();
 
+  // Contest Store
+  const {
+    contestSubmitCode,
+    isContestLoading,
+    contestSubmissions,
+    getContestSubmissionForProblem,
+    contestSubmission,
+  } = useContestStore();
+
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("JAVA");
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [testCases, setTestCases] = useState([]);
 
+  // Editor Settings State
+  const [showSettings, setShowSettings] = useState(false);
+  const [editorSettings, setEditorSettings] = useState({
+    fontSize: 18,
+    fontLigatures: true,
+    tabSize: 4,
+    wordWrap: "on",
+    lineNumbers: "on", 
+    minimap: false,
+  });
+
   // Resizable split pane state
-  const [leftPanelWidth, setLeftPanelWidth] = useState(50); // percentage
-  const [rightPanelEditorHeight, setRightPanelEditorHeight] = useState(70); // percentage - start with more editor space
+  const [leftPanelWidth, setLeftPanelWidth] = useState(50);
+  const [rightPanelEditorHeight, setRightPanelEditorHeight] = useState(70);
   const [isDraggingHorizontal, setIsDraggingHorizontal] = useState(false);
   const [isDraggingVertical, setIsDraggingVertical] = useState(false);
   const containerRef = useRef(null);
@@ -62,14 +91,12 @@ const ContestProblemPage = () => {
 
   const { theme, setTheme } = useThemeStore();
 
-  // Toggle theme function matching navbar implementation
   const toggleTheme = () => {
     const newTheme = theme === "dark" ? "light" : "dark";
     setTheme(newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
   };
 
-  // Set Monaco theme based on app theme
   const handleEditorMount = (editor, monaco) => {
     monaco.editor.defineTheme("my-dark-theme", myCustomTheme);
     if (theme === "dark") {
@@ -79,7 +106,6 @@ const ContestProblemPage = () => {
     }
   };
 
-  // React to theme changes
   useEffect(() => {
     if (window.monaco && window.monaco.editor) {
       if (theme === "dark") {
@@ -90,15 +116,13 @@ const ContestProblemPage = () => {
     }
   }, [theme]);
 
+  // Initial Logic Loading
   useEffect(() => {
     getProblemById(id);
-    // /change here also
     getSubmissionCountForProblem(id);
-    // Clear run results and submission when navigating to a new problem
     if (useExecutionStore.getState().clearRunResults) {
       useExecutionStore.getState().clearRunResults();
     }
-    // Clear submission state if present
     if (useExecutionStore.getState().submission !== null) {
       useExecutionStore.setState({ submission: null });
     }
@@ -106,22 +130,12 @@ const ContestProblemPage = () => {
 
   useEffect(() => {
     if (problem) {
-      // Use studentCodeSnippet for display (without boilerplate)
-      // Fall back to codeSnippet for backward compatibility
       const snippetToUse = problem.studentCodeSnippet?.[selectedLanguage] 
         || problem.codeSnippet?.[selectedLanguage] 
         || "";
       
-      // console.log('🔍 Frontend Debug:', {
-      //   language: selectedLanguage,
-      //   hasStudentSnippet: !!problem.studentCodeSnippet?.[selectedLanguage],
-      //   hasCodeSnippet: !!problem.codeSnippet?.[selectedLanguage],
-      //   usingField: problem.studentCodeSnippet?.[selectedLanguage] ? 'studentCodeSnippet' : 'codeSnippet',
-      //   snippetLength: snippetToUse.length,
-      //   containsMarkers: snippetToUse.includes('USER_CODE') || snippetToUse.includes('BOILERPLATE')
-      // });
-      
       setCode(snippetToUse);
+      
       setTestCases(
         problem.testcase.map((tc) => ({
           input: tc.input,
@@ -140,16 +154,13 @@ const ContestProblemPage = () => {
   const handleLanguageChange = (e) => {
     const lang = e.target.value;
     setSelectedLanguage(lang);
-    
-    // Use studentCodeSnippet for display, fallback to codeSnippet
     const snippetToUse = problem.studentCodeSnippet?.[lang] 
       || problem.codeSnippet?.[lang] 
       || "";
-    
     setCode(snippetToUse);
   };
 
-  // Horizontal resizable split pane handlers
+  // Horizontal Resize Handlers
   const handleHorizontalMouseDown = (e) => {
     setIsDraggingHorizontal(true);
     e.preventDefault();
@@ -157,21 +168,15 @@ const ContestProblemPage = () => {
 
   const handleHorizontalMouseMove = (e) => {
     if (!isDraggingHorizontal || !containerRef.current) return;
-
     const containerRect = containerRef.current.getBoundingClientRect();
-    const newLeftWidth =
-      ((e.clientX - containerRect.left) / containerRect.width) * 100;
-
-    // Apply constraints: min 20%, max 80%
+    const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
     const constrainedWidth = Math.max(20, Math.min(80, newLeftWidth));
     setLeftPanelWidth(constrainedWidth);
   };
 
-  const handleHorizontalMouseUp = () => {
-    setIsDraggingHorizontal(false);
-  };
+  const handleHorizontalMouseUp = () => setIsDraggingHorizontal(false);
 
-  // Vertical resizable split pane handlers for right panel
+  // Vertical Resize Handlers
   const handleVerticalMouseDown = (e) => {
     setIsDraggingVertical(true);
     e.preventDefault();
@@ -179,19 +184,13 @@ const ContestProblemPage = () => {
 
   const handleVerticalMouseMove = (e) => {
     if (!isDraggingVertical || !rightPanelRef.current) return;
-
     const rightPanelRect = rightPanelRef.current.getBoundingClientRect();
-    const newEditorHeight =
-      ((e.clientY - rightPanelRect.top) / rightPanelRect.height) * 100;
-
-    // Apply constraints: min 30%, max 100% (allow full height)
+    const newEditorHeight = ((e.clientY - rightPanelRect.top) / rightPanelRect.height) * 100;
     const constrainedHeight = Math.max(30, Math.min(100, newEditorHeight));
     setRightPanelEditorHeight(constrainedHeight);
   };
 
-  const handleVerticalMouseUp = () => {
-    setIsDraggingVertical(false);
-  };
+  const handleVerticalMouseUp = () => setIsDraggingVertical(false);
 
   useEffect(() => {
     if (isDraggingHorizontal) {
@@ -207,7 +206,6 @@ const ContestProblemPage = () => {
         document.body.style.userSelect = "";
       }
     }
-
     return () => {
       document.removeEventListener("mousemove", handleHorizontalMouseMove);
       document.removeEventListener("mouseup", handleHorizontalMouseUp);
@@ -232,7 +230,6 @@ const ContestProblemPage = () => {
         document.body.style.userSelect = "";
       }
     }
-
     return () => {
       document.removeEventListener("mousemove", handleVerticalMouseMove);
       document.removeEventListener("mouseup", handleVerticalMouseUp);
@@ -247,50 +244,48 @@ const ContestProblemPage = () => {
     switch (activeTab) {
       case "description":
         return (
-          <div className="prose prose-lg max-w-none">
-            {/* Problem Title */}
-            <h1 className="text-3xl mb-4 text-success font-bold">
+          <div className="prose prose-lg max-w-none prose-invert pb-10">
+            <h1 className="text-3xl mb-4 font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">
               {problem?.title}
             </h1>
             
-            {/* Problem Description */}
-            <div className="mb-8">
-              <div className="text-base-content/90 leading-relaxed whitespace-pre-wrap">
+            <div className="mb-8 p-6 bg-base-200/40 rounded-2xl border border-base-content/5 shadow-inner">
+              <div className="text-base-content/90 leading-relaxed whitespace-pre-wrap font-medium">
                 {problem?.description}
               </div>
             </div>
 
             {problem?.examples && (
               <>
-                <h3 className="text-2xl font-bold mb-4 text-primary">Examples:</h3>
+                <h3 className="text-xl font-bold mb-4 text-base-content flex items-center gap-2">
+                   <Code2 className="w-5 h-5 text-emerald-500" />
+                   Examples:
+                </h3>
                 {Object.entries(problem?.examples).map(
                   ([lang, example], idx) => (
                     <div
                       key={lang}
-                      className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300"
+                      className="bg-base-200/50 p-6 rounded-xl mb-6 border border-base-content/5 hover:border-emerald-500/20 transition-colors"
                     >
                       <div className="mb-4">
-                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
-                          Input:
-                        </div>
-                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                        <div className="text-base-content/60 mb-2 text-xs font-bold uppercase tracking-wider">Input</div>
+                        <div className="bg-base-300/50 px-4 py-3 rounded-lg font-mono text-sm border border-base-content/5 text-base-content">
                           <pre className="whitespace-pre-wrap break-words">{example.input}</pre>
                         </div>
                       </div>
                       <div className="mb-4">
-                        <div className="text-primary mb-2 text-base font-bold uppercase tracking-wide">
-                          Output:
-                        </div>
-                        <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                        <div className="text-base-content/60 mb-2 text-xs font-bold uppercase tracking-wider">Output</div>
+                        <div className="bg-base-300/50 px-4 py-3 rounded-lg font-mono text-sm border border-base-content/5 text-base-content">
                           <pre className="whitespace-pre-wrap break-words">{example.output}</pre>
                         </div>
                       </div>
                       {example.explanation && (
                         <div>
-                          <div className="text-success mb-2 text-base font-bold uppercase tracking-wide">
-                            Explanation:
+                          <div className="text-emerald-500 mb-2 text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                             <Lightbulb className="w-3 h-3" />
+                             Explanation
                           </div>
-                          <div className="text-base-content/80 text-base leading-relaxed whitespace-pre-wrap">
+                          <div className="text-base-content/80 text-sm leading-relaxed whitespace-pre-wrap pl-2 border-l-2 border-emerald-500/30">
                             {example.explanation}
                           </div>
                         </div>
@@ -303,9 +298,12 @@ const ContestProblemPage = () => {
 
             {problem?.constraints && (
               <>
-                <h3 className="text-2xl font-bold mb-4 text-warning">Constraints:</h3>
-                <div className="bg-base-200 p-6 rounded-xl mb-6 border border-base-300">
-                  <div className="bg-base-300 px-4 py-3 rounded-lg font-mono text-sm">
+                <h3 className="text-xl font-bold mb-4 text-base-content flex items-center gap-2">
+                   <Zap className="w-5 h-5 text-amber-500" />
+                   Constraints:
+                </h3>
+                <div className="bg-base-200/50 p-6 rounded-xl mb-6 border border-base-content/5">
+                  <div className="bg-base-300/50 px-4 py-3 rounded-lg font-mono text-sm text-base-content/80">
                     <pre className="whitespace-pre-wrap break-words">{problem.constraints}</pre>
                   </div>
                 </div>
@@ -332,28 +330,17 @@ const ContestProblemPage = () => {
     submission,
     isSubmitExecuting,
     isRunExecuting,
+    cooldownSeconds, // Assuming contest execution also uses global cooldown or we need to check store
   } = useExecutionStore();
-
-  const {
-    contestSubmitCode,
-    isContestLoading,
-    contestSubmissions,
-    getContestSubmissionForProblem,
-    contestSubmission,
-  } = useContestStore();
 
   const handleRunCode = (e) => {
     e.preventDefault();
     try {
-      // Get full template and merge student code
       const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
       const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
-      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
-
       const expected_outputs = problem.testcase.map((tc) => tc.output);
-      console.log(expected_outputs);
       runCode(executableCode, language_id, stdin, expected_outputs, id);
     } catch (error) {
       console.error("error in executing code", error);
@@ -363,17 +350,15 @@ const ContestProblemPage = () => {
   const handleSubmitCode = (e) => {
     e.preventDefault();
     try {
-      // Get full template and merge student code
       const fullTemplate = problem.codeSnippet?.[selectedLanguage] || "";
       const executableCode = mergeStudentCodeWithTemplate(code, fullTemplate);
-      
       const language_id = getLaguageId(selectedLanguage);
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
+      
       // Clear previous contest submission output before submitting new code
       useContestStore.setState({ contestSubmission: null });
       contestSubmitCode(executableCode, language_id, stdin, expected_outputs, id, cid);
-      // getContestSubmissionForProblem(id);
     } catch (error) {
       console.error("error in submitting code", error);
     }
@@ -381,203 +366,347 @@ const ContestProblemPage = () => {
 
   const renderBottomPanel = () => {
     if (runResults) {
-      return <RunResultsTable results={runResults} />;
+      return (
+        <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-base-content/10 hover:scrollbar-thumb-base-content/20">
+          <RunResultsTable results={runResults} />
+        </div>
+      );
     } else if (contestSubmission) {
-      return <Submission submission={contestSubmission} />;
+      return (
+        <div className="h-full overflow-y-auto scrollbar-thin scrollbar-thumb-base-content/10 hover:scrollbar-thumb-base-content/20">
+          <Submission submission={contestSubmission} />
+        </div>
+      );
     } else {
       return (
-        <>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Test Cases</h3>
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-between mb-4 sticky top-0 bg-base-100/95 backdrop-blur-sm p-1 z-10">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-base-content/60 flex items-center gap-2">
+               <Terminal className="w-4 h-4" />
+               Test Cases
+            </h3>
           </div>
-          <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
+          <div className="overflow-auto flex-1 scrollbar-thin scrollbar-thumb-base-content/10 hover:scrollbar-thumb-base-content/20">
+            <table className="table table-sm w-full text-left">
               <thead>
-                <tr>
-                  <th>Input</th>
-                  <th>Expected Output</th>
+                <tr className="border-b border-base-content/10">
+                  <th className="bg-transparent text-base-content/60 font-semibold p-3 pl-4">Input</th>
+                  <th className="bg-transparent text-base-content/60 font-semibold p-3">Expected Output</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="font-mono text-sm">
                 {testCases.map((testCase, index) => (
-                  <tr key={index}>
-                    <td className="font-mono">{testCase.input}</td>
-                    <td className="font-mono">{testCase.output}</td>
+                  <tr key={index} className="border-b border-base-content/5 hover:bg-base-content/5 transition-colors cursor-default">
+                    <td className="p-3 pl-4 text-emerald-500">{testCase.input}</td>
+                    <td className="p-3 text-base-content/70">{testCase.output}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
+        </div>
       );
     }
   };
 
   return (
-    <div className="min-h-screen w-[98vw] ">
+    <div className="h-screen w-full bg-base-100 overflow-hidden relative font-sans selection:bg-emerald-500/30">
+       {/* Premium Animated Background */}
+       <div className="fixed inset-0 pointer-events-none z-0">
+         <div className="absolute inset-0 bg-gradient-to-b from-base-100 via-base-100 to-base-200/50" />
+        
+        {/* Animated Orbs */}
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, 30, 0], opacity: [0.1, 0.2, 0.1] }} 
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-20%] right-[-20%] w-[1000px] h-[1000px] bg-emerald-500/5 rounded-full blur-[150px]" 
+        />
+        <motion.div 
+          animate={{ x: [0, -30, 0], y: [0, 50, 0], opacity: [0.1, 0.2, 0.1] }} 
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-[-20%] left-[-20%] w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px]" 
+        />
+      </div>
+
+      {/* Editor Settings Modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          >
+            <div className="bg-base-100 w-[90%] max-w-md rounded-2xl shadow-2xl border border-base-content/10 overflow-hidden">
+              <div className="p-4 border-b border-base-content/5 flex items-center justify-between bg-base-200/30">
+                <h3 className="text-lg font-bold flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-emerald-500" />
+                  Editor Settings
+                </h3>
+                <button 
+                  onClick={() => setShowSettings(false)}
+                  className="btn btn-ghost btn-sm btn-circle hover:bg-base-content/10 transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                {/* Font Size */}
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">Font Size</span>
+                    <span className="text-xs text-base-content/50">Control the text size in editor</span>
+                  </div>
+                  <select 
+                    value={editorSettings.fontSize}
+                    onChange={(e) => setEditorSettings({...editorSettings, fontSize: parseInt(e.target.value)})}
+                    className="select select-bordered select-sm w-24 cursor-pointer bg-base-200"
+                  >
+                    {[12, 14, 16, 18, 20, 22, 24, 26, 28, 30].map(size => (
+                      <option key={size} value={size}>{size}px</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Font Ligatures */}
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">Font Ligatures</span>
+                    <span className="text-xs text-base-content/50">Enable special character combinations</span>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    className="toggle toggle-success cursor-pointer"
+                    checked={editorSettings.fontLigatures}
+                    onChange={(e) => setEditorSettings({...editorSettings, fontLigatures: e.target.checked})}
+                  />
+                </div>
+
+                {/* Word Wrap */}
+                <div className="flex items-center justify-between">
+                   <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">Word Wrap</span>
+                    <span className="text-xs text-base-content/50">Wrap long lines to fit usage</span>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    className="toggle toggle-success cursor-pointer"
+                    checked={editorSettings.wordWrap === "on"}
+                    onChange={(e) => setEditorSettings({...editorSettings, wordWrap: e.target.checked ? "on" : "off"})}
+                  />
+                </div>
+
+                {/* Line Numbers */}
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">Relative Line Numbers</span>
+                    <span className="text-xs text-base-content/50">Show numbers relative to cursor</span>
+                  </div>
+                  <input 
+                    type="checkbox" 
+                    className="toggle toggle-success cursor-pointer"
+                    checked={editorSettings.lineNumbers === "relative"}
+                    onChange={(e) => setEditorSettings({...editorSettings, lineNumbers: e.target.checked ? "relative" : "on"})}
+                  />
+                </div>
+
+                 {/* Tab Size */}
+                 <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base-content">Tab Size</span>
+                    <span className="text-xs text-base-content/50">Spaces per tab indentation</span>
+                  </div>
+                  <select 
+                    value={editorSettings.tabSize}
+                    onChange={(e) => setEditorSettings({...editorSettings, tabSize: parseInt(e.target.value)})}
+                    className="select select-bordered select-sm w-24 cursor-pointer bg-base-200"
+                  >
+                     <option value={2}>2 Spaces</option>
+                     <option value={4}>4 Spaces</option>
+                     <option value={8}>8 Spaces</option>
+                  </select>
+                </div>
+              </div>
+              <div className="p-4 border-t border-base-content/5 bg-base-200/30 flex justify-end">
+                <button 
+                  onClick={() => setShowSettings(false)}
+                  className="btn btn-primary btn-sm px-6 cursor-pointer"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Navigation */}
-      <nav className="w-full  shadow-lg px-4 md:px-10 py-2 border-b border-base-300 z-10 sticky top-0">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 w-full">
+      <nav className="relative z-20 w-full px-4 h-[60px] flex items-center border-b border-base-content/5 bg-base-100/60 backdrop-blur-xl">
+        <div className="flex items-center justify-between w-full h-full">
           {/* Breadcrumb and Problem Title */}
-          <div className="flex items-center gap-2 flex-shrink-0 min-w-0">
+          <div className="flex items-center gap-3">
             <Link
               to="/dashboard"
-              className="flex items-center gap-2 text-primary font-semibold hover:underline"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-base-200/50 text-base-content/60 hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors cursor-pointer"
             >
-              <Home className="w-6 h-6" />
-              <ChevronRight className="w-4 h-4" />
+              <Home className="w-4 h-4" />
             </Link>
-            <span className="text-base-content/80 font-semibold text-lg truncate max-w-[200px] md:max-w-xs lg:max-w-sm">
-              {problem?.title || "..."}
+            <ChevronRight className="w-4 h-4 text-base-content/30" />
+            <span className="text-base-content font-bold text-lg truncate max-w-[200px] md:max-w-md bg-transparent select-none">
+              {problem?.title || "Loading Problem..."}
             </span>
           </div>
 
-          {/* Problem Info */}
-
-          {/* Actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Centered Run/Submit buttons - Contest Mode */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-2 p-1 bg-base-100/80 backdrop-blur-md rounded-xl border border-base-content/10 shadow-lg">
             <button
-              className={`btn btn-ghost btn-circle ${
-                isBookmarked ? "text-primary" : ""
-              }`}
-              onClick={() => setIsBookmarked(!isBookmarked)}
-              title="Bookmark"
+               className="btn btn-sm btn-ghost gap-2 text-base-content hover:bg-base-200 hover:text-emerald-500 rounded-lg h-9 px-4 font-bold transition-all cursor-pointer"
+               onClick={handleRunCode}
+               disabled={isRunExecuting || cooldownSeconds > 0}
             >
-              <Bookmark className="w-5 h-5" />
+               {cooldownSeconds > 0 ? (
+                 <>
+                   <span className="loading loading-spinner w-3 h-3" />
+                   <span className="text-xs">{cooldownSeconds}s</span>
+                 </>
+               ) : isRunExecuting ? (
+                 <span className="loading loading-spinner w-4 h-4" />
+               ) : (
+                 <Play className="w-4 h-4 text-emerald-500" />
+               )}
+               <span className="hidden sm:inline text-xs uppercase tracking-wider">
+                 Run
+               </span>
             </button>
-            <button className="btn btn-ghost btn-circle" title="Share">
-              <Share2 className="w-5 h-5" />
-            </button>
-            <button 
-              className="btn btn-ghost btn-circle hover:bg-emerald-500/10 hover:text-emerald-500 transition-colors" 
-              onClick={toggleTheme}
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-            <select
-              className="select select-bordered select-primary w-32 md:w-40"
-              value={selectedLanguage}
-              onChange={handleLanguageChange}
-            >
-              {Object.keys(problem?.codeSnippet || {}).map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang.charAt(0).toUpperCase() + lang.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Centered small Run/Submit buttons */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex gap-2 items-center z-20">
-            {/* Run Button */}
+            <div className="w-px h-6 bg-base-content/10 my-auto mx-1"></div>
             <button
-              className="btn btn-primary btn-sm gap-2 min-w-[90px] flex items-center justify-center"
-              onClick={handleRunCode}
-              disabled={isRunExecuting}
-            >
-              {isRunExecuting ? (
-                <span className="loading loading-spinner w-4 h-4" />
-              ) : (
-                <Play className="w-4 h-4" />
-              )}
-              <span className="hidden sm:inline">Run</span>
-            </button>
-
-            {/* Submit Button */}
-            <button
-              className="btn btn-success btn-sm gap-2 min-w-[90px] flex items-center justify-center"
+              className="btn btn-sm bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white border-none rounded-lg h-9 px-6 gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all font-bold cursor-pointer"
               onClick={handleSubmitCode}
-              disabled={isContestLoading}
+              disabled={isContestLoading || cooldownSeconds > 0}
             >
-              {isContestLoading ? (
-                <span className="loading loading-spinner w-4 h-4" />
+              {cooldownSeconds > 0 ? (
+                <>
+                  <span className="loading loading-spinner w-3 h-3 text-white" />
+                  <span className="text-xs">{cooldownSeconds}s</span>
+                </>
+              ) : isContestLoading ? (
+                <span className="loading loading-spinner w-4 h-4 text-white" />
               ) : (
-                <Play className="w-4 h-4" />
+                <Cpu className="w-4 h-4 text-white" />
               )}
-              <span className="hidden sm:inline">Submit</span>
+              <span className="hidden sm:inline text-xs uppercase tracking-wider">
+                Submit
+              </span>
             </button>
           </div>
+
+           {/* Right Actions */}
+           <div className="flex items-center gap-3">
+             <div className="hidden md:flex bg-base-200/80 rounded-lg p-0.5 border border-base-content/5">
+                <select
+                  className="select select-xs select-ghost w-32 focus:outline-none focus:bg-transparent font-mono text-xs cursor-pointer bg-base-200"
+                  value={selectedLanguage}
+                  onChange={handleLanguageChange}
+                >
+                  {Object.keys(problem?.codeSnippet || {}).map((lang) => (
+                    <option key={lang} value={lang} className="bg-base-100">
+                      {lang.charAt(0).toUpperCase() + lang.slice(1)}
+                    </option>
+                  ))}
+                </select>
+             </div>
+
+             <div className="flex items-center gap-1 border-l border-base-content/10 pl-3 ml-2">
+                 <button className="btn btn-ghost btn-xs btn-square text-base-content/60 hover:bg-base-content/5 cursor-pointer" onClick={toggleTheme}>
+                   {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                 </button>
+                 <button 
+                  className="btn btn-ghost btn-xs btn-square text-base-content/60 hover:bg-base-content/5 cursor-pointer"
+                  onClick={() => setShowSettings(true)}
+                  title="Editor Settings"
+                 >
+                    <Settings className="w-4 h-4" />
+                 </button>
+                 <button className="btn btn-ghost btn-xs btn-square text-base-content/60 hover:bg-base-content/5 cursor-pointer"><Share2 className="w-4 h-4" /></button>
+             </div>
+           </div>
         </div>
       </nav>
 
-      {/* Main Content - Resizable Split Layout */}
-      <div className="h-[calc(100vh-68px)] flex gap-1 " ref={containerRef}>
-        {/* Left Panel - Problem Description */}
+      {/* Main Content */}
+      <div className="relative z-10 h-[calc(100vh-60px)] p-2 flex gap-2" ref={containerRef}>
+        
+        {/* Left Panel */}
         <div
-          className="bg-base-100 shadow-xl rounded-xl border-1 border-gray-600 flex flex-col"
+          className="bg-base-100/60 backdrop-blur-xl shadow-2xl rounded-2xl border border-base-content/5 flex flex-col overflow-hidden"
           style={{ width: `${leftPanelWidth}%` }}
         >
           {/* Tabs */}
-          <div className="tabs tabs-bordered rounded-t-xl bg-base-300">
-            <button
-              className={`tab gap-2 ${
-                activeTab === "description" ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab("description")}
-            >
-              <FileText className="w-4 h-4" />
-              Description
-            </button>
-            <button
-              className={`tab gap-2 ${
-                activeTab === "submissions" ? "tab-active" : ""
-              }`}
-              onClick={() => setActiveTab("submissions")}
-            >
-              <Code2 className="w-4 h-4" />
-              Submissions
-            </button>
+          <div className="flex px-2 pt-2 gap-1 border-b border-base-content/5 bg-base-200/30">
+             {[
+               { id: 'description', icon: FileText, label: 'Description' },
+               { id: 'submissions', icon: Code2, label: 'Submissions' },
+             ].map(tab => (
+               <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-t-xl text-xs font-bold uppercase tracking-wide transition-colors relative cursor-pointer ${activeTab === tab.id ? 'text-emerald-500 bg-base-100 shadow-sm' : 'text-base-content/50 hover:bg-base-200/50 hover:text-base-content'}`}
+               >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.label}
+                  {activeTab === tab.id && <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />}
+               </button>
+             ))}
           </div>
 
-          {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-6">{renderTabContent()}</div>
+          <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-base-content/10 hover:scrollbar-thumb-base-content/20">
+             {renderTabContent()}
+          </div>
         </div>
 
-        {/* Horizontal Resizable Divider */}
+        {/* Divider */}
         <div
-          className={`w-[4px] bg-base-300 hover:bg-blue-700 cursor-ew-resize flex items-center justify-center transition-colors ${
-            isDraggingHorizontal ? "bg-primary/30" : ""
+          className={`w-[6px] rounded-full hover:bg-emerald-500/50 cursor-ew-resize flex items-center justify-center transition-all group ${
+            isDraggingHorizontal ? "bg-emerald-500 ring-2 ring-emerald-500/20" : "bg-transparent"
           }`}
           onMouseDown={handleHorizontalMouseDown}
         >
-          <GripVertical className="w-4 h-4 text-base-content/50" />
+          <div className="h-8 w-1 rounded-full bg-base-content/20 group-hover:bg-white transition-colors"></div>
         </div>
 
-        {/* Right Panel - Code Editor and Results */}
+        {/* Right Panel */}
         <div
-          className="bg-base-100 shadow-xl flex flex-col gap-1 min-w-[200px] min-h-0 rounded-xl "
+          className="flex flex-col gap-2 min-w-[200px] min-h-0"
           style={{ width: `${100 - leftPanelWidth}%` }}
           ref={rightPanelRef}
         >
-          {/* Code Editor Section */}
+          {/* Editor */}
           <div
-            className="flex flex-col rounded-xl min-h-0   border-1 border-gray-600"
+            className="flex flex-col rounded-2xl overflow-hidden border border-base-content/5 bg-base-100/60 backdrop-blur-xl shadow-2xl"
             style={{ height: `${rightPanelEditorHeight}%` }}
           >
-            {/* Code Editor Header */}
-            <div className="tabs tabs-bordered flex-shrink-0 border-b bg-base-300 rounded-t-xl border-base-300">
-              <button className="tab tab-active gap-2">
-                <Terminal className="w-4 h-4 " />
-                Code Editor
-              </button>
-              <div className="flex-1"></div>
-              <button
-                className="cursor-pointer p-2 rounded-xl hover:bg-base-100 btn-sm mr-2"
-                onClick={() =>
-                  setRightPanelEditorHeight(
-                    rightPanelEditorHeight === 100 ? 70 : 100,
-                  )
-                }
-              >
-                {rightPanelEditorHeight === 100 ? "Show Results" : <Maximize />}
-              </button>
+            <div className="flex items-center justify-between px-4 py-2 bg-base-200/30 border-b border-base-content/5">
+               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-500">
+                  <Terminal className="w-4 h-4" />
+                  Code Editor
+               </div>
+               <div className="flex items-center gap-1">
+                 <button 
+                  className="p-1.5 rounded-lg hover:bg-base-content/5 text-base-content/60 transition-colors cursor-pointer"
+                  onClick={() => setShowSettings(true)}
+                 >
+                    <Settings className="w-3.5 h-3.5" />
+                 </button>
+                 <button
+                  className="p-1.5 rounded-lg hover:bg-base-content/5 text-base-content/60 transition-colors cursor-pointer"
+                  onClick={() => setRightPanelEditorHeight(rightPanelEditorHeight === 100 ? 70 : 100)}
+                >
+                  {rightPanelEditorHeight === 100 ? <GripHorizontal className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                </button>
+               </div>
             </div>
-            <div className="flex-1 min-h-0  rounded-xl overflow-hidden">
+            
+            <div className="flex-1 min-h-0 relative">
               <Editor
                 height="100%"
                 language={selectedLanguage.toLowerCase()}
@@ -585,41 +714,43 @@ const ContestProblemPage = () => {
                 value={code}
                 onChange={(value) => setCode(value || "")}
                 options={{
-                  minimap: { enabled: false },
-                  fontSize: 18,
-                  lineNumbers: "on",
+                  minimap: { enabled: editorSettings.minimap },
+                  fontSize: editorSettings.fontSize,
+                  lineNumbers: editorSettings.lineNumbers,
+                  wordWrap: editorSettings.wordWrap,
+                  fontLigatures: editorSettings.fontLigatures,
+                  tabSize: editorSettings.tabSize,
+                  roundedSelection: true,
                   scrollBeyondLastLine: false,
-                  readOnly: false,
                   automaticLayout: true,
                   smoothScrolling: true,
-                  glyphMargin: true,
-                  folding: true,
-                  foldingStrategy: "indentation",
-                  showFoldingControls: "always",
-                  lineNumbersMinChars: 3,
+                  cursorBlinking: "smooth",
+                  cursorSmoothCaretAnimation: "on",
+                  fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+                  padding: { top: 16 },
                   mouseWheelZoom: true,
-                  roundedSelection: true,
-                  }}
+                  theme: theme === 'dark' ? 'my-dark-theme' : 'vs-light'
+                }}
               />
             </div>
           </div>
 
-          {/* Vertical Resizable Divider - Hide when editor is fullscreen */}
+          {/* Vertical Divider */}
           {rightPanelEditorHeight < 100 && (
             <div
-              className={`h-[4px] bg-base-300 hover:bg-blue-700 cursor-ns-resize flex items-center justify-center transition-colors flex-shrink-0 ${
-                isDraggingVertical ? "bg-primary/30" : ""
+              className={`h-[6px] w-full rounded-full hover:bg-emerald-500/50 cursor-ns-resize flex items-center justify-center transition-all group ${
+                isDraggingVertical ? "bg-emerald-500 ring-2 ring-emerald-500/20" : "bg-transparent"
               }`}
               onMouseDown={handleVerticalMouseDown}
             >
-              <GripHorizontal className="w-4 h-4 text-base-content/50" />
+               <div className="w-8 h-1 rounded-full bg-base-content/20 group-hover:bg-white transition-colors"></div>
             </div>
           )}
 
-          {/* Results Section - Hide when editor is fullscreen */}
+          {/* Results */}
           {rightPanelEditorHeight < 100 && (
             <div
-              className="flex-1 overflow-y-auto  border-1 border-gray-600 rounded-xl p-4 bg-base-50 min-h-[100px]"
+              className="flex-1 overflow-hidden border border-base-content/5 rounded-2xl bg-base-100/60 backdrop-blur-xl shadow-2xl p-4 flex flex-col"
               style={{
                 height: `${100 - rightPanelEditorHeight}%`,
                 minHeight: "100px",

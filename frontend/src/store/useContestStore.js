@@ -363,7 +363,14 @@ export const useContestStore = create((set) => ({
         },
       );
       toast.success(res.data.message || "Code submitted successfully");
-      set({ contestSubmission: res.data.submission ,runResults: null }); // Assuming the response contains the submission data
+      set({ contestSubmission: res.data.submission }); // Store contest submission
+      
+      // Import execution store and clear runResults + trigger cooldown
+      const executionStore = await import("./useExecutionStore").then(
+        (module) => module.useExecutionStore
+      );
+      executionStore.setState({ runResults: null }); // Clear run results so submission shows
+      executionStore.getState().startCooldown(30); // Start cooldown timer
     } catch (error) {
       console.error("Error occurred in contest code submission", error);
       
