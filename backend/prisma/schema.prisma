@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -12,6 +6,322 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  String                @id @default(uuid())
+  name                String?
+  email               String                @unique
+  image               String?
+  password            String?
+  role                UserRole              @default(USER)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  clerkId             String?               @unique
+  emailVerified       Boolean               @default(false)
+  googleId            String?               @unique
+  ContestRegistration ContestRegistration[]
+  PatternProgress     PatternProgress[]
+  Payment             Payment[]
+  playlists           Playlist[]
+  Problem             Problem[]
+  solvedProblem       ProblemSolved[]
+  Submission          Submission[]
+  Subscription        Subscription?
+  UsageTracker        UsageTracker?
+}
+
+model Problem {
+  id                  String                @id @default(uuid())
+  title               String
+  description         String
+  difficulty          Difficulty
+  tags                String[]
+  userId              String
+  examples            Json
+  constraints         String
+  hints               String?
+  editorial           String?
+  testcase            Json
+  codeSnippet         Json
+  referenceSolution   Json
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  companyTags         String[]
+  CompanySheetProblem CompanySheetProblem[]
+  ContestProblem      ContestProblem[]
+  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ProblemInPattern    ProblemInPattern[]
+  problemInPlayLists  ProblemInPlayList[]
+  solvedBy            ProblemSolved[]
+  Submission          Submission[]
+}
+
+model Submission {
+  id             String            @id @default(uuid())
+  userId         String
+  problemId      String
+  sourceCode     Json
+  language       String
+  stdin          String?
+  stdout         String?
+  time           String?
+  stderr         String?
+  compile_output String?
+  status         String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  memory         String?
+  problem        Problem           @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  testCases      TeastCaseResult[]
+}
+
+model TeastCaseResult {
+  id            String     @id @default(uuid())
+  submissionId  String
+  testcase      Int
+  passed        Boolean
+  stdout        String?
+  expected      String
+  stderr        String?
+  compileOutput String?
+  status        String
+  memory        String?
+  time          String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  submission    Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+}
+
+model ProblemSolved {
+  id        String   @id @default(uuid())
+  userId    String
+  problemId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
+}
+
+model Playlist {
+  id          String              @id @default(uuid())
+  name        String
+  description String
+  userId      String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem     ProblemInPlayList[]
+
+  @@unique([name, userId])
+}
+
+model ProblemInPlayList {
+  id         String   @id @default(uuid())
+  playListId String
+  problemId  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  playlist   Playlist @relation(fields: [playListId], references: [id], onDelete: Cascade)
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([playListId, problemId])
+}
+
+model Contest {
+  id                  String                @id @default(uuid())
+  name                String
+  description         String?
+  startTime           DateTime
+  endTime             DateTime
+  createdAt           DateTime              @default(now())
+  createdBy           String
+  problems            ContestProblem[]
+  ContestRegistration ContestRegistration[]
+}
+
+model ContestProblem {
+  id        String  @id @default(uuid())
+  contestId String
+  problemId String
+  marks     Int     @default(0)
+  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+model ContestSubmission {
+  id             String   @id @default(uuid())
+  userId         String
+  contestId      String
+  problemId      String
+  sourceCode     Json
+  language       String
+  stdin          String?
+  stdout         String?
+  time           String?
+  stderr         String?
+  compile_output String?
+  status         String
+  memory         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  obtainedMarks  Int      @default(0)
+
+  @@index([contestId, userId])
+  @@index([contestId, obtainedMarks])
+}
+
+model ContestRegistration {
+  id        String   @id @default(uuid())
+  userId    String
+  contestId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  contest   Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contestId])
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  userId                 String             @unique
+  plan                   SubscriptionPlan   @default(FREE)
+  status                 SubscriptionStatus @default(ACTIVE)
+  paymentProvider        PaymentProvider?
+  providerSubscriptionId String?
+  providerCustomerId     String?
+  priceId                String?
+  amount                 Float?
+  currency               String?            @default("INR")
+  startDate              DateTime           @default(now())
+  endDate                DateTime?
+  trialEndDate           DateTime?
+  billingCycle           String?
+  canAccessCompanySheets Boolean            @default(false)
+  canAccessAIAnalysis    Boolean            @default(false)
+  maxProblemsPerMonth    Int                @default(50)
+  maxAIAnalysisPerMonth  Int                @default(10)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  payments               Payment[]
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usageTracker           UsageTracker?
+}
+
+model Payment {
+  id                String          @id @default(uuid())
+  userId            String
+  subscriptionId    String?
+  paymentProvider   PaymentProvider
+  providerPaymentId String
+  providerInvoiceId String?
+  amount            Float
+  currency          String          @default("USD")
+  status            String
+  description       String?
+  receiptUrl        String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  subscription      Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UsageTracker {
+  id                      String       @id @default(uuid())
+  userId                  String       @unique
+  subscriptionId          String       @unique
+  currentMonth            Int          @default(1)
+  currentYear             Int          @default(2024)
+  problemsSolvedThisMonth Int          @default(0)
+  aiAnalysisUsedThisMonth Int          @default(0)
+  companySheetAccessCount Int          @default(0)
+  monthlyUsageHistory     Json         @default("{}")
+  lastResetDate           DateTime     @default(now())
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime     @updatedAt
+  subscription            Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  user                    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CompanySheet {
+  id           String                @id @default(uuid())
+  name         String
+  slug         String                @unique
+  description  String?
+  color        String                @default("#3B82F6")
+  logoUrl      String?
+  isPremium    Boolean               @default(false)
+  requiredPlan SubscriptionPlan      @default(FREE)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  problems     CompanySheetProblem[]
+}
+
+model CompanySheetProblem {
+  id             String       @id @default(uuid())
+  companySheetId String
+  problemId      String
+  difficulty     String
+  frequency      Int          @default(0)
+  lastAskedDate  DateTime?
+  tags           String[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  companySheet   CompanySheet @relation(fields: [companySheetId], references: [id], onDelete: Cascade)
+  problem        Problem      @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([companySheetId, problemId])
+}
+
+model Pattern {
+  id              String             @id @default(uuid())
+  name            String             @unique
+  slug            String             @unique
+  description     String
+  link            String?
+  icon            String             @default("📚")
+  order           Int                @default(0)
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  patternProgress PatternProgress[]
+  problems        ProblemInPattern[]
+}
+
+model ProblemInPattern {
+  id        String   @id @default(uuid())
+  patternId String
+  problemId String
+  order     Int      @default(0)
+  link      String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pattern   Pattern  @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([patternId, problemId])
+}
+
+model PatternProgress {
+  id                String    @id @default(uuid())
+  userId            String
+  patternId         String
+  completedProblems Int       @default(0)
+  totalProblems     Int       @default(0)
+  lastSolvedAt      DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  pattern           Pattern   @relation(fields: [patternId], references: [id], onDelete: Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, patternId])
 }
 
 enum UserRole {
@@ -42,373 +352,4 @@ enum PaymentProvider {
   STRIPE
   RAZORPAY
   PAYPAL
-}
-
-model User {
-  id                  String                @id @default(uuid())
-  name                String?
-  email               String                @unique
-  image               String?
-  password            String?               // Nullable for OAuth users
-  googleId            String?               @unique // Google OAuth ID
-  clerkId             String?               @unique // Clerk ID (for future use)
-  emailVerified       Boolean               @default(false) // Email verification status
-  role                UserRole              @default(USER)
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  Problem             Problem[]
-  Submission          Submission[]
-  solvedProblem       ProblemSolved[]
-  playlists           Playlist[]
-  ContestRegistration ContestRegistration[]
-  Subscription        Subscription?
-  Payment             Payment[]
-  UsageTracker        UsageTracker?
-  PatternProgress     PatternProgress[]
-}
-
-model Problem {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  difficulty  Difficulty
-  tags        String[]
-  companyTags String[]
-  userId      String
-  examples    Json
-  constraints String
-  hints       String?
-  editorial   String?
-
-  testcase          Json
-  codeSnippet       Json
-  referenceSolution Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  //relationShip
-  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Submission          Submission[]
-  solvedBy            ProblemSolved[]
-  problemInPlayLists  ProblemInPlayList[]
-  ContestProblem      ContestProblem[]
-  CompanySheetProblem CompanySheetProblem[]
-  ProblemInPattern    ProblemInPattern[]
-}
-
-model Submission {
-  id             String  @id @default(uuid())
-  userId         String
-  problemId      String
-  sourceCode     Json
-  language       String
-  stdin          String?
-  stdout         String?
-  time           String?
-  stderr         String?
-  compile_output String?
-  status         String
-  memory         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem   Problem           @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  testCases TeastCaseResult[]
-}
-
-model TeastCaseResult {
-  id            String  @id @default(uuid())
-  submissionId  String
-  testcase      Int
-  passed        Boolean
-  stdout        String?
-  expected      String
-  stderr        String?
-  compileOutput String?
-  status        String
-  memory        String?
-  time          String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-
-  @@index([submissionId])
-}
-
-model ProblemSolved {
-  id        String @id @default(uuid())
-  userId    String
-  problemId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, problemId])
-}
-
-model Playlist {
-  id          String @id @default(uuid())
-  name        String
-  description String
-  userId      String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  problem ProblemInPlayList[]
-  user    User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([name, userId]) //unique playlist for each user
-}
-
-model ProblemInPlayList {
-  id         String @id @default(uuid())
-  playListId String
-  problemId  String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  playlist Playlist @relation(fields: [playListId], references: [id], onDelete: Cascade)
-  problem  Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
-  @@unique([playListId, problemId])
-}
-
-model Contest {
-  id                  String                @id @default(uuid())
-  name                String
-  description         String?
-  startTime           DateTime
-  endTime             DateTime
-  problems            ContestProblem[]
-  createdAt           DateTime              @default(now())
-  createdBy           String
-  ContestRegistration ContestRegistration[]
-}
-
-model ContestProblem {
-  id        String  @id @default(uuid())
-  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  contestId String
-  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  problemId String
-  marks     Int     @default(0)
-}
-
-model ContestSubmission {
-  id             String  @id @default(uuid())
-  userId         String
-  contestId      String
-  problemId      String
-  obtainedMarks  Int     @default(0)
-  sourceCode     Json
-  language       String
-  stdin          String?
-  stdout         String?
-  time           String?
-  stderr         String?
-  compile_output String?
-  status         String
-  memory         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([contestId, userId])
-  @@index([contestId, obtainedMarks])
-}
-
-model ContestRegistration {
-  id        String  @id @default(uuid())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  contest   Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  contestId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, contestId])
-}
-
-model Subscription {
-  id                     String             @id @default(uuid())
-  userId                 String             @unique
-  plan                   SubscriptionPlan   @default(FREE)
-  status                 SubscriptionStatus @default(ACTIVE)
-  paymentProvider        PaymentProvider?
-  providerSubscriptionId String? // Stripe subscription ID
-  providerCustomerId     String? // Stripe customer ID
-
-  priceId  String? // Price ID from payment provider
-  amount   Float? // Subscription amount
-  currency String? @default("INR")
-
-  startDate    DateTime  @default(now())
-  endDate      DateTime?
-  trialEndDate DateTime?
-
-  billingCycle String? // "monthly", "yearly"
-
-  canAccessCompanySheets Boolean @default(false)
-  canAccessAIAnalysis    Boolean @default(false)
-  maxProblemsPerMonth    Int     @default(50)
-  maxAIAnalysisPerMonth  Int     @default(10)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments     Payment[]
-  usageTracker UsageTracker?
-}
-
-model Payment {
-  id             String  @id @default(uuid())
-  userId         String
-  subscriptionId String?
-
-  paymentProvider   PaymentProvider
-  providerPaymentId String // Stripe payment intent ID
-  providerInvoiceId String? // Stripe invoice ID
-
-  amount   Float
-  currency String @default("USD")
-  status   String // "succeeded", "pending", "failed"
-
-  // Payment metadata
-  description String?
-  receiptUrl  String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-}
-
-model UsageTracker {
-  id             String @id @default(uuid())
-  userId         String @unique
-  subscriptionId String @unique
-
-  currentMonth Int @default(1) // 1-12
-  currentYear  Int @default(2024)
-
-  problemsSolvedThisMonth Int @default(0)
-  aiAnalysisUsedThisMonth Int @default(0)
-  companySheetAccessCount Int @default(0)
-
-  // Usage history (JSON field for detailed tracking)
-  monthlyUsageHistory Json @default("{}")
-
-  lastResetDate DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  // Relations
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-}
-
-model CompanySheet {
-  id          String  @id @default(uuid())
-  name        String // "Google", "Microsoft", etc.
-  slug        String  @unique // "google", "microsoft"
-  description String?
-  color       String  @default("#3B82F6") // Tailwind color
-  logoUrl     String?
-
-  isPremium    Boolean          @default(false)
-  requiredPlan SubscriptionPlan @default(FREE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  problems CompanySheetProblem[]
-}
-
-model CompanySheetProblem {
-  id             String @id @default(uuid())
-  companySheetId String
-  problemId      String
-
-  // Problem metadata for company sheet
-  difficulty    String // "Easy", "Medium", "Hard"
-  frequency     Int       @default(0) // How often asked (1-5)
-  lastAskedDate DateTime?
-  tags          String[] // Additional company-specific tags
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  companySheet CompanySheet @relation(fields: [companySheetId], references: [id], onDelete: Cascade)
-  problem      Problem      @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
-  @@unique([companySheetId, problemId])
-}
-
-model Pattern {
-  id          String   @id @default(uuid())
-  name        String   @unique // "Two Pointers", "Sliding Window"
-  slug        String   @unique // "two-pointers", "sliding-window"
-  description String
-  link        String? // Reference link/article about pattern
-  icon        String   @default("📚") // Icon/emoji for UI
-  order       Int      @default(0) // Display order
-  isActive    Boolean  @default(true) // Show/hide patterns
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  problems         ProblemInPattern[]
-  patternProgress  PatternProgress[]
-}
-
-model ProblemInPattern {
-  id        String  @id @default(uuid())
-  patternId String
-  problemId String
-  order     Int     @default(0) // Problem sequence within pattern
-  link      String? // Specific link for this problem in pattern context
-  notes     String? // Pattern-specific notes
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  pattern Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
-  @@unique([patternId, problemId])
-}
-
-model PatternProgress {
-  id                String    @id @default(uuid())
-  userId            String
-  patternId         String
-  completedProblems Int       @default(0)
-  totalProblems     Int       @default(0)
-  lastSolvedAt      DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  pattern Pattern @relation(fields: [patternId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, patternId])
 }
