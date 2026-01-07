@@ -6,7 +6,7 @@ echo "🔗 Checking database connection..."
 # Wait for database to be ready (max 30 seconds)
 TIMEOUT=30
 ELAPSED=0
-until npx prisma db execute --stdin <<< "SELECT 1" > /dev/null 2>&1 || [ $ELAPSED -ge $TIMEOUT ]; do
+until echo "SELECT 1" | npx prisma db execute --stdin > /dev/null 2>&1 || [ $ELAPSED -ge $TIMEOUT ]; do
   echo "⏳ Waiting for database..."
   sleep 2
   ELAPSED=$((ELAPSED + 2))
