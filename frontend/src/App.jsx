@@ -28,6 +28,7 @@ import PatternsPage from "./page/PatternsPage";
 import PatternDetailPage from "./page/PatternDetailPage";
 import ManagePatternsPage from "./page/ManagePatternsPage";
 import AdminMonitoringPage from "./page/AdminMonitoringPage";
+import PrivacyPolicy from "./page/PrivacyPolicy";
 
 
 const App = () => {
@@ -68,6 +69,10 @@ const App = () => {
         <Route
           path="/"
           element={<HomePage />}
+        />
+        <Route
+          path="/privacy-policy"
+          element={<PrivacyPolicy />}
         />
 
         {/* Protected routes with Layout */}

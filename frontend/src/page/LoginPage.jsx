@@ -105,7 +105,7 @@ function LoginPage() {
 
              <div className="text-center">
                <p className="text-xs text-slate-500 mt-6">
-                  By continuing, you agree to our <span className="text-emerald-500 cursor-pointer hover:underline">Terms of Service</span>.
+                  By continuing, you agree to our <span className="text-emerald-500 cursor-pointer hover:underline"> <Link  to="/privacy-policy">Terms of Service</Link></span>.
                </p>
              </div>
           </motion.div>

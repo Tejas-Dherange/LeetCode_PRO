@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { Code2, Zap, Trophy, TrendingUp, Users, Target, Sparkles, Rocket, Shield, CheckCircle, Laptop } from "lucide-react";
+import { Code2, Zap, Trophy, TrendingUp, Users, Target, Sparkles, Rocket, Shield, CheckCircle, Laptop, Mail } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
 function HomePage() {
@@ -11,7 +11,6 @@ function HomePage() {
   const y1 = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
 
-  const [stats, setStats] = useState({ problems: 0, users: 0, contests: 0 });
   const [typedText, setTypedText] = useState("");
   const fullText = "Master the art of problem-solving";
 
@@ -32,27 +31,6 @@ function HomePage() {
     }, 1500); // 1.5s delay to wait for entrance animations
 
     return () => clearTimeout(startDelay);
-  }, []);
-
-  // Stats counter animation
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const interval = duration / steps;
-    
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      setStats({
-        problems: Math.floor((500 * step) / steps),
-        users: Math.floor((1200 * step) / steps),
-        contests: Math.floor((50 * step) / steps),
-      });
-      
-      if (step >= steps) clearInterval(timer);
-    }, interval);
-    
-    return () => clearInterval(timer);
   }, []);
 
   // Animation Variants
@@ -192,30 +170,58 @@ function HomePage() {
         </motion.div>
       </header>
 
-      {/* Stats Section */}
+      {/* Feature Highlights Section - Authentic, No Fake Stats */}
       <section className="py-20 relative z-10 border-t border-slate-800/50 bg-slate-950/50 backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { icon: Code2, label: "Problems", value: stats.problems, color: "text-emerald-400" },
-            { icon: Users, label: "Active Users", value: stats.users, color: "text-blue-400" },
-            { icon: Trophy, label: "Contests", value: stats.contests, color: "text-yellow-400" },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ y: -5 }}
-              className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-slate-700 transition-colors text-center group"
-            >
-              <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-800 group-hover:bg-slate-800/80 transition-colors">
-                <stat.icon className={`w-8 h-8 ${stat.color}`} />
-              </div>
-              <div className="text-4xl font-bold text-white mb-2">{stat.value}+</div>
-              <div className="text-slate-400 font-medium">{stat.label}</div>
-            </motion.div>
-          ))}
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">What Makes Us Different</h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">Focus on what matters - clean interface, quality problems, fair competition</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Zap,
+                title: "Real-Time Execution",
+                desc: "Judge0 API integration with live test results and instant feedback",
+                color: "text-yellow-400",
+                bgColor: "bg-yellow-500/10",
+                hoverBorderColor: "hover:border-yellow-500/30"
+              },
+              {
+                icon: Trophy,
+                title: "Live Leaderboards",
+                desc: "Real-time contest rankings with WebSocket updates - watch your rank change instantly",
+                color: "text-emerald-400",
+                bgColor: "bg-emerald-500/10",
+                hoverBorderColor: "hover:border-emerald-500/30"
+              },
+              {
+                icon: Shield,
+                title: "Secure & Fast",
+                desc: "Redis caching, rate limiting, and optimized database queries for smooth experience",
+                color: "text-blue-400",
+                bgColor: "bg-blue-500/10",
+                hoverBorderColor: "hover:border-blue-500/30"
+              },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ y: -5 }}
+                className={`bg-slate-900/50 p-8 rounded-2xl border border-slate-800 ${feature.hoverBorderColor} transition-all group`}
+              >
+                <div className={`mb-4 inline-flex items-center justify-center w-16 h-16 rounded-2xl ${feature.bgColor} transition-colors`}>
+                  <feature.icon className={`w-8 h-8 ${feature.color}`} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
+                <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -309,8 +315,56 @@ function HomePage() {
 
       {/* Footer */}
       <footer className="bg-slate-950 py-10 border-t border-slate-900">
-        <div className="text-center text-slate-500 text-sm">
-          <p>&copy; 2025 CodeLoom. Crafted with <span className="text-emerald-500 animate-pulse">❤️</span> for developers.</p>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* About */}
+            <div>
+              <h3 className="text-white font-bold mb-3">CodeLoom</h3>
+              <p className="text-slate-500 text-sm">
+                A premium coding platform built for developers who value quality over quantity.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-white font-bold mb-3">Quick Links</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link to="/dashboard" className="text-slate-500 hover:text-emerald-400 text-sm transition-colors">
+                    Problems
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/dashboard/contest" className="text-slate-500 hover:text-emerald-400 text-sm transition-colors">
+                    Contests
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy-policy" className="text-slate-500 hover:text-emerald-400 text-sm transition-colors">
+                    Privacy Policy
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h3 className="text-white font-bold mb-3">Contact</h3>
+              <div className="space-y-2">
+                <a 
+                  href="mailto:tejasdherange0099@gmail.com" 
+                  className="text-slate-500 hover:text-emerald-400 text-sm transition-colors flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  tejasdherange0099@gmail.com
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center text-slate-500 text-sm pt-8 border-t border-slate-900">
+            <p>&copy; 2025 CodeLoom. Crafted with <span className="text-emerald-500 animate-pulse">❤️</span> for developers.</p>
+          </div>
         </div>
       </footer>
     </div>
