@@ -28,7 +28,7 @@ export const useContestStore = create((set) => ({
   getContestById: async (id) => {
     try {
       set({ isContestLoading: true });
-      console.log("Fetching contest with ID:", id);
+      // console.log("Fetching contest with ID:", id);
 
       const res = await axiosInstance.get(`/contest/get-contest/${id}`);
       console.log("Contest fetched successfully:", res.data);
@@ -178,7 +178,7 @@ export const useContestStore = create((set) => ({
       const res = await axiosInstance.get(
         "/contest/getAllProblemsSolvedByUser",
       );
-      console.log(res);
+      // console.log(res);
       set({ solvedProblems: res.data.problemSolvedByUser });
       // toast.success(res.data.message);
     } catch (error) {
@@ -196,7 +196,7 @@ export const useContestStore = create((set) => ({
         `/contest/update-contest/${id}`,
         updatedData,
       );
-      console.log(res);
+      // console.log(res);
       set((state) => ({
         contests: state.contests.map((contest) =>
           contest._id === id
@@ -217,7 +217,7 @@ export const useContestStore = create((set) => ({
         `/contest/update-problem/${contestId}/${problemId}`,
         updatedData,
       );
-      console.log(res);
+      // console.log(res);
       // Optionally update the contest state with the updated problem
       toast.success(res.data.message || "Problem updated successfully");
     } catch (error) {
@@ -231,7 +231,7 @@ export const useContestStore = create((set) => ({
       const res = await axiosInstance.delete(
         `/contest/delete-problem/${contestId}/${problemId}`,
       );
-      console.log(res);
+      // console.log(res);
       // Optionally update the contest state to remove the deleted problem
       toast.success(res.data.message || "Problem deleted successfully");
     } catch (error) {
@@ -348,9 +348,9 @@ export const useContestStore = create((set) => ({
     contestId,
   ) => {
     try {
-      // console.log("Submitting contest code with data:", submissionData);
-
       set({ isContestLoading: true });
+      
+      // Use the contest-specific endpoint
       const res = await axiosInstance.post(
         "/contest/contest-submission/submit-code",
         {
@@ -362,8 +362,12 @@ export const useContestStore = create((set) => ({
           contestId,
         },
       );
+      
       toast.success(res.data.message || "Code submitted successfully");
-      set({ contestSubmission: res.data.submission }); // Store contest submission
+      
+      // The worker returns: { contestSubmission, submission, allPassed, obtainedMarks, results }
+      // Store the submission object which has testCases populated
+      set({ contestSubmission: res.data.submission });
       
       // Import execution store and clear runResults + trigger cooldown
       const executionStore = await import("./useExecutionStore").then(

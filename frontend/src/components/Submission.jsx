@@ -42,9 +42,9 @@ const Submission = ({ submission }) => {
       .map((t) => parseFloat(t))
       .reduce((a, b) => a + b, 0) / timeArr.length;
 
-  const passedTests = submission.testCases.filter((tc) => tc.passed).length;
-  const totalTests = submission.testCases.length;
-  const successRate = (passedTests / totalTests) * 100;
+  const passedTests = submission.testCases?.filter((tc) => tc.passed).length || 0;
+  const totalTests = submission.testCases?.length || 0;
+  const successRate = totalTests > 0 ? (passedTests / totalTests) * 100 : 0;
 
   const { isLLMLoading, complexity: rawComplexity, getComplexity } = useAiStore();
 
@@ -177,50 +177,56 @@ const Submission = ({ submission }) => {
             )}
           </div>
           <div className="overflow-x-auto">
-            <table className="table w-full">
-              <thead>
-                <tr className="border-b border-base-300">
-                  <th className="bg-base-200">Status</th>
-                  <th className="bg-base-200">Expected</th>
-                  <th className="bg-base-200">Output</th>
-                  <th className="bg-base-200">Memory</th>
-                  <th className="bg-base-200">Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submission.testCases.map((testCase) => (
-                  <tr key={testCase.id} className="border-b border-base-200 hover:bg-base-200/50 transition-colors">
-                    <td>
-                      {testCase.passed ? (
-                        <div className="badge badge-success gap-2 py-3">
-                          <CheckCircle2 className="w-4 h-4" />
-                          Passed
-                        </div>
-                      ) : (
-                        <div className="badge badge-error gap-2 py-3">
-                          <XCircle className="w-4 h-4" />
-                          Failed
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      <div className="bg-base-300 px-3 py-2 rounded font-mono text-sm max-w-xs">
-                        <pre className="whitespace-pre-wrap break-words">{testCase.expected}</pre>
-                      </div>
-                    </td>
-                    <td>
-                      <div className={`px-3 py-2 rounded font-mono text-sm max-w-xs ${
-                        testCase.passed ? 'bg-success/10 text-success' : 'bg-error/10 text-error'
-                      }`}>
-                        <pre className="whitespace-pre-wrap break-words">{testCase.stdout || "null"}</pre>
-                      </div>
-                    </td>
-                    <td className="font-mono text-sm">{testCase.memory}</td>
-                    <td className="font-mono text-sm">{testCase.time}</td>
+            {submission.testCases && submission.testCases.length > 0 ? (
+              <table className="table w-full">
+                <thead>
+                  <tr className="border-b border-base-300">
+                    <th className="bg-base-200">Status</th>
+                    <th className="bg-base-200">Expected</th>
+                    <th className="bg-base-200">Output</th>
+                    <th className="bg-base-200">Memory</th>
+                    <th className="bg-base-200">Time</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {submission.testCases.map((testCase) => (
+                    <tr key={testCase.id} className="border-b border-base-200 hover:bg-base-200/50 transition-colors">
+                      <td>
+                        {testCase.passed ? (
+                          <div className="badge badge-success gap-2 py-3">
+                            <CheckCircle2 className="w-4 h-4" />
+                            Passed
+                          </div>
+                        ) : (
+                          <div className="badge badge-error gap-2 py-3">
+                            <XCircle className="w-4 h-4" />
+                            Failed
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <div className="bg-base-300 px-3 py-2 rounded font-mono text-sm max-w-xs">
+                          <pre className="whitespace-pre-wrap break-words">{testCase.expected}</pre>
+                        </div>
+                      </td>
+                      <td>
+                        <div className={`px-3 py-2 rounded font-mono text-sm max-w-xs ${
+                          testCase.passed ? 'bg-success/10 text-success' : 'bg-error/10 text-error'
+                        }`}>
+                          <pre className="whitespace-pre-wrap break-words">{testCase.stdout || "null"}</pre>
+                        </div>
+                      </td>
+                      <td className="font-mono text-sm">{testCase.memory}</td>
+                      <td className="font-mono text-sm">{testCase.time}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center py-8 text-base-content/60">
+                <p>Test case details not available for this submission.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

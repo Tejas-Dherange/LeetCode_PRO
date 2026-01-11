@@ -56,13 +56,12 @@ const ContestProblemPage = () => {
   } = useSubmissionStore();
 
   // Contest Store
-  const {
-    contestSubmitCode,
-    isContestLoading,
-    contestSubmissions,
-    getContestSubmissionForProblem,
-    contestSubmission,
-  } = useContestStore();
+  // Contest Store - use explicit selectors to ensure re-renders
+  const contestSubmitCode = useContestStore((state) => state.contestSubmitCode);
+  const isContestLoading = useContestStore((state) => state.isContestLoading);
+  const contestSubmissions = useContestStore((state) => state.contestSubmissions);
+  const getContestSubmissionForProblem = useContestStore((state) => state.getContestSubmissionForProblem);
+  const contestSubmission = useContestStore((state) => state.contestSubmission);
 
   const [code, setCode] = useState("");
   const [activeTab, setActiveTab] = useState("description");
@@ -120,11 +119,19 @@ const ContestProblemPage = () => {
   useEffect(() => {
     getProblemById(id);
     getSubmissionCountForProblem(id);
+    
+    // Clear execution store states when navigating to a different problem
     if (useExecutionStore.getState().clearRunResults) {
       useExecutionStore.getState().clearRunResults();
     }
     if (useExecutionStore.getState().submission !== null) {
       useExecutionStore.setState({ submission: null });
+    }
+    
+    // CRITICAL: Clear contest submission when changing problems
+    // This prevents old submission from one problem appearing on another
+    if (useContestStore.getState().contestSubmission !== null) {
+      useContestStore.setState({ contestSubmission: null });
     }
   }, [id]);
 
@@ -356,8 +363,7 @@ const ContestProblemPage = () => {
       const stdin = problem.testcase.map((tc) => tc.input);
       const expected_outputs = problem.testcase.map((tc) => tc.output);
       
-      // Clear previous contest submission output before submitting new code
-      useContestStore.setState({ contestSubmission: null });
+      // Call contest submit - the store will handle state updates
       contestSubmitCode(executableCode, language_id, stdin, expected_outputs, id, cid);
     } catch (error) {
       console.error("error in submitting code", error);
