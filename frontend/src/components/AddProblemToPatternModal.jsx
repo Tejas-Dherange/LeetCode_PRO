@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { X, Search, Plus, Link as LinkIcon, FileText, Hash } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { X, Search, Plus, Link as LinkIcon, FileText, Hash, Loader2 } from "lucide-react";
 import { usePatternStore } from "../store/usePatternStore";
 import { useProblemStore } from "../store/useProblemStore";
 
 const AddProblemToPatternModal = ({ patternId, initialOrder, onClose }) => {
   const { addProblemToPattern } = usePatternStore();
-  const { problems, getAllProblems } = useProblemStore();
+  const { problems, getAllProblems, loadMoreProblems, isLoadingMore, pagination } = useProblemStore();
   
   const [selectedProblem, setSelectedProblem] = useState("");
   const [order, setOrder] = useState(initialOrder || 0);
@@ -13,8 +13,12 @@ const AddProblemToPatternModal = ({ patternId, initialOrder, onClose }) => {
   const [notes, setNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const problemListRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
+    // Fetch initial problems when modal opens
     if (problems.length === 0) {
       getAllProblems();
     }
@@ -25,6 +29,28 @@ const AddProblemToPatternModal = ({ patternId, initialOrder, onClose }) => {
       setOrder(initialOrder);
     }
   }, [initialOrder]);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container || isLoadingMore || !pagination.hasMore) return;
+
+    const scrollPosition = container.scrollTop + container.clientHeight;
+    const scrollHeight = container.scrollHeight;
+    
+    // Load more when scrolled to 80% of the list
+    if (scrollPosition >= scrollHeight * 0.8) {
+      loadMoreProblems();
+    }
+  }, [isLoadingMore, pagination.hasMore, loadMoreProblems]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const filteredProblems = problems.filter((problem) =>
     problem.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -90,26 +116,73 @@ const AddProblemToPatternModal = ({ patternId, initialOrder, onClose }) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              <div className="border border-base-300 rounded-lg overflow-hidden">
-                <select
-                  className="select select-bordered w-full h-48 focus:outline-none border-none"
-                  value={selectedProblem}
-                  onChange={(e) => setSelectedProblem(e.target.value)}
-                  required
-                  size={8}
-                >
-                  <option value="" disabled className="text-base-content/40 py-2">-- Select a problem from the list --</option>
-                  {filteredProblems.map((problem) => (
-                    <option key={problem.id} value={problem.id} className="py-2 px-2 hover:bg-base-200 cursor-pointer border-b border-base-100 last:border-none">
-                      {problem.title} • {problem.difficulty}
-                    </option>
-                  ))}
-                </select>
+              
+              {/* Custom scrollable problem list */}
+              <div 
+                ref={scrollContainerRef}
+                className="border border-base-300 rounded-lg overflow-y-auto h-64 bg-base-100"
+              >
+                <div ref={problemListRef} className="p-2 space-y-1">
+                  {filteredProblems.length === 0 && !isLoadingMore ? (
+                    <div className="py-8 text-center text-base-content/60">
+                      {searchTerm ? "No problems found matching your search" : "No problems available"}
+                    </div>
+                  ) : (
+                    <>
+                      {filteredProblems.map((problem) => (
+                        <div
+                          key={problem.id}
+                          onClick={() => setSelectedProblem(problem.id)}
+                          className={`
+                            px-4 py-3 rounded-lg cursor-pointer transition-all border
+                            ${selectedProblem === problem.id 
+                              ? 'bg-primary text-primary-content border-primary shadow-md' 
+                              : 'bg-base-200 hover:bg-base-300 border-transparent'}
+                          `}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-sm">{problem.title}</span>
+                            <span className={`
+                              badge badge-sm
+                              ${problem.difficulty === 'EASY' ? 'badge-success' : ''}
+                              ${problem.difficulty === 'MEDIUM' ? 'badge-warning' : ''}
+                              ${problem.difficulty === 'HARD' ? 'badge-error' : ''}
+                            `}>
+                              {problem.difficulty}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Loading indicator at bottom */}
+                      {isLoadingMore && (
+                        <div className="py-4 flex items-center justify-center gap-2 text-base-content/60">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-sm">Loading more problems...</span>
+                        </div>
+                      )}
+                      
+                      {/* End of list indicator */}
+                      {!pagination.hasMore && filteredProblems.length > 0 && (
+                        <div className="py-3 text-center text-xs text-base-content/40">
+                          All problems loaded
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
+              
               <label className="label">
                 <span className="label-text-alt text-base-content/60">
-                  {filteredProblems.length} problems found
+                  {filteredProblems.length} of {pagination.total || problems.length} problems
+                  {searchTerm && ` matching "${searchTerm}"`}
                 </span>
+                {!selectedProblem && (
+                  <span className="label-text-alt text-error">
+                    Please select a problem
+                  </span>
+                )}
               </label>
             </div>
 
