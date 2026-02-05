@@ -251,7 +251,7 @@ const ProblemPage = () => {
                    <Code2 className="w-5 h-5 text-emerald-500" />
                    Examples:
                 </h3>
-                {Object.entries(problem?.examples).map(
+                {Object.entries(problem?.examples).slice(0, 3).map(
                   ([lang, example], idx) => (
                     <div
                       key={lang}
