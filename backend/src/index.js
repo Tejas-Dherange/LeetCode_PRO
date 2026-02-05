@@ -28,7 +28,7 @@ import { app, server } from "../socket/socket.js";
 import "../workers/codeExecutionWorker.js"; // Start the worker
 
 // const app = express(); // Removed in favor of app from socket.js
-
+//updated judge0 api key
 app.use(
   cors({
     origin: [
