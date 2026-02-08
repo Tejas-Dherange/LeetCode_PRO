@@ -9,6 +9,11 @@ export const useMonitoringStore = create((set, get) => ({
   redisMetrics: null,
   submissionAnalytics: null,
   systemHealth: null,
+  userAnalytics: null,
+  problemStats: null,
+  topUsers: null,
+  usersList: null,
+  activityTimeline: null,
   isLoading: false,
   lastUpdated: null,
   autoRefreshInterval: null,
@@ -62,6 +67,68 @@ export const useMonitoringStore = create((set, get) => ({
     }
   },
 
+  // New Analytics Methods
+  fetchUserAnalytics: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/users/analytics");
+      set({ userAnalytics: res.data.data });
+    } catch (error) {
+      console.error("Error fetching user analytics:", error);
+      toast.error("Failed to fetch user analytics");
+    }
+  },
+
+  fetchProblemStats: async () => {
+    try {
+      const res = await axiosInstance.get("/admin/monitoring/problems/stats");
+      set({ problemStats: res.data.data });
+    } catch (error) {
+      console.error("Error fetching problem stats:", error);
+      toast.error("Failed to fetch problem statistics");
+    }
+  },
+
+  fetchTopUsers: async (limit = 10) => {
+    try {
+      const res = await axiosInstance.get(`/admin/monitoring/users/top?limit=${limit}`);
+      set({ topUsers: res.data.data });
+    } catch (error) {
+      console.error("Error fetching top users:", error);
+      toast.error("Failed to fetch top users");
+    }
+  },
+
+  fetchUsersList: async (page = 1, search = "") => {
+    try {
+      const res = await axiosInstance.get(`/admin/monitoring/users?page=${page}&limit=20&search=${search}`);
+      set({ usersList: res.data.data });
+    } catch (error) {
+      console.error("Error fetching users list:", error);
+      toast.error("Failed to fetch users list");
+    }
+  },
+
+  fetchActivityTimeline: async (period = "7d") => {
+    try {
+      const res = await axiosInstance.get(`/admin/monitoring/activity?period=${period}`);
+      set({ activityTimeline: res.data.data });
+    } catch (error) {
+      console.error("Error fetching activity timeline:", error);
+      toast.error("Failed to fetch activity timeline");
+    }
+  },
+
+  fetchUserDetails: async (userId) => {
+    try {
+      const res = await axiosInstance.get(`/admin/monitoring/users/${userId}/details`);
+      return res.data.data;
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      toast.error("Failed to fetch user details");
+      return null;
+    }
+  },
+
   fetchAllMetrics: async () => {
     set({ isLoading: true });
     try {
@@ -71,6 +138,21 @@ export const useMonitoringStore = create((set, get) => ({
         get().fetchRedisMetrics(),
         get().fetchSubmissionAnalytics(),
         get().fetchSystemHealth(),
+      ]);
+    } finally {
+      set({ isLoading: false, lastUpdated: new Date() });
+    }
+  },
+
+  fetchAllAnalytics: async () => {
+    set({ isLoading: true });
+    try {
+      await Promise.all([
+        get().fetchUserAnalytics(),
+        get().fetchProblemStats(),
+        get().fetchTopUsers(),
+        get().fetchUsersList(),
+        get().fetchActivityTimeline(),
       ]);
     } finally {
       set({ isLoading: false, lastUpdated: new Date() });

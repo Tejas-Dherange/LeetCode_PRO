@@ -6,6 +6,12 @@ import {
   getRedisMetrics,
   getSubmissionAnalytics,
   getSystemHealth,
+  getUserAnalytics,
+  getProblemSolvingStats,
+  getTopUsers,
+  getUsersList,
+  getUserActivityTimeline,
+  getUserDetails,
 } from "../controllers/monitoring.controller.js";
 
 const router = express.Router();
@@ -24,11 +30,19 @@ const requireAdmin = (req, res, next) => {
 // All monitoring routes require authentication and admin role
 router.use(isLoggedIn, requireAdmin);
 
-// Monitoring endpoints
+// System monitoring endpoints
 router.get("/queue", getQueueStatus);
 router.get("/judge0", getJudge0Health);
 router.get("/redis", getRedisMetrics);
 router.get("/submissions", getSubmissionAnalytics);
 router.get("/system", getSystemHealth);
+
+// User analytics endpoints
+router.get("/users/analytics", getUserAnalytics);
+router.get("/problems/stats", getProblemSolvingStats);
+router.get("/users/top", getTopUsers);
+router.get("/users", getUsersList);
+router.get("/users/:userId/details", getUserDetails);
+router.get("/activity", getUserActivityTimeline);
 
 export default router;

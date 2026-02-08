@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { User, Code, LogOut, Trophy, Moon, Sun, Sheet, BookOpen, Activity } from "lucide-react";
+import { User, Code, LogOut, Trophy, Moon, Sun, Sheet, BookOpen, Activity, BarChart3 } from "lucide-react";
 import useAuthStore from "../store/useAuthStore";
 import LogoutButton from "./LogoutButton";
 import { useEffect, useState } from "react";
@@ -169,6 +169,17 @@ const Navbar = () => {
                   >
                     <Activity className="w-4 h-4 mr-1" />
                     Monitoring Dashboard
+                  </Link>
+                </li>
+              )}
+              {authUser?.role === "ADMIN" && (
+                <li>
+                  <Link
+                    to="/admin/analytics"
+                    className="hover:bg-info hover:text-white text-base font-semibold"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-1" />
+                    User Analytics
                   </Link>
                 </li>
               )}

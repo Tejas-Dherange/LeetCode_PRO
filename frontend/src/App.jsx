@@ -28,6 +28,7 @@ import PatternsPage from "./page/PatternsPage";
 import PatternDetailPage from "./page/PatternDetailPage";
 import ManagePatternsPage from "./page/ManagePatternsPage";
 import AdminMonitoringPage from "./page/AdminMonitoringPage";
+import AdminAnalyticsPage from "./page/AdminAnalyticsPage";
 import PrivacyPolicy from "./page/PrivacyPolicy";
 
 
@@ -121,6 +122,7 @@ const App = () => {
           <Route path="/add-problem" element={<AddProblemPage />} />
           <Route path="/admin/patterns" element={<ManagePatternsPage />} />
           <Route path="/admin/monitoring" element={<AdminMonitoringPage />} />
+          <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
         </Route>
       </Routes>
     </div>
