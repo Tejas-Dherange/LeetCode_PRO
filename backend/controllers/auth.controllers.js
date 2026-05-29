@@ -253,7 +253,7 @@ const googleCallback = async (req, res) => {
     const user = req.user;
 
     if (!user) {
-      const frontendURL = process.env.FRONTEND_URL || "https://www.codeloomhq.me";
+      const frontendURL = process.env.FRONTEND_URL ||   "https://www.codeloomhq.me";
       return res.redirect(`${frontendURL}/login?error=authentication_failed`);
     }
 
