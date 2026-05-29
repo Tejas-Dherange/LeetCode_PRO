@@ -253,7 +253,7 @@ const googleCallback = async (req, res) => {
     const user = req.user;
 
     if (!user) {
-      const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+      const frontendURL = process.env.FRONTEND_URL || "https://www.codeloomhq.me";
       return res.redirect(`${frontendURL}/login?error=authentication_failed`);
     }
 
@@ -271,11 +271,11 @@ const googleCallback = async (req, res) => {
     });
 
     // Redirect to client home page
-    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloomhq.me";
     return res.redirect(`${frontendURL}/dashboard`);
   } catch (error) {
     console.log(error);
-    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloom.software";
+    const frontendURL = process.env.FRONTEND_URL || "https://www.codeloomhq.me";
     return res.redirect(`${frontendURL}/login?error=server_error`);
   }
 };
