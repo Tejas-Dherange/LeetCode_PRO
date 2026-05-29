@@ -9,12 +9,17 @@ import toast from "react-hot-toast";
 export const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
     // Redirect to backend Google OAuth endpoint
-    const backendUrl =
-      import.meta.env.MODE === "development"
-        ? "http://localhost:3000"
-        : "https://api.codeloom.software";
+    const backendBase = import.meta.env.MODE === "development"
+      ? "http://localhost:3000"
+      : (import.meta.env.VITE_API_BASE_URL || "https://api.codeloomhq.me/api/v1");
 
-    window.location.href = `${backendUrl}/api/v1/user/google`;
+    // If VITE_API_BASE_URL contains the full API path (e.g. includes /api/v1), use it directly,
+    // otherwise append the standard `/api/v1` prefix.
+    const redirectUrl = backendBase.endsWith("/api/v1")
+      ? `${backendBase}/user/google`
+      : `${backendBase}/api/v1/user/google`;
+
+    window.location.href = redirectUrl;
   };
 
   return (

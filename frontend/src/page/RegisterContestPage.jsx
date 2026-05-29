@@ -167,9 +167,12 @@ function RegisterContestPage() {
     let socket;
     try {
        // Determine socket URL based on environment (assume same host as API or specific config)
-       const socketUrl = import.meta.env.MODE === "development" 
-         ? "http://localhost:3000" 
-         : "https://api.codeloom.software"; 
+       const socketBase = import.meta.env.MODE === "development"
+         ? "http://localhost:3000"
+         : (import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_BASE_URL || "https://api.codeloomhq.me/api/v1");
+
+       // socket.io expects the origin (no /api path). Strip any trailing /api/v1 if present.
+       const socketUrl = socketBase.replace(/\/api\/v1\/?$/, "");
 
        socket = io(socketUrl);
 
