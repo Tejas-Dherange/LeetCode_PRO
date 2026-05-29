@@ -33,8 +33,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-    "https://codeloom.software",
-    "https://www.codeloom.software",
+    "https://codeloomhq.me",
+    "https://www.codeloomhq.me",
     "https://leet-code-pro.vercel.app"
     ],
     credentials: true,
