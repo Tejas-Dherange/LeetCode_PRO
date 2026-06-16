@@ -22,7 +22,9 @@ const getJudge0Headers = () => {
 
   // If API key is set, add Authorization header (for RapidAPI/Sulu)
   if (process.env.JUDGE0_SULU_API_KEY && process.env.JUDGE0_SULU_API_KEY.trim()) {
-    headers["X-Auth-Token"] = process.env.JUDGE0_SULU_API_KEY;
+    // headers["X-Auth-Token"] = process.env.JUDGE0_SULU_API_KEY;
+     headers["x-rapidapi-key"] = process.env.JUDGE0_SULU_API_KEY;       // ← correct header name
+     headers["x-rapidapi-host"] = "judge0-ce.p.rapidapi.com"; 
     console.log('[Judge0] Using API authentication (RapidAPI/Sulu)');
   } else {
     console.log('[Judge0] Using self-hosted mode (no auth)');
